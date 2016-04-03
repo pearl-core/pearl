@@ -105,12 +105,13 @@ function parse_arguments(){
 function execute_operation(){
 	$OPT_HELP && usage && return
 
-	# Ensure to load the repos at least once
-	pearl_load_repos
+	$COMMAND_INIT && { pearl_init; return; }
 
+	# Ensure to load the repos at least once
+    pearl_load_repos
+	
 	$COMMAND_LIST && { pearl_package_list; return; }
 	$COMMAND_SEARCH && { pearl_package_list ${COMMAND_ARGS[@]}; return; }
-	$COMMAND_INIT && { pearl_init; return; }
 
 	local final_res=0
 	if $COMMAND_INSTALL; then

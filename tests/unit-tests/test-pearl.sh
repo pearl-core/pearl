@@ -103,7 +103,7 @@ function test_pearl_no_pearl_root_directory(){
 
 function test_pearl_init(){
     assertCommandSuccess pearl_wrap init
-    assertEquals "$(echo -e "pearl_load_repos\npearl_init ")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "pearl_init ")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_install(){
