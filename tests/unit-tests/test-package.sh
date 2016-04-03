@@ -47,7 +47,7 @@ PEARL_PACKAGES[pearl-ssh]="https://pearl-ssh"
 PEARL_PACKAGES[ls-colors]="https://ls-colors"
 EOF
 )
-    echo "$pearl_conf_content" > $PEARL_HOME/etc/pearl.conf
+    echo "$pearl_conf_content" > $PEARL_HOME/pearl.conf
 }
 
 function create_install(){
@@ -370,7 +370,7 @@ function test_pearl_load_repos(){
     }
     GIT=git_mock
     mkdir -p $PEARL_HOME/repos/31c8bf07d0de14c822e9f085156aeca2/.git
-    echo "PEARL_REPOS+=(\"https://pearl-repo.git\")" > $PEARL_HOME/etc/pearl.conf
+    echo "PEARL_REPOS+=(\"https://pearl-repo.git\")" > $PEARL_HOME/pearl.conf
     echo "echo \"sourced repo.conf\"" > $PEARL_HOME/repos/31c8bf07d0de14c822e9f085156aeca2/repo.conf
     assertCommandSuccess pearl_load_repos
     assertEquals \
@@ -379,7 +379,7 @@ function test_pearl_load_repos(){
 
 function test_pearl_load_repos_new(){
     scenario_misc_mods
-    echo "PEARL_REPOS+=(\"https://pearl-repo.git\")" > $PEARL_HOME/etc/pearl.conf
+    echo "PEARL_REPOS+=(\"https://pearl-repo.git\")" > $PEARL_HOME/pearl.conf
     git_mock() {
         echo $@
         mkdir -p $PEARL_HOME/repos/31c8bf07d0de14c822e9f085156aeca2/.git
