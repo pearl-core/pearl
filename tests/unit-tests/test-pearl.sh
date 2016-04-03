@@ -1,6 +1,7 @@
 #!/bin/bash
 source "$(dirname $0)/utils.sh"
 
+pearlSetUp
 PEARL_LOCAL_ROOT="$(dirname $0)/../.."
 source $PEARL_LOCAL_ROOT/bin/pearl -h &> /dev/null
 
@@ -12,7 +13,7 @@ function oneTimeSetUp(){
 }
 
 function setUp(){
-    PEARL_ROOT="DEFINE_FOR_SENDING_SIGNAL"
+:
 }
 
 function tearDown(){
@@ -32,6 +33,10 @@ function usage(){
 
 function pearl_load_repos(){
     echo "pearl_load_repos"
+}
+
+function pearl_init(){
+    echo "pearl_init $@"
 }
 
 function pearl_install(){
@@ -83,19 +88,29 @@ function test_help(){
     assertEquals "usage" "$(cat $STDOUTF)"
 }
 
-function test_pearl_install_existing_installation(){
+function test_pearl_no_pearl_root_defined(){
+    OLD_PEARL_ROOT=$PEARL_ROOT
+    unset PEARL_ROOT
+    assertCommandFailOnStatus 1 source $PEARL_LOCAL_ROOT/bin/pearl -h
+    PEARL_ROOT=$OLD_PEARL_ROOT
+}
+function test_pearl_no_pearl_root_directory(){
+    OLD_PEARL_ROOT=$PEARL_ROOT
+    PEARL_ROOT="not-a-directory"
+    assertCommandFailOnStatus 2 source $PEARL_LOCAL_ROOT/bin/pearl -h
+    PEARL_ROOT=$OLD_PEARL_ROOT
+}
+
+function test_pearl_init(){
+    assertCommandSuccess pearl_wrap init
+    assertEquals "$(echo -e "pearl_load_repos\npearl_init ")" "$(cat $STDOUTF)"
+}
+
+function test_pearl_install(){
     assertCommandFail pearl_wrap install
     assertEquals "pearl_load_repos" "$(cat $STDOUTF)"
     assertCommandFail pearl_wrap i
     assertEquals "pearl_load_repos" "$(cat $STDOUTF)"
-}
-
-function test_pearl_install(){
-    unset PEARL_ROOT
-    assertCommandSuccess pearl_wrap install
-    assertEquals "$(echo -e "pearl_load_repos\npearl_install $PEARL_LOCAL_ROOT")" "$(cat $STDOUTF)"
-    assertCommandSuccess pearl_wrap i
-    assertEquals "$(echo -e "pearl_load_repos\npearl_install $PEARL_LOCAL_ROOT")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_update(){
@@ -121,9 +136,9 @@ function test_pearl_package_install(){
 
 function test_pearl_package_install_already_installed(){
     pearl_package_install(){
-        [ "$1" == "misc/ranger" ] && return 1
-        echo "pearl_package_install $@"
-        return 0
+	[ "$1" == "misc/ranger" ] && return 1
+	echo "pearl_package_install $@"
+	return 0
     }
     assertCommandFail pearl_wrap install vim/fugitive misc/ranger
     assertEquals "$(outputWithKill "pearl_package_install vim/fugitive")" "$(cat $STDOUTF)"
@@ -140,9 +155,9 @@ function test_pearl_package_update(){
 
 function test_pearl_package_update_not_installed(){
     pearl_package_update(){
-        [ "$1" == "misc/ranger" ] && return 1
-        echo "pearl_package_update $@"
-        return 0
+	[ "$1" == "misc/ranger" ] && return 1
+	echo "pearl_package_update $@"
+	return 0
     }
     assertCommandFail pearl_wrap update vim/fugitive misc/ranger
     assertEquals "$(outputWithKill "pearl_package_update vim/fugitive")" "$(cat $STDOUTF)"
@@ -159,9 +174,9 @@ function test_pearl_package_remove(){
 
 function test_pearl_package_remove_not_installed(){
     pearl_package_remove(){
-        [ "$1" == "misc/ranger" ] && return 1
-        echo "pearl_package_remove $@"
-        return 0
+	[ "$1" == "misc/ranger" ] && return 1
+	echo "pearl_package_remove $@"
+	return 0
     }
     assertCommandFail pearl_wrap remove vim/fugitive misc/ranger
     assertEquals "$(outputWithKill "pearl_package_remove vim/fugitive")" "$(cat $STDOUTF)"

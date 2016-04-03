@@ -36,20 +36,16 @@ function pearl_package_remove(){
     echo "removing: $@"
 }
 
-function test_pearl_install_not_existing_directory(){
-    rm -rf $PEARL_HOME
-    assertCommandFail pearl_install /tmp/not-existing-dirctory
-    cat $STDERRF | grep -q "Could not set PEARL_ROOT env"
-    assertEquals  0 $?
-}
-
 function test_pearl_install(){
     rm -rf $PEARL_HOME
-    assertCommandSuccess pearl_install $PEARL_ROOT
+    assertCommandSuccess pearl_init
 
     [ -d $PEARL_HOME/repos ]
     assertEquals 0 $?
     [ -d $PEARL_HOME/packages ]
+    assertEquals 0 $?
+
+    [ -e $PEARL_HOME/pearl.conf ]
     assertEquals 0 $?
 
     assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.bashrc)"

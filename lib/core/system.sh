@@ -9,20 +9,11 @@
 
 GIT=git
 
-function pearl_install(){
-    local PEARL_ROOT=$1
-    [ ! -d "$PEARL_ROOT" ] && die "Error: Could not set PEARL_ROOT env because ${PEARL_ROOT} does not exist."
-
-    # Shows information system
-    echo ""
-    command -v uname && uname -m
-    cat /etc/*release
-    echo ""
-
+function pearl_init(){
     mkdir -p $PEARL_HOME/repos
     mkdir -p $PEARL_HOME/packages
 
-    cp "$PEARL_ROOT/etc/pearl.conf.template" "$PEARL_HOME/pearl.conf"
+    [ -e "$PEARL_HOME/pearl.conf" ] || cp "$PEARL_ROOT/etc/pearl.conf.template" "$PEARL_HOME/pearl.conf"
 
     apply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.bashrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc

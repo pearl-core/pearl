@@ -3,6 +3,10 @@ Pearl
 
 Because only in the best Shells you will find a Pearl...
 
+```sh
+curl -sL https://git.io/vV4yE | sh
+```
+
 <h1 align="center">
     <a href="https://github.com/pearl-core/pearl"><img
         alt="Pearl"
@@ -19,7 +23,7 @@ Because only in the best Shells you will find a Pearl...
 **Table of Contents**
 - [Description](#description)
 - [Quickstart](#quickstart)
-- [Install](#install)
+- [Installation](#installation)
 - [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds)
 - [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds)
 - [Troubleshooting](#troubleshooting)
@@ -154,12 +158,11 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 ...
 ```
 
-Install
-=======
-```bash
-    git clone 'https://github.com/pearl-core/pearl.git' $HOME/.pearl
-    export PATH=$HOME/.pearl/bin:$PATH
-    pearl install
+Installation
+============
+
+```
+curl -sL https://git.io/vV4yE | sh
 ```
 
 Dependencies
