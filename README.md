@@ -1,6 +1,8 @@
 Pearl
 =====
 
+[![Join the chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/pearl-core/pearl.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Because only in the best Shells you will find a Pearl...
 
 **Table of Contents**
