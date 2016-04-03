@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+
+set -e
+
+NAME='Pearl'
+CMD='pearl'
+DESCRIPTION='Because only in the best shells you will find a Pearl...'
+VERSION='v1.0.0'
+
+PEARL_LOCAL_ROOT="${PEARL_LOCAL_ROOT:-$(readlink -f $(dirname $(readlink -f "$0"))/..)}"
+PEARL_HOME="${PEARL_HOME:-${HOME}/.config/pearl}"
+
+source "${PEARL_LOCAL_ROOT}/lib/utils.sh"
+source "${PEARL_LOCAL_ROOT}/lib/core/package.sh"
+source "${PEARL_LOCAL_ROOT}/lib/core/system.sh"
+
+KILL_CMD=kill
+
+###################################
+### General functions           ###
+###################################
+
+usage() {
+	echo -e "$NAME ($VERSION): $DESCRIPTION"
+    echo -e "Usage: $CMD <command> [args]"
+	echo
+    echo -e "Commands:"
+    echo -e "  l[ist]                         List all the available $NAME packages"
+    echo -e "  s[earch]    <pattern>          Search the available $NAME packages that match pattern"
+    echo -e "  i[nstall]   [[repo/]pkg1...]   Install $NAME or the packages if specified"
+    echo -e "  u[pdate]    [[repo/]pkg1...]   Update $NAME or the packages if specified"
+    echo -e "  r[emove]    [[repo/]pkg1...]   Remove $NAME or the packages if specified"
+    echo -e "  h[elp], [-h], [--help]         Show this help message"
+	echo
+}
+
+check_cli(){
+	$COMMAND_SEARCH || $COMMAND_LIST || \
+			$COMMAND_INSTALL || \
+			$COMMAND_UPDATE || $COMMAND_REMOVE || \
+			$OPT_HELP || die "No command has been specified. Run: $CMD --help"
+    if $OPT_HELP
+    then
+        if $COMMAND_SEARCH || $COMMAND_LIST || \
+			$COMMAND_INSTALL || \
+			$COMMAND_UPDATE || $COMMAND_REMOVE
+        then
+            die "The help option must be used exclusively"
+        fi
+    fi
+    if [ "$ARGS" != "" ]
+    then
+        die "No arguments are needed. Run: $CMD --help"
+    fi
+
+    return 0
+}
+
+
+function parse_arguments(){
+    COMMAND_LIST=false
+    COMMAND_SEARCH=false
+    COMMAND_INSTALL=false
+    COMMAND_UPDATE=false
+    COMMAND_REMOVE=false
+	COMMAND_ARGS=()
+	OPT_HELP=false
+
+	for opt in "$@"
+	do
+		case "$1" in
+			list|l)
+				COMMAND_LIST=true; shift ;;
+			search|s)
+				COMMAND_SEARCH=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+			install|i)
+				COMMAND_INSTALL=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+			update|u)
+				COMMAND_UPDATE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+			remove|r)
+				COMMAND_REMOVE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+
+			help|h|-h|--help) OPT_HELP=true ; shift ;;
+
+			--) shift ; break ;;
+			-*) die "Invalid option $1" ;;
+			*) break ;;
+		esac
+	done
+
+	ARGS=()
+	for arg in "$@"
+	do
+		ARGS+=("$arg")
+	done
+}
+
+function execute_operation(){
+	$OPT_HELP && usage && return
+
+	# Ensure to load the repos at least once
+	pearl_load_repos
+
+	$COMMAND_LIST && { pearl_package_list; return; }
+	$COMMAND_SEARCH && { pearl_package_list ${COMMAND_ARGS[@]}; return; }
+
+	local final_res=0
+	if $COMMAND_INSTALL; then
+		if [ -z "$COMMAND_ARGS" ]
+		then
+			if [ -z "$PEARL_ROOT" ]
+			then
+				pearl_install ${PEARL_LOCAL_ROOT}
+			else
+			    die "Pearl seems already been installed since the environment variable PEARL_ROOT is already setup."
+			fi
+		fi
+
+		for pkg in ${COMMAND_ARGS[@]}
+		do
+		    pearl_package_install "$pkg" || final_res=$?
+		done
+	    source_pearl
+	elif $COMMAND_UPDATE; then
+		[ -z "$COMMAND_ARGS" ] && pearl_update
+
+		for pkg in ${COMMAND_ARGS[@]}
+		do
+		    pearl_package_update "$pkg" || final_res=$?
+		done
+	    source_pearl
+	elif $COMMAND_REMOVE; then
+		# Do not send a signal if $NAME has been removed
+		[ -z "$COMMAND_ARGS" ] && pearl_remove && return 0
+
+		for pkg in ${COMMAND_ARGS[@]}
+		do
+		    pearl_package_remove "$pkg" || final_res=$?
+		done
+	    source_pearl
+	fi
+
+	return $final_res
+}
+
+function source_pearl(){
+	# Send signal to parent in order to (re)source pearl
+    [ -z "$PEARL_ROOT" ] || $KILL_CMD -USR1 $PPID
+	return 0
+}
+
+parse_arguments "$@"
+check_cli
+execute_operation
+# vim: set ts=4 sw=4 noet:
