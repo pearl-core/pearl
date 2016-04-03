@@ -60,7 +60,10 @@ function test_pearl_update(){
     }
     GIT=git_mock
     assertCommandSuccess pearl_update
-    assertEquals "$(echo -e "pearl_load_repos\nupdating: ls-colors")" "$(cat $STDOUTF)"
+    cat $STDOUTF | grep "pearl_load_repos"
+    assertEquals 0 $?
+    cat $STDOUTF | grep "updating: ls-colors"
+    assertEquals 0 $?
 }
 
 function test_pearl_remove(){

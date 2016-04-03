@@ -10,6 +10,7 @@
 GIT=git
 
 function pearl_init(){
+    bold_white; echo -n "* "; normal; echo "Creating Pearl configuration in $PEARL_HOME"
     mkdir -p $PEARL_HOME/repos
     mkdir -p $PEARL_HOME/packages
 
@@ -17,18 +18,18 @@ function pearl_init(){
 
     apply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.bashrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc
-    echo "* Activated Pearl for Bash"
+    bold_white; echo -n "* "; normal; echo "Activated Pearl for Bash"
     apply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.zshrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.zshrc
-    echo "* Activated Pearl for Zsh"
+    bold_white; echo -n "* "; normal; echo "Activated Pearl for Zsh"
     apply "source ${PEARL_ROOT}/boot/pearl.fish" ${HOME}/.config/fish/config.fish
     apply "set -x PEARL_ROOT ${PEARL_ROOT}" ${HOME}/.config/fish/config.fish
-    echo "* Activated Pearl for Fish shell"
+    bold_white; echo -n "* "; normal; echo "Activated Pearl for Fish shell"
     apply "source ${PEARL_ROOT}/boot/vim/pearl.vim" ${HOME}/.vimrc
-    echo "* Activated Pearl for Vim editor"
-    info ""
+    bold_white; echo -n "* "; normal; echo "Activated Pearl for Vim editor"
+    echo
     info "Done! Open a new terminal and have fun!"
-    info ""
+    echo
     info "To get the list of Pearl packages available:"
     echo "    >> pearl list"
 }
@@ -65,8 +66,9 @@ function pearl_remove(){
 
 function pearl_update(){
     cd $PEARL_ROOT
-    $GIT fetch --all
-    $GIT reset --hard origin/master
+    bold_white; echo -n "* "; normal; echo "Updating Pearl script"
+    $GIT fetch --quiet --all
+    $GIT reset --quiet --hard origin/master
 
     pearl_load_repos
     for pkgname in $(get_list_installed_packages)
