@@ -3,12 +3,25 @@ Pearl
 
 Because only in the best Shells you will find a Pearl...
 
+<h1 align="center">
+    <a href="https://github.com/pearl-core/pearl"><img
+        alt="Pearl"
+        width=300px
+        src="https://rawgit.com/pearl-core/logo/master/pearl.png"></a>
+</h1>
+
+|Communication|
+|:-----------:|
+| [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+
+
+
 **Table of Contents**
 - [Description](#description)
 - [Quickstart](#quickstart)
 - [Install](#install)
-- [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds!)
-- [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds!)
+- [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds)
+- [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds)
 - [Troubleshooting](#troubleshooting)
 
 Description
@@ -19,7 +32,7 @@ and any form of source code accessible via git.
 As soon as a package is installed, its content can be activated out of the box
 whenever a shell (i.e. Bash, Zsh or Fish) or editor (i.e. vim or emas) will be
 started. This is possible via a smart and simple
-[hook mechanism](#create-your-own-pearl-package-in-seconds!)
+[hook mechanism](#create-your-own-pearl-package-in-seconds)
 that integrates the package content within the Pearl ecosystem.
 
 The main advantages on using Pearl are:
