@@ -1,0 +1,17 @@
+# vim: ft=yaml
+language: bash
+sudo: required
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y zsh
+  - ./tests/integ-tests/install-fish.sh "2.2.0"
+
+install:
+  - PATH=$PWD/bin:$PATH
+
+script:
+  - ./tests/unit-tests/unit-tests.sh
+  - bash ./tests/integ-tests/integ-tests.sh $PWD
+  - zsh ./tests/integ-tests/integ-tests.sh $PWD
+  - fish ./tests/integ-tests/integ-tests.fish $PWD

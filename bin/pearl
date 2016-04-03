@@ -104,10 +104,9 @@ function parse_arguments(){
 
 function execute_operation(){
 	$OPT_HELP && usage && return
+	$COMMAND_INIT && { pearl_init; pearl_load_repos; return; }
 
-	$COMMAND_INIT && { pearl_init; return; }
-
-	# Ensure to load the repos at least once
+    # Ensure to load the repos at least once
     pearl_load_repos
 
 	$COMMAND_LIST && { pearl_package_list; return; }

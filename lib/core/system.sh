@@ -38,7 +38,6 @@ function pearl_remove(){
     cd $PEARL_ROOT
     if ask "Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder?" "N"
     then
-	pearl_load_repos
         for pkgname in $(get_list_installed_packages)
         do
             pearl_package_remove $pkgname
@@ -70,7 +69,6 @@ function pearl_update(){
     $GIT fetch --quiet --all
     $GIT reset --quiet --hard origin/master
 
-    pearl_load_repos
     for pkgname in $(get_list_installed_packages)
     do
         pearl_package_update $pkgname

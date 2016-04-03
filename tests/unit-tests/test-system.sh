@@ -20,10 +20,6 @@ function tearDown(){
     pearlTearDown
 }
 
-function pearl_load_repos(){
-    echo "pearl_load_repos"
-}
-
 function get_list_installed_packages(){
     echo "ls-colors"
 }
@@ -36,7 +32,7 @@ function pearl_package_remove(){
     echo "removing: $@"
 }
 
-function test_pearl_install(){
+function test_pearl_init(){
     rm -rf $PEARL_HOME
     assertCommandSuccess pearl_init
 
@@ -60,8 +56,6 @@ function test_pearl_update(){
     }
     GIT=git_mock
     assertCommandSuccess pearl_update
-    cat $STDOUTF | grep "pearl_load_repos"
-    assertEquals 0 $?
     cat $STDOUTF | grep "updating: ls-colors"
     assertEquals 0 $?
 }
@@ -85,8 +79,6 @@ function test_pearl_remove(){
 
     assertCommandSuccess pearl_remove
     [ ! -e $PEARL_HOME ]
-    assertEquals 0 $?
-    cat $STDOUTF | grep -q "pearl_load_repos"
     assertEquals 0 $?
     cat $STDOUTF | grep -q "removing: ls-colors"
     assertEquals 0 $?

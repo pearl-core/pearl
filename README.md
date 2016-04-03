@@ -34,14 +34,14 @@ Description
 and any form of source code accessible via git.
 
 As soon as a package is installed, its content can be activated out of the box
-whenever a shell (i.e. Bash, Zsh or Fish) or editor (i.e. vim or emas) will be
-started. This is possible via a smart and simple
+according to certain events, like for instance a shell startup (Bash, Zsh or Fish) or
+an editor startup (vim or emacs). This is possible via a smart and simple
 [hook mechanism](#create-your-own-pearl-package-in-seconds)
 that integrates the package content within the Pearl ecosystem.
 
 The main advantages on using Pearl are:
 
-- Create your own Pearl package ***in seconds*** (any git repository is alread a Pearl package)!
+- Create your own Pearl package ***in seconds*** (any git repository is already a Pearl package)!
 - Full control and sync of your dotfiles across different systems.
 - No more hassles to use different package/plugin managers that only control specific editors, shells, etc.
 - Automatic booting of the package content whenever shells or editors are started.
@@ -86,7 +86,7 @@ Install
 -------
 - Install pearl/vim package (as soon as the package is installed the package is ready out of the box in vim editor!):
 
-```
+```sh
 $ pearl install vim
 * Updating https://github.com/pearl-hub/repo.git repository
 * Installing pearl/vim package
@@ -94,7 +94,7 @@ $ pearl install vim
 
 - Install pearl/trash package:
 
-```
+```sh
 $ pearl install trash
 * Updating https://github.com/pearl-hub/repo.git repository
 * Installing pearl/trash package
@@ -114,7 +114,7 @@ Update
 -------
 - Update pearl/vim package:
 
-```bash
+```sh
 $ pearl update vim
 * Updating https://github.com/pearl-hub/repo.git repository
 * Updating pearl/vim package
@@ -122,7 +122,7 @@ $ pearl update vim
 
 - Update Pearl and all its packages installed:
 
-```bash
+```sh
 $ pearl update
 ...
 * Updating https://github.com/pearl-hub/repo.git repository
@@ -137,18 +137,18 @@ Remove
 -------
 - Remove pearl/vim package:
 
-```bash
+```sh
 $ pearl remove vim
 * Updating https://github.com/pearl-hub/repo.git repository
-* Updating pearl/vim package
-* Updating pearl/airline package
-* Updating pearl/trash package
-* Updating pearl/caprica package
+* Removing pearl/vim package
+* Removing pearl/airline package
+* Removing pearl/trash package
+* Removing pearl/caprica package
 ```
 
 - Remove Pearl and all its packages installed:
 
-```bash
+```sh
 $ pearl remove
 ...
 Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
@@ -161,7 +161,7 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 Installation
 ============
 
-```
+```sh
 curl -sL https://git.io/vV4yE | sh
 ```
 
