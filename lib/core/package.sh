@@ -26,7 +26,7 @@ OLD_PWD=${PWD}
 #
 function pearl_load_repos() {
     declare -a PEARL_REPOS
-    _load_internal_repo "$PEARL_HOME/etc/pearl.conf"
+    _load_internal_repo "$PEARL_HOME/pearl.conf"
     for repo in "${PEARL_REPOS[@]}"
     do
         _load_repo "$repo"
