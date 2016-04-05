@@ -8,7 +8,8 @@ function pearlSetUp(){
 }
 
 function pearlRootSetUp(){
-    PEARL_ROOT=$(TMPDIR=/tmp mktemp -d -t pearl-test-root.XXXXXXX)
+    export PEARL_ROOT=$(TMPDIR=/tmp mktemp -d -t pearl-test-root.XXXXXXX)
+    mkdir -p $PEARL_ROOT/bin
     mkdir -p $PEARL_ROOT/etc
     touch $PEARL_ROOT/etc/pearl.conf.template
     mkdir -p $PEARL_ROOT/lib
@@ -18,7 +19,7 @@ function pearlRootSetUp(){
 function pearlHomeSetUp(){
     HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
     mkdir -p $HOME
-    PEARL_HOME=${HOME}/.config/pearl
+    export PEARL_HOME=${HOME}/.config/pearl
     mkdir -p $PEARL_HOME
     mkdir -p $PEARL_HOME/etc
     touch $PEARL_HOME/etc/pearl.conf
@@ -31,6 +32,7 @@ function pearlTearDown(){
     rm -rf $PEARL_HOME
     rm -rf $HOME
     rm -rf $PEARL_ROOT
+    unset PEARL_ROOT PEARL_HOME
 }
 
 function setUpUnitTests(){
