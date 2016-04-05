@@ -6,6 +6,13 @@ unset PEARL_ROOT
 unset PEARL_HOME
 unset PEARL_TEMPORARY
 
+if [ -z "$1" ]
+then
+    echo "ERROR: To run the integ tests you must specify the Pearl location."
+    echo "For instance: $0 ~/.local/share/pearl"
+    exit 33
+fi
+
 export PEARL_ROOT="$1"
 export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
 export PEARL_HOME="${HOME}/.config/pearl"

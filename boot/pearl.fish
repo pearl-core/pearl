@@ -10,13 +10,12 @@ end
 
 if [ ! -d "$PEARL_ROOT" ]
     echo "Error: PEARL_ROOT directory '$PEARL_ROOT' does not exist."
-    exit 1
+    exit 2
 end
 
 set -x PEARL_HOME $HOME/.config/pearl
 set -x PEARL_TEMPORARY $PEARL_HOME/tmp/(tty)
 mkdir -p $PEARL_TEMPORARY
-
 
 set PATH $PEARL_ROOT/bin $PATH
 set MANPATH $MANPATH $PEARL_ROOT/man

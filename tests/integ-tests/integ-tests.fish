@@ -1,5 +1,12 @@
 #!/usr/bin/fish
 
+
+if [ -z $argv[1] ]
+    echo "ERROR: To run the integ tests you must specify the Pearl location."
+    echo "For instance: $0 ~/.local/share/pearl"
+    exit 33
+end
+
 set -x PEARL_ROOT $argv[1]
 set -x HOME (mktemp -d -t pearl-user-home.XXXXXXX)
 set -x PEARL_HOME "$HOME/.config/pearl"
