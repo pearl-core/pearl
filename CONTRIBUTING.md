@@ -150,6 +150,27 @@ All Pearl issues are tracked as [GitHub issues](https://guides.github.com/featur
 * Send a [GitHub Pull Request to Pearl](https://github.com/pearl-core/pearl/compare/dev...) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)).
 * Put **dev as the base branch** and NOT the master one.
 
+#### Unit Tests ####
+To run unit tests:
+```sh
+./tests/unit-tests/unit-tests.sh
+```
+
+#### Integration Tests ####
+The integration tests attempt to test Pearl code by creating a fake `$HOME` directory.
+You need to specify the Pearl code location (aka `PEARL_ROOT`).
+
+For instance, to run locally the integration tests against Pearl
+located in `$HOME/.local/share/pearl` using `Bash`, `Zsh` and `Fish` shells:
+```sh
+bash ./tests/integ-tests/integ-tests.sh $HOME/.local/share/pearl
+zsh ./tests/integ-tests/integ-tests.sh $HOME/.local/share/pearl
+fish ./tests/integ-tests/integ-tests.fish $HOME/.local/share/pearl
+```
+
+Generally, there is no need to run integration tests locally since [Travis](https://travis-ci.org/pearl-core/pearl) will run as
+soon as the pull request gets created.
+
 ## Styleguides ##
 
 ### Git Commit Messages ###

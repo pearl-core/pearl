@@ -58,10 +58,10 @@ List
 ```sh
 $ pearl list
 ...
-pearl/sesaila [installed]
-    Awesome aliases for Bash, Zsh and Fish shells (https://github.com/pearl-hub/sesaila)
 pearl/git
     Awesome git dotfiles (https://github.com/pearl-hub/git)
+pearl/sesaila [installed]
+    Awesome aliases for Bash, Zsh and Fish shells (https://github.com/pearl-hub/sesaila)
 pearl/airline [installed]
     Status/tabline for vim (https://github.com/vim-airline/vim-airline)
 pearl/trash [installed]
@@ -71,7 +71,7 @@ pearl/trash [installed]
 
 Search
 ------
-- Search for vim Pearl packages:
+- Search for `vim` Pearl packages:
 
 ```sh
 $ pearl search vim
@@ -82,7 +82,7 @@ pearl/vim
 
 Install
 -------
-- Install pearl/vim package (as soon as the package is installed the package is ready out of the box in vim editor!):
+- Install `pearl/vim` package (as soon as the package is installed the package is ready out of the box in vim editor!):
 
 ```sh
 $ pearl install vim
@@ -90,7 +90,7 @@ $ pearl install vim
 * Installing pearl/vim package
 ```
 
-- Install pearl/trash package:
+- Install `pearl/trash` package:
 
 ```sh
 $ pearl install trash
@@ -110,7 +110,7 @@ Options:
 
 Update
 -------
-- Update pearl/vim package:
+- Update `pearl/vim` package:
 
 ```sh
 $ pearl update vim
@@ -133,7 +133,7 @@ $ pearl update
 
 Remove
 -------
-- Remove pearl/vim package:
+- Remove `pearl/vim` package:
 
 ```sh
 $ pearl remove vim
@@ -185,7 +185,7 @@ Add the following line to *pearl.conf* file:
 In other words, update the `PEARL_PACKAGES` array with a new entry containing the
 name of the package (i.e. *joe-dotfiles*) and the git url (i.e. *https://github.com/joe/mydotfiles.git*).
 
-***That's it!*** The package will be ready to be installed, updated and removed via the Pearl system.
+***That's it!*** The package will be ready to be [installed](#install), [updated](#update) and [removed](#remove) via the Pearl system.
 
 Also, an optional description of the package can be defined via `PEARL_PACKAGES_DESCR` array:
 
@@ -326,3 +326,12 @@ Troubleshooting
 
 This section has been left blank intentionally.
 It will be filled up as soon as troubles come in!
+
+Contributing
+============
+
+You could help improving Pearl and the [OPH](https://github.com/pearl-hub) in the following ways:
+
+- [Reporting Bugs](https://github.com/pearl-core/pearl/blob/master/CONTRIBUTING.md#reporting-bugs)
+- [Suggesting Enhancements](https://github.com/pearl-core/pearl/blob/master/CONTRIBUTING.md#suggesting-enhancements)
+- [Writing Code](https://github.com/pearl-core/pearl/blob/master/CONTRIBUTING.md#your-first-code-contribution)
