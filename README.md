@@ -25,6 +25,7 @@ curl -sL https://git.io/vV4yE | sh
 - [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds)
 - [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds)
 - [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 
 Description
 ===========
