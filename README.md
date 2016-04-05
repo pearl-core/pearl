@@ -14,11 +14,9 @@ curl -sL https://git.io/vV4yE | sh
         src="https://rawgit.com/pearl-core/logo/master/pearl.png"></a>
 </h1>
 
-|Communication|
-|:-----------:|
-| [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
-
-
+|Project Status|Communication|
+|:-----------:|:-----------:|
+|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 **Table of Contents**
 - [Description](#description)

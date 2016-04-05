@@ -36,6 +36,8 @@ info Install ALL pearl packages
 for package in $(bash -c 'declare -A PEARL_PACKAGES; source $PEARL_HOME/repos/*/repo.conf; echo ${!PEARL_PACKAGES[@]};')
 do
     yes "" | pearl install $package
+    [ -d "$PEARL_HOME/packages/pearl/$package" ] || { echo "$PEARL_HOME/packages/pearl/$package does not exist"; exit 6; }
+    [ -d "$PEARL_HOME/packages/pearl/$package/module" ] && [ ! "$(ls -A $PEARL_HOME/packages/pearl/$package/module)" ] && { echo "$PEARL_HOME/packages/pearl/$package/module exists but it is empty"; exit 7; }
 done
 
 info Update ALL Pearl packages
@@ -48,6 +50,7 @@ info Remove ALL pearl packages
 for package in $(get_all_packages)
 do
     pearl remove $package
+    [ -d "$PEARL_HOME/packages/pearl/$package" ] && { echo "$PEARL_HOME/packages/pearl/$package still exists"; exit 8; }
 done
 
 yes | pearl remove
