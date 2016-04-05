@@ -26,6 +26,7 @@ curl -sL https://git.io/vV4yE | sh
 - [Installation](#installation)
 - [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds)
 - [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds)
+- [How to run tests](#how-to-run-tests)
 - [Troubleshooting](#troubleshooting)
 
 Description
@@ -323,8 +324,16 @@ update the *pearl.conf* file by adding the following line:
 
     PEARL_REPOS+=("https://github.com/myrepo/pearl-repo.git")
 
-Troubleshooting
+How to run tests
 ===============
 
+*unit tests*
+
+```sh
+./tests/unit-tests/unit-tests.sh
+```
+
+Troubleshooting
+===============
 This section has been left blank intentionally.
 It will be filled up as soon as troubles come in!
