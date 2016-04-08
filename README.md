@@ -52,6 +52,8 @@ Quickstart
 The Pearl CLI script allows to: *list*, *search*, *install*, *update*,
 *remove* the Pearl packages defined according to the configuration located in *~/.config/pearl/pearl.conf*
 
+![quickstart](https://raw.githubusercontent.com/pearl-core/resources/master/pearl-opt3.gif)
+
 List
 ----
 - List all the available packages:
