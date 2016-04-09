@@ -1,5 +1,12 @@
 # Change Log #
 
+## [1.1.0][v110] - 2016-04-09 ##
+
+* Check if Git URL changed during updates
+* Introduce the template for new Pearl packages
+* Local directories can be used as Pearl packages
+* Add VERSION file
+
 ## [1.0.1][v101] - 2016-04-08 ##
 
 * Update docs
@@ -14,3 +21,4 @@
 
 [v100]: https://github.com/pearl-core/pearl/releases/tag/1.0.0
 [v101]: https://github.com/pearl-core/pearl/releases/tag/1.0.1
+[v110]: https://github.com/pearl-core/pearl/releases/tag/1.1.0
