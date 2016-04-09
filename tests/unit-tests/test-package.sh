@@ -21,12 +21,9 @@ function tearDown(){
 }
 
 function scenario_misc_mods(){
-    mkdir -p $PEARL_HOME/packages/default/pearl-ssh/.git
-    mkdir -p $PEARL_HOME/packages/default/ls-colors/.git
-    mkdir -p $PEARL_HOME/packages/default/vim-rails/.git
-    mkdir -p $PEARL_HOME/packages/default/pearl-ssh/pearl-metadata
-    mkdir -p $PEARL_HOME/packages/default/ls-colors/pearl-metadata
-    mkdir -p $PEARL_HOME/packages/default/vim-rails/pearl-metadata
+    create_package pearl-ssh
+    create_package ls-colors
+    create_package vim-rails
     create_pearl_conf "pearl-utils" "https://pearl-utils" \
                       "pearl-ssh" "https://pearl-ssh" \
                       "ls-colors" "https://ls-colors"
@@ -42,10 +39,15 @@ function scenario_misc_mods(){
     GIT=git_mock
 }
 
+function create_package(){
+    local pkgname=$1
+    mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
+    mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
+}
+
 function scenario_local_pkgs(){
-    mkdir -p $PEARL_HOME/packages/default/vim-django/.git
+    create_package vim-django
     touch $PEARL_HOME/packages/default/vim-django/file_django
-    mkdir -p $PEARL_HOME/packages/default/vim-django/pearl-metadata
     mkdir -p $HOME/my-vim-django/.git
     mkdir -p $HOME/my-vim-django/pearl-metadata
     mkdir -p $HOME/my-vim-rails/.git
@@ -167,8 +169,7 @@ function test_pearl_package_install(){
     local pkgname="pearl-utils"
     scenario_misc_mods
     git_mock() {
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
+        create_package $pkgname
         create_install "$pkgname" post_install
     }
     GIT=git_mock
@@ -184,8 +185,7 @@ function test_pearl_package_install_errors_on_hooks(){
     local pkgname="pearl-utils"
     scenario_misc_mods
     git_mock() {
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
+        create_package $pkgname
         create_bad_install $pkgname post_install
     }
     GIT=git_mock
@@ -201,8 +201,7 @@ function test_pearl_package_install_deinit(){
     local pkgname="pearl-utils"
     scenario_misc_mods
     git_mock() {
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
+        create_package $pkgname
         create_install "$pkgname" post_install
     }
     GIT=git_mock
@@ -224,8 +223,7 @@ function test_pearl_package_install_no_install_file(){
     local pkgname="pearl-utils"
     scenario_misc_mods
     git_mock() {
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
+        create_package $pkgname
     }
     GIT=git_mock
 
@@ -240,8 +238,7 @@ function test_pearl_package_install_empty_install(){
     local pkgname="pearl-utils"
     scenario_misc_mods
     git_mock() {
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
-        mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
+        create_package $pkgname
         echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
     }
     GIT=git_mock
@@ -367,6 +364,7 @@ function test_pearl_package_update(){
     local pkgname="ls-colors"
     scenario_misc_mods
     git_mock() {
+        [ "$1" == "config" ] && { echo "https://ls-colors"; return; }
         echo "git pull"
     }
     GIT=git_mock
@@ -382,10 +380,77 @@ function test_pearl_package_update(){
     assertEquals 0 $?
 }
 
+function test_pearl_package_update_url_changed(){
+    local pkgname="ls-colors"
+    scenario_misc_mods
+    ask() {
+        return 0
+    }
+    git_mock() {
+        [ "$1" == "config" ] && { echo "https://ls-colors2"; return; }
+        if [ "$1" == "clone" ]
+        then
+            create_package ls-colors
+            create_install "ls-colors" post_install \
+                                       pre_update post_update \
+                                       pre_remove post_remove
+            echo "git clone"
+            return
+        fi
+        [ "$1" == "submodule" ] && { echo "git submodule"; return; }
+        echo "git pull"
+    }
+    GIT=git_mock
+
+    assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "pre_remove"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "post_remove"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "post_install"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -qv "pre_update"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -qv "post_update"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -qv "git pull"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "git clone"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "git submodule"
+    assertEquals 0 $?
+}
+
+function test_pearl_package_update_git_config_error(){
+    local pkgname="ls-colors"
+    scenario_misc_mods
+    git_mock() {
+        [ "$1" == "config" ] && { echo ""; return; }
+        [ "$1" == "submodule" ] && { echo "git submodule"; return; }
+        echo "git pull"
+    }
+    GIT=git_mock
+
+    assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "pre_update"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "post_update"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "git pull"
+    assertEquals 0 $?
+    cat "$STDOUTF" | grep -q "git submodule"
+    assertEquals 0 $?
+}
+
 function test_pearl_package_update_errors_on_hooks(){
     local pkgname="ls-colors"
     scenario_misc_mods
     git_mock() {
+        [ "$1" == "config" ] && { echo "https://ls-colors"; return; }
         echo "git pull"
     }
     GIT=git_mock
@@ -409,6 +474,7 @@ function test_pearl_package_update_deinit(){
     local pkgname="ls-colors"
     scenario_misc_mods
     git_mock() {
+        [ "$1" == "config" ] && { echo "https://ls-colors"; return; }
         echo "git pull"
     }
     GIT=git_mock
@@ -431,6 +497,11 @@ function test_pearl_package_update_not_installed(){
 function test_pearl_package_update_empty_install(){
     local pkgname="ls-colors"
     scenario_misc_mods
+    git_mock() {
+        [ "$1" == "config" ] && { echo "https://ls-colors"; return; }
+        return 0
+    }
+    GIT=git_mock
     echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
     assertCommandSuccess load_repo_first pearl_package_update $pkgname
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]

@@ -133,6 +133,14 @@ function pearl_package_install(){
     _deinit_package $pkgfullname $pre_func $post_func
 }
 
+function _is_url_changed(){
+    local pkgfullname=$1
+    local existingurl=$($GIT config remote.origin.url)
+    # Compare the Git URL only if git config produce an non empty string
+    [ -z "$existingurl" ] && return 1
+    [ "$existingurl" != "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" ]
+}
+
 function pearl_package_update(){
     local pkgname=$1
     local pre_func=pre_update
@@ -148,6 +156,19 @@ function pearl_package_update(){
     echo "Updating $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
     cd $PEARL_PKGDIR
+
+    if ! _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" && \
+        _is_url_changed $pkgfullname
+    then
+        echo "The Git URL for $pkgfullname has changed to ${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
+        if ask "Do you want to replace the package with the new repository?" "N"
+        then
+            pearl_package_remove $pkgfullname || return 5
+            pearl_package_install $pkgfullname || return 6
+        fi
+        return 0
+    fi
+
     if type -t $pre_func &> /dev/null
     then
         $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 3; }

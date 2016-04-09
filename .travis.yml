@@ -11,6 +11,10 @@ install:
   - PATH=$PWD/bin:$PATH
 
 script:
+  - git --version
+  - bash --version
+  - zsh --version
+  - fish --version
   - ./tests/unit-tests/unit-tests.sh
   - bash ./tests/integ-tests/integ-tests.sh $PWD
   - zsh ./tests/integ-tests/integ-tests.sh $PWD
