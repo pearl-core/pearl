@@ -24,7 +24,7 @@ KILL_CMD=kill
 ###################################
 
 usage() {
-    echo -e "$NAME ($VERSION): $DESCRIPTION"
+    echo -e "$NAME (v$(cat $PEARL_ROOT/VERSION)): $DESCRIPTION"
     echo -e "Usage: $CMD <command> [args]"
     echo
     echo -e "Commands:"

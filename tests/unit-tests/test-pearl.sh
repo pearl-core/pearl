@@ -27,10 +27,6 @@ function kill_mock() {
     echo "kill $@"
 }
 
-function usage(){
-    echo "usage"
-}
-
 function pearl_load_repos(){
     echo "pearl_load_repos"
 }
@@ -79,13 +75,17 @@ function outputWithKill(){
 
 function test_help(){
     assertCommandSuccess pearl_wrap -h
-    assertEquals "usage" "$(cat $STDOUTF)"
+    cat $STDOUTF | grep -q "Pearl (v1.2.3)"
+    assertEquals 0 $?
     assertCommandSuccess pearl_wrap --help
-    assertEquals "usage" "$(cat $STDOUTF)"
+    cat $STDOUTF | grep -q "Pearl (v1.2.3)"
+    assertEquals 0 $?
     assertCommandSuccess pearl_wrap help
-    assertEquals "usage" "$(cat $STDOUTF)"
+    cat $STDOUTF | grep -q "Pearl (v1.2.3)"
+    assertEquals 0 $?
     assertCommandSuccess pearl_wrap h
-    assertEquals "usage" "$(cat $STDOUTF)"
+    cat $STDOUTF | grep -q "Pearl (v1.2.3)"
+    assertEquals 0 $?
 }
 
 function test_pearl_no_pearl_root_defined(){

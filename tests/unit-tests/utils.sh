@@ -14,6 +14,7 @@ function pearlRootSetUp(){
     touch $PEARL_ROOT/etc/pearl.conf.template
     mkdir -p $PEARL_ROOT/lib
     echo "echo sourced utils.sh" > $PEARL_ROOT/lib/utils.sh
+    echo "1.2.3" > $PEARL_ROOT/VERSION
 }
 
 function pearlHomeSetUp(){
