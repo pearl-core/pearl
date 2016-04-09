@@ -168,8 +168,16 @@ zsh ./tests/integ-tests/integ-tests.sh $HOME/.local/share/pearl
 fish ./tests/integ-tests/integ-tests.fish $HOME/.local/share/pearl
 ```
 
-Generally, there is no need to run integration tests locally since [Travis](https://travis-ci.org/pearl-core/pearl) will run as
+Generally, there is no need to run integration tests locally
+since [Travis](https://travis-ci.org/pearl-core/pearl) will run as
 soon as the pull request gets created.
+
+#### Contribute to the Official Pearl Hub ####
+Would you like to create a cool Pearl package and you want to submit it
+to [OPH](https://github.com/pearl-hub) repository?
+
+1. Create the package starting from the [template package](https://github.com/pearl-core/template).
+1. Create a pull request to add the new package in the [OPH repository](https://github.com/pearl-hub/repo).
 
 ## Styleguides ##
 
