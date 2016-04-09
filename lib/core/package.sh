@@ -12,6 +12,8 @@ declare -a PEARL_INTERNAL_REPOS_NAME
 declare -A PEARL_INTERNAL_PACKAGES
 declare -A PEARL_INTERNAL_PACKAGES_DESCR
 
+RM=rm
+CP=cp
 GIT=git
 OLD_PWD=${PWD}
 
@@ -80,6 +82,27 @@ function _package_full_name() {
     echo ""
 }
 
+function _is_local_package(){
+    local pkgurl=$1
+    [[ "$pkgurl" == /* ]]
+}
+
+function _check_and_remove(){
+    local destdir=$1
+    [ -e "${destdir}" ] && $RM -rf "${destdir}"
+    return 0
+}
+
+function _check_and_copy(){
+    local sourcedir=$1
+    local destdir=$2
+    [ -d "${sourcedir}" ] || { error "Error: $sourcedir is not a directory"; return 1; }
+    [ -r "${sourcedir}" ] || { error "Error: $sourcedir is not readable"; return 2; }
+    _check_and_remove "${destdir}"
+    mkdir -p "${destdir}"
+    $CP -r "${sourcedir}"/* "${destdir}"
+}
+
 function pearl_package_install(){
     local pkgname=$1
     local post_func=post_install
@@ -90,18 +113,23 @@ function pearl_package_install(){
 
     bold_white; echo -n "* "; normal
     echo "Installing $pkgfullname package"
-    mkdir -p $PEARL_HOME/packages/$pkgfullname
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
-    cd $PEARL_PKGDIR
-    $GIT clone --quiet --depth 1 "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
-    $GIT submodule --quiet update --depth 1 --init --remote
+    mkdir -p $(dirname "$PEARL_PKGDIR")
+    if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
+    then
+        _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; return 3; }
+    else
+        $GIT clone --quiet --depth 1 "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
+        cd "$PEARL_PKGDIR"
+        $GIT submodule --quiet update --depth 1 --init --remote
+    fi
+    cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; return 4; }
+        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 4; }
     fi
 
-    unset PEARL_PKGDIR
     _deinit_package $pkgfullname $pre_func $post_func
 }
 
@@ -122,16 +150,20 @@ function pearl_package_update(){
     cd $PEARL_PKGDIR
     if type -t $pre_func &> /dev/null
     then
-        $pre_func || { error "Error on executing '$pre_func' hook."; return 3; }
+        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 3; }
     fi
-    $GIT pull --quiet origin master
-    $GIT submodule --quiet update --depth 1 --init --remote
+    if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
+    then
+        _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; return 3; }
+    else
+        $GIT pull --quiet origin master
+        $GIT submodule --quiet update --depth 1 --init --remote
+    fi
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; return 4; }
+        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 4; }
     fi
 
-    unset PEARL_PKGDIR
     _deinit_package $pkgfullname $pre_func $post_func
 }
 
@@ -151,22 +183,21 @@ function pearl_package_remove(){
     cd $PEARL_PKGDIR
     if type -t $pre_func &> /dev/null
     then
-        $pre_func || { error "Error on executing '$pre_func' hook."; return 3; }
+        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 3; }
     fi
     cd $PEARL_HOME
-    rm -rf $PEARL_HOME/packages/$pkgfullname
+    _check_and_remove "${PEARL_PKGDIR}"
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; return 4; }
+        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 4; }
     fi
 
-    unset PEARL_PKGDIR
     _deinit_package $pkgfullname $pre_func $post_func
 }
 
 function _is_installed() {
     local pkgfullname=$1
-    [ -d "$PEARL_HOME/packages/$pkgfullname/.git" ]
+    [ -d "$PEARL_HOME/packages/$pkgfullname" ]
 }
 
 function _init_package(){
@@ -184,6 +215,7 @@ function _deinit_package(){
     local pkgfullname=$1
     local pre_func=$2
     local post_func=$3
+    unset PEARL_PKGDIR
     unset ${pre_func} ${post_func}
 }
 

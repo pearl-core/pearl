@@ -188,7 +188,8 @@ Add the following line to *pearl.conf* file:
 In other words, update the `PEARL_PACKAGES` array with a new entry containing the
 name of the package (i.e. *joe-dotfiles*) and the git url (i.e. *https://github.com/joe/mydotfiles.git*).
 
-***That's it!*** The package will be ready to be [installed](#install), [updated](#update) and [removed](#remove) via the Pearl system.
+***That's it!*** The package will be ready to be [installed](#install),
+[updated](#update) and [removed](#remove) via the Pearl system.
 
 Also, an optional description of the package can be defined via `PEARL_PACKAGES_DESCR` array:
 
@@ -265,6 +266,24 @@ if the function will be called multiple times) that are able
 to insert/remove a line in a config file.
 
 All these functions belong to the *utils.sh* script.
+
+## Create a Pearl package from a local directory ##
+Pearl package system will work even for local directories. This is particularly useful
+whenever a Pearl package needs to be tested before pushing to a git repository.
+
+For instance, the following lines in *pearl.conf* file will add a package located in
+*/home/joe/dotfiles*:
+
+    PEARL_PACKAGES["joe-dotfiles"]="/home/joe/dotfiles"
+    PEARL_PACKAGES_DESCR["joe-dotfiles"]="The Joe's dotfiles"
+
+The directory path must be an absolute path.
+
+The package will be ready to be [installed](#install), [updated](#update)
+and [removed](#remove) via the Pearl system.
+
+The directory content can be structured in the exact way as described
+in the previous [section](#structure-of-a-pearl-package).
 
 ## Use third-party project not available in Pearl Hub ##
 If you want to use a third-party project

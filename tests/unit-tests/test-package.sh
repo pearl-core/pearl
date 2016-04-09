@@ -27,7 +27,9 @@ function scenario_misc_mods(){
     mkdir -p $PEARL_HOME/packages/default/pearl-ssh/pearl-metadata
     mkdir -p $PEARL_HOME/packages/default/ls-colors/pearl-metadata
     mkdir -p $PEARL_HOME/packages/default/vim-rails/pearl-metadata
-    create_pearl_conf
+    create_pearl_conf "pearl-utils" "https://pearl-utils" \
+                      "pearl-ssh" "https://pearl-ssh" \
+                      "ls-colors" "https://ls-colors"
     create_install "pearl-ssh" post_install \
                                pre_update post_update \
                                pre_remove post_remove
@@ -40,17 +42,48 @@ function scenario_misc_mods(){
     GIT=git_mock
 }
 
+function scenario_local_pkgs(){
+    mkdir -p $PEARL_HOME/packages/default/vim-django/.git
+    touch $PEARL_HOME/packages/default/vim-django/file_django
+    mkdir -p $PEARL_HOME/packages/default/vim-django/pearl-metadata
+    mkdir -p $HOME/my-vim-django/.git
+    mkdir -p $HOME/my-vim-django/pearl-metadata
+    mkdir -p $HOME/my-vim-rails/.git
+    mkdir -p $HOME/my-vim-rails/pearl-metadata
+    create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
+                      "vim-django" "$HOME/my-vim-django"
+    local install_content="$(_create_install "vim-rails" post_install \
+                               pre_update post_update \
+                               pre_remove post_remove)"
+    echo "$install_content" > $HOME/my-vim-rails/pearl-metadata/install.sh
+    local install_content="$(_create_install "vim-django" post_install \
+                               pre_update post_update \
+                               pre_remove post_remove)"
+    echo "$install_content" > $HOME/my-vim-django/pearl-metadata/install.sh
+    git_mock(){
+        :
+    }
+    GIT=git_mock
+}
+
 function create_pearl_conf(){
-    local pearl_conf_content=$(cat <<EOF
-PEARL_PACKAGES[pearl-utils]="https://pearl-utils"
-PEARL_PACKAGES[pearl-ssh]="https://pearl-ssh"
-PEARL_PACKAGES[ls-colors]="https://ls-colors"
+    local pearl_conf_content=""
+    for opt in "$@"
+    do
+        [ -z "$1" ] && break
+        local pkgname=$1
+        local url=$2
+        shift 2
+        local content=$(cat <<EOF
+PEARL_PACKAGES[$pkgname]="$url"
 EOF
 )
+        pearl_conf_content=$(echo -e "$pearl_conf_content\n$content")
+    done
     echo "$pearl_conf_content" > $PEARL_HOME/pearl.conf
 }
 
-function create_install(){
+function _create_install(){
     local pkgname=$1
     shift
     local install_content=""
@@ -70,6 +103,12 @@ EOF
 )
         install_content=$(echo -e "$install_content\n$content")
     done
+    echo "$install_content"
+}
+
+function create_install(){
+    local pkgname=$1
+    local install_content="$(_create_install $@)"
     echo "$install_content" > $PEARL_HOME/packages/default/${pkgname}/pearl-metadata/install.sh
 }
 
@@ -171,6 +210,8 @@ function test_pearl_package_install_deinit(){
     load_repo_first pearl_package_install "$pkgname" > /dev/null
     type -t post_install
     assertEquals 1 $?
+    [ -z "$PEARL_PKGDIR" ]
+    assertEquals 0 $?
 }
 
 function test_pearl_package_install_already_installed(){
@@ -217,6 +258,43 @@ function test_pearl_package_install_not_existing_package(){
     assertCommandFailOnStatus 2 load_repo_first pearl_package_install "$pkgname"
 }
 
+function test_pearl_local_package_install(){
+    local pkgname="vim-rails"
+    scenario_local_pkgs
+
+    assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    cat $STDOUTF | grep -q "post_install"
+    assertEquals 0 $?
+}
+
+function test_pearl_local_package_install_not_existing_directory(){
+    local pkgname="vim-rails"
+    scenario_local_pkgs
+    create_pearl_conf "$pkgname" "$HOME/my-vim-rails/no-exist"
+
+    assertCommandFailOnStatus 3 load_repo_first pearl_package_install "$pkgname"
+    [ ! -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    cat $STDERRF | grep -q "not a directory"
+    assertEquals 0 $?
+}
+
+function test_pearl_local_package_install_not_readable(){
+    local pkgname="vim-rails"
+    scenario_local_pkgs
+    chmod -r "$HOME/my-vim-rails"
+    create_pearl_conf "$pkgname" "$HOME/my-vim-rails"
+
+    assertCommandFailOnStatus 3 load_repo_first pearl_package_install "$pkgname"
+    [ ! -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    cat $STDERRF | grep -q "not readable"
+    assertEquals 0 $?
+    chmod +r "$HOME/my-vim-rails"
+}
+
 function test_pearl_package_remove(){
     local pkgname="ls-colors"
     scenario_misc_mods
@@ -256,6 +334,8 @@ function test_pearl_package_remove_deinit(){
     assertEquals 1 $?
     type -t post_remove
     assertEquals 1 $?
+    [ -z "$PEARL_PKGDIR" ]
+    assertEquals 0 $?
 }
 
 function test_pearl_package_remove_not_installed(){
@@ -338,6 +418,8 @@ function test_pearl_package_update_deinit(){
     assertEquals 1 $?
     type -t post_update
     assertEquals 1 $?
+    [ -z "$PEARL_PKGDIR" ]
+    assertEquals 0 $?
 }
 
 function test_pearl_package_update_not_installed(){
@@ -360,6 +442,55 @@ function test_pearl_package_update_not_existing_package(){
     local pkgname="vim-rails"
     scenario_misc_mods
     assertCommandFailOnStatus 2 load_repo_first pearl_package_update "$pkgname"
+}
+
+function test_pearl_local_package_update(){
+    local pkgname="vim-django"
+    scenario_local_pkgs
+
+    assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    [ -f $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh ]
+    assertEquals 0 $?
+    [ ! -e $PEARL_HOME/packages/default/$pkgname/file_django ]
+    assertEquals 0 $?
+    cat $STDOUTF | grep -qv "post_update"
+    assertEquals 0 $?
+    cat $STDOUTF | grep -qv "pre_update"
+    assertEquals 0 $?
+}
+
+function test_pearl_local_update_install_not_existing_directory(){
+    local pkgname="vim-django"
+    scenario_local_pkgs
+    create_pearl_conf "$pkgname" "$HOME/my-vim-rails/no-exist"
+
+    assertCommandFailOnStatus 3 load_repo_first pearl_package_update "$pkgname"
+
+    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    [ -e $PEARL_HOME/packages/default/$pkgname/file_django ]
+    assertEquals 0 $?
+    cat $STDERRF | grep -q "not a directory"
+    assertEquals 0 $?
+}
+
+function test_pearl_local_update_install_not_readable(){
+    local pkgname="vim-django"
+    scenario_local_pkgs
+    chmod -r "$HOME/my-vim-rails"
+    create_pearl_conf "$pkgname" "$HOME/my-vim-rails"
+
+    assertCommandFailOnStatus 3 load_repo_first pearl_package_update "$pkgname"
+
+    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    [ -e $PEARL_HOME/packages/default/$pkgname/file_django ]
+    assertEquals 0 $?
+    cat $STDERRF | grep -q "not readable"
+    assertEquals 0 $?
+    chmod +r "$HOME/my-vim-rails"
 }
 
 function test_pearl_load_repos(){
