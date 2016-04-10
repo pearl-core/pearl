@@ -229,7 +229,8 @@ The following variables can be used in any of the previous scripts:
 - *PEARL_ROOT*    - Pearl script location
 - *PEARL_PKGDIR*  - Pearl package location
 
-Additionally, the scripts can use the utility functions in *utils.sh* that
+Additionally, the script *install.sh* can use the utility functions in
+[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
@@ -265,7 +266,8 @@ The `apply` `unapply` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able
 to insert/remove a line in a config file.
 
-All these functions belong to the *utils.sh* script.
+All these functions belong to the
+[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) script.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
@@ -284,6 +286,13 @@ and [removed](#remove) via the Pearl system.
 
 The directory content can be structured in the exact way as described
 in the previous [section](#structure-of-a-pearl-package).
+
+## Create a Pearl package from a Vim plugin ##
+Packages containing Vim plugins are specials.
+They are automatically detected via [pathogen](https://github.com/tpope/vim-pathogen),
+so there is no need to use [hooks functions](#hook-functions) to link
+the Vim plugin with Pearl.
+This feature will be probably available for Emacs too in the future.
 
 ## Use third-party project not available in Pearl Hub ##
 If you want to use a third-party project
