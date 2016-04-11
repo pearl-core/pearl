@@ -249,22 +249,22 @@ Useful examples of Pearl packages can be checked in the
     post_install() {
         info "Awesome - new package installed!"
         warn "Remember to setup your config located in: ~/.dotfiles"
-        apply "source $PEARL_PKGDIR/mytmux.conf" ${HOME}/.tmux.conf
+        link tmux "$PEARL_PKGDIR/mytmux.conf"
     }
     post_update() {
         post_install
     }
     pre_remove() {
         info "dotfiles package removed"
-        unapply "source $PEARL_PKGDIR/mytmux.conf" ${HOME}/.tmux.conf
+        unlink tmux "$PEARL_PKGDIR/mytmux.conf"
     }
 
 The `info` and `warn` are functions that print a message
 using different colors (namely white and yellow).
 
-The `apply` `unapply` are idempotent functions (the result will not change
+The `link` `unlink` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able
-to insert/remove a line in a config file.
+to link/unlink a config file in order to be loaded at startup by a certain program.
 
 All these functions belong to the
 [*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) script.

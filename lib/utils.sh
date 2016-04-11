@@ -1,58 +1,220 @@
 #!/bin/sh
 
-echoerr() {
-    # $@: msg (mandatory) - str: Message to print
+declare -A CONFIG_FILES
+CONFIG_FILES[bash]="$HOME/.bashrc"
+CONFIG_FILES[emacs]="$HOME/.emacs"
+CONFIG_FILES[fish]="$HOME/.config/fish/config.fish"
+CONFIG_FILES[git]="$HOME/.gitconfig"
+CONFIG_FILES[inputrc]="$HOME/.inputrc"
+CONFIG_FILES[mutt]="$HOME/.muttrc"
+CONFIG_FILES[screen]="$HOME/.screenrc"
+CONFIG_FILES[tmux]="$HOME/.tmux.conf"
+CONFIG_FILES[vim]="$HOME/.vimrc"
+CONFIG_FILES[zsh]="$HOME/.zshrc"
+
+declare -A SOURCE_LINES
+SOURCE_LINES[bash]="source \"{}\""
+SOURCE_LINES[emacs]="(load-file \"{}\")"
+SOURCE_LINES[fish]="source \"{}\""
+SOURCE_LINES[git]="[include] path = \"{}\""
+SOURCE_LINES[inputrc]="\$include {}"
+SOURCE_LINES[mutt]="source {}"
+SOURCE_LINES[screen]="source {}"
+SOURCE_LINES[tmux]="source {}"
+SOURCE_LINES[vim]="source {}"
+SOURCE_LINES[zsh]="source \"{}\""
+
+#######################################
+# Check if the argument is null.
+#
+# Globals:
+#   None
+# Arguments:
+#   argument ($1): Argument to check
+# Returns:
+#   0 if argument is not null
+#   11 if argument is null
+#######################################
+function check_not_null() {
+    [ -z "$1" ] && { error "Error: null argument $1"; return 11; }
+    return 0
+}
+
+#######################################
+# Redirect message to stderr.
+#
+# Globals:
+#   None
+# Arguments:
+#   msg ($@): Message to print
+# Returns:
+#   None
+#######################################
+function echoerr() {
     echo "$@" 1>&2;
 }
 
-function die(){
-    # $@: msg (mandatory) - str: Message to print
+#######################################
+# Print an error message to stderr and exit program.
+#
+# Globals:
+#   None
+# Arguments:
+#   msg ($@): Message to print
+# Returns:
+#   None
+#######################################
+function die() {
     error $@
     exit 1
 }
 
-function error(){
-    # $@: msg (mandatory) - str: Message to print
+#######################################
+# Print an error message to stderr and exit program with a given status.
+#
+# Globals:
+#   None
+# Arguments:
+#   status ($1): The exit status to use
+#   msg ($2-): Message to print
+# Returns:
+#   None
+#######################################
+function die_on_status() {
+    status=$1
+    shift
+    error $@
+    exit $status
+}
+
+#######################################
+# Print an error message to stderr.
+#
+# Globals:
+#   None
+# Arguments:
+#   msg ($@): Message to print
+# Returns:
+#   None
+#######################################
+function error() {
     echoerr -e "\033[1;31m$@\033[0m"
 }
 
-function warn(){
+#######################################
+# Print a warn message to stderr.
+#
+# Globals:
+#   None
+# Arguments:
+#   msg ($@): Message to print
+# Returns:
+#   None
+#######################################
+function warn() {
     # $@: msg (mandatory) - str: Message to print
     echoerr -e "\033[1;33m$@\033[0m"
 }
 
+#######################################
+# Print an info message to stdout.
+#
+# Globals:
+#   None
+# Arguments:
+#   msg ($@): Message to print
+# Returns:
+#   None
+#######################################
 function info(){
-    # $@: msg (mandatory) - str: Message to print
     echo -e "\033[1;37m$@\033[0m"
 }
 
+#######################################
+# Print escape chars to activate the bold white style.
+#
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function bold_white(){
     echo -ne "\033[1;37m"
 }
 
+#######################################
+# Print escape chars to activate the bold cyan style.
+#
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function bold_cyan(){
     echo -ne "\033[1;36m"
 }
 
+#######################################
+# Print escape chars to activate the bold red style.
+#
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function bold_red(){
     echo -ne "\033[1;35m"
 }
 
+#######################################
+# Print escape char to deactivate any style.
+#
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function normal(){
     echo -ne "\033[0m"
 }
 
+#######################################
+# Ask a question and wait to receive an answer from stdin.
+# It returns $default_answer if no answer has be received from stdin.
+#
+# Globals:
+#   None
+# Arguments:
+#   question ($1):
+#   default_answer ($2): Possible values: 'Y', 'y', 'N', 'n' (default: 'Y')
+# Returns:
+#   0   if function received either 'Y' or 'y'
+#   1   if function received either 'N' or 'n'
+#   33  if default_answer is not one of the possible values
+#######################################
 function ask(){
-    # $1: question string
-    # $2: default value - can be either Y, y, N, n (by default Y)
+    local question=$1
+    local default_answer=$2
+    check_not_null $question
+
+    local answers="Y y N n"
+    [[ "$answers" =~ "$default_answer" ]] || { error "The default answer: $default_answer is wrong."; return 33; }
 
     local default="Y"
-    [ -z $2 ] || default=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+    [ -z "$default_answer" ] || default=$(echo "$default_answer" | tr '[:lower:]' '[:upper:]')
 
     local other="n"
     [ "$default" == "N" ] && other="y"
 
-    local prompt=$(info "$1 (${default}/${other})> ")
+    local prompt=$(info "$question (${default}/${other})> ")
 
     local res="none"
     while [ "$res" != "Y" ] && [ "$res" != "N"  ] && [ "$res" != "" ];
@@ -63,53 +225,183 @@ function ask(){
 
     [ "$res" == "" ] && res="$default"
 
-    if [ "$res" == "Y" ]
-    then
-        return 0
-    else
-        return 1
-    fi
-
+    [ "$res" == "Y" ]
 }
 
 
+#######################################
+# Apply a string to a file.
+# The function is idempotent, so calling this function multiple
+# times will apply the string once.
+# If $config_file does not exist, the function will create the file and all its
+# parent directories (if needed).
+#
+# Example of usage:
+#    apply "source ~/myvimrcfile" ~/.vimrc
+#
+# Globals:
+#   None
+# Arguments:
+#   string_to_apply ($1): String to apply
+#   config_file ($2):     The file in which the string
+#                         needs to be applied
+#   apply_at_top ($3):    If true puts the string at the top,
+#                         otherwise append it (default true).
+# Returns:
+#   None
+#######################################
 function apply(){
-    # $1: String to apply
-    # $2: File path in which the string must be applied
-    # $3: bool - put string at the beginning (default true)
-    #
-    # If the file doesn't exist create it and append the line
+    local string_to_apply=$1
+    local config_file=$2
+    local apply_at_top=$3
+    check_not_null $string_to_apply
+    check_not_null $config_file
 
-    if [ ! -e "$2" ]
+    if [ ! -e "$config_file" ]
     then
-        local dirp=$(dirname $2)
+        local dirp=$(dirname "$config_file")
         mkdir -p $dirp
-        touch "$2"
+        touch "$config_file"
     fi
 
     local putfirst=true
-    [ -z $3 ] || putfirst=$3
+    [ -z "$apply_at_top" ] || putfirst=$apply_at_top
 
-    local original=$(grep -F -x -v "$1" "$2")
+    local original=$(grep -F -x -v "$string_to_apply" "$config_file")
     if $putfirst
     then
-        echo -e "$1\n$original" > $2
+        echo -e "$string_to_apply\n$original" > "$config_file"
     else
-        echo -e "$original\n$1" > $2
+        echo -e "$original\n$string_to_apply" > "$config_file"
     fi
 }
 
-# Returns the exit status:
-# - 0 if $1 is matching a line in $2 file.
-# - 1 if $1 is not available in $2 file.
-# - 2 if $2 file does not exist.
+#######################################
+# Check if a string is applied to a file.
+#
+# Globals:
+#   None
+# Arguments:
+#   string_to_apply ($1): String to apply
+#   config_file ($2):     The file in which the string
+#                         needs to be applied
+# Returns:
+#   0 if $string_to_apply is matching a line in $config_file file.
+#   1 if $string_to_apply is not available in $config_file file.
+#   2 if $config_file file does not exist.
+#######################################
 function is_applied(){
-    grep -q -F -x "$1" "$2"
+    local string_to_apply=$1
+    local config_file=$2
+    check_not_null $string_to_apply
+    check_not_null $config_file
+
+    grep -q -F -x "$string_to_apply" "$config_file"
 }
 
+#######################################
+# Unapply a string to a file.
+# The function is idempotent, so calling this function multiple
+# times will remove the string entirely and if the string does not exist
+# it will return successfully.
+# If $config_file does not exist, the function will
+# return successfully.
+#
+# Globals:
+#   None
+# Arguments:
+#   string_to_apply ($1): String to apply
+#   config_file ($2):     The file in which the string
+#                         needs to be applied
+# Returns:
+#   None
+#######################################
 function unapply(){
-    [ ! -e "$2" ] && return
+    local string_to_apply=$1
+    local config_file=$2
+    check_not_null $string_to_apply
+    check_not_null $config_file
 
-    local original=$(grep -F -x -v "$1" "$2")
-    echo -e "$original" > $2
+    [ ! -e "$config_file" ] && return
+
+    local original=$(grep -F -x -v "$string_to_apply" "$config_file")
+    echo -e "$original" > $config_file
+}
+
+#######################################
+# Simplify the use of the apply() function.
+# User can apply a certain config file to a (well known) program without knowing
+# about the syntax used to import the config file.
+# All available programs are defined in the variable CONFIG_FILES.
+#
+# The function is idempotent, so calling this function multiple
+# times will apply the string once.
+# If the program config file does not exist, the function will create the file and all its
+# parent directories (if needed).
+#
+# Example of usage:
+#     link vim $HOME/myvimrc
+#
+# Globals:
+#   HOME: The program config files are located in HOME.
+# Arguments:
+#   program ($1): Can be one of the keys in CONFIG_FILES
+#   config_file_to_apply ($2): The file used to link to the program
+#   apply_at_top ($3): If true will put the line
+#                      at the top of the file (default true).
+# Returns:
+#   33 if program does not exist
+#######################################
+function link() {
+    local program=$1
+    local config_file_to_apply=$2
+    local apply_at_top=$3
+    check_not_null $program
+    check_not_null $config_file_to_apply
+
+    local config_file=${CONFIG_FILES[$program]}
+    [ -z "$config_file" ] && { error "The program $program does not exist" ; return 33; }
+    local source_line=${SOURCE_LINES[$program]}
+    [ -z "$source_line" ] && { error "The program $program does not exist" ; return 33; }
+
+    apply "${source_line/\{\}/$config_file_to_apply}" "$config_file" $apply_at_top
+}
+
+#######################################
+# Simplify the use of the unapply() function.
+# User can unapply a certain config file to a (well known) program without knowing
+# about the syntax used to import the config file.
+# All available programs are defined in the variable CONFIG_FILES.
+#
+# The function is idempotent, so calling this function multiple
+# times will remove the string entirely and if the string does not exist
+# it will return successfully.
+# If the program config file does not exist, the function will
+# return successfully.
+#
+# Example of usage:
+#     unlink vim $HOME/myvimrc
+#
+# Globals:
+#   HOME: The program config files are located in HOME.
+# Arguments:
+#   program ($1): Can be one of the keys in CONFIG_FILES
+#   config_file_to_apply ($2): The file used to link to the program
+#   apply_at_top ($3): If true will put the line
+#                      at the top of the file (default true).
+# Returns:
+#   33 if program does not exist
+#######################################
+function unlink() {
+    local program=$1
+    local config_file_to_apply=$2
+    check_not_null $program
+    check_not_null $config_file_to_apply
+
+    local config_file=${CONFIG_FILES[$program]}
+    [ -z "$config_file" ] && { error "The program $program does not exist" ; return 33; }
+    local source_line=${SOURCE_LINES[$program]}
+    [ -z "$source_line" ] && { error "The program $program does not exist" ; return 33; }
+
+    unapply "${source_line/\{\}/$config_file_to_apply}" "$config_file"
 }

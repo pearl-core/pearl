@@ -45,14 +45,14 @@ function setUpUnitTests(){
 
 function assertCommandSuccess(){
     $(set -e
-      $@ > $STDOUTF 2> $STDERRF
+      "$@" > $STDOUTF 2> $STDERRF
     )
     assertTrue "The command $1 did not return 0 exit status" $?
 }
 
 function assertCommandFail(){
     $(set -e
-      $@ > $STDOUTF 2> $STDERRF
+      "$@" > $STDOUTF 2> $STDERRF
     )
     assertFalse "The command $1 returned 0 exit status" $?
 }
@@ -63,7 +63,7 @@ function assertCommandFailOnStatus(){
     local status=$1
     shift
     $(set -e
-      $@ > $STDOUTF 2> $STDERRF
+      "$@" > $STDOUTF 2> $STDERRF
     )
     assertEquals $status $?
 }
