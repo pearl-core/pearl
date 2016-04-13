@@ -593,4 +593,103 @@ function test_pearl_load_repos_new(){
         "$(echo -e "clone --quiet --depth 1 https://pearl-repo.git $PEARL_HOME/repos/31c8bf07d0de14c822e9f085156aeca2\nsourced repo.conf")" "$(cat $STDOUTF | grep -v Initializing)"
 }
 
+function test_package_full_name_from_local() {
+    scenario_misc_mods
+    assertCommandSuccess _package_full_name_from_local ls-colors
+    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+}
+
+function test_package_full_name_from_local_with_fullname() {
+    scenario_misc_mods
+    assertCommandSuccess _package_full_name_from_local default/ls-colors
+    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+}
+
+function test_package_full_name_from_local_null_arg() {
+    scenario_misc_mods
+    assertCommandFailOnStatus 11 _package_full_name_from_local ""
+}
+
+function test_package_full_name_from_local_no_pkg() {
+    scenario_misc_mods
+    assertCommandSuccess _package_full_name_from_local ls-colors2
+    assertEquals "" "$(cat $STDOUTF)"
+}
+
+function test_package_full_name() {
+    scenario_misc_mods
+    assertCommandSuccess _package_full_name ls-colors
+    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+}
+
+function test_package_full_name_with_fullname() {
+    scenario_misc_mods
+    assertCommandSuccess _package_full_name default/ls-colors
+    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+}
+
+function test_package_full_name_null_arg() {
+    scenario_misc_mods
+    assertCommandFailOnStatus 11 _package_full_name ""
+}
+
+function test_package_full_name_no_pkg() {
+    scenario_misc_mods
+    assertCommandSuccess _package_full_name ls-colors2
+    assertEquals "" "$(cat $STDOUTF)"
+}
+
+function test_get_list_installed_packages() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_installed_packages ".*"
+    assertEquals "$(echo -e "default/ls-colors\ndefault/pearl-ssh\ndefault/vim-rails")" "$(cat $STDOUTF)"
+}
+
+function test_get_list_installed_packages_with_pattern() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_installed_packages "pearl"
+    assertEquals "default/pearl-ssh" "$(cat $STDOUTF)"
+}
+
+function test_get_list_installed_packages_no_pattern() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_installed_packages ""
+    assertEquals "$(echo -e "default/ls-colors\ndefault/pearl-ssh\ndefault/vim-rails")" "$(cat $STDOUTF)"
+}
+
+function test_get_list_installed_packages_no_match() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_installed_packages "no-match"
+    assertEquals "" "$(cat $STDOUTF)"
+}
+
+function test_get_list_installed_packages_empty() {
+    assertCommandSuccess get_list_installed_packages ".*"
+    assertEquals "" "$(cat $STDOUTF)"
+}
+
+function test_get_list_uninstalled_packages() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_uninstalled_packages ".*"
+    assertEquals "$(echo -e "default/pearl-utils")" "$(cat $STDOUTF)"
+}
+
+function test_get_list_uninstalled_packages_with_pattern() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_uninstalled_packages "pearl"
+    assertEquals "$(echo -e "default/pearl-utils")" "$(cat $STDOUTF)"
+}
+
+function test_get_list_uninstalled_packages_no_pattern() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_uninstalled_packages "pearl"
+    assertEquals "$(echo -e "default/pearl-utils")" "$(cat $STDOUTF)"
+}
+
+function test_get_list_uninstalled_packages_no_match() {
+    scenario_misc_mods
+    assertCommandSuccess get_list_uninstalled_packages "no-match"
+    assertEquals "" "$(cat $STDOUTF)"
+}
+
 source $(dirname $0)/shunit2

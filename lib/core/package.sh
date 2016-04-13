@@ -67,8 +67,22 @@ function _load_repo() {
     _load_internal_repo "$PEARL_HOME/repos/$sum/repo.conf"
 }
 
+#######################################
+# Provide the full name of a package by reading the repository.
+#
+# Globals:
+#   None
+# Arguments:
+#   pkgname ($1): The name of the package
+# Returns:
+#   None
+# Output:
+#   The package full name
+#######################################
 function _package_full_name() {
     local pkgname=$1
+    check_not_null $pkgname
+
     if [[ $pkgname == *[/]* ]]
     then
         echo $pkgname
@@ -78,6 +92,36 @@ function _package_full_name() {
     for reponame in "${PEARL_INTERNAL_REPOS_NAME[@]}"
     do
         [ ${PEARL_INTERNAL_PACKAGES[$reponame/$pkgname]+abc} ] && { echo "$reponame/$pkgname" ; return; }
+    done
+    echo ""
+}
+
+#######################################
+# Provide the full name of a package by reading the local directory.
+#
+# Globals:
+#   PEARL_HOME (RO): Used to access to the local directory
+# Arguments:
+#   pkgname ($1): The name of the package
+# Returns:
+#   None
+# Output:
+#   The package full name
+#######################################
+function _package_full_name_from_local() {
+    local pkgname=$1
+    check_not_null $pkgname
+
+    cd $PEARL_HOME/packages
+    if [[ $pkgname == *[/]* ]]
+    then
+        echo $pkgname
+        return
+    fi
+
+    for reponame in $(ls ${PEARL_HOME}/packages/)
+    do
+        [ -d "$reponame/$pkgname" ] && { echo "$reponame/$pkgname"; return; }
     done
     echo ""
 }
@@ -193,8 +237,8 @@ function pearl_package_remove(){
     local pre_func=pre_remove
     local post_func=post_remove
 
-    local pkgfullname=$(_package_full_name $pkgname)
-    ! _is_installed $pkgfullname && { warn "Skipping $pkgname since it has not been installed."; return 1; }
+    local pkgfullname=$(_package_full_name_from_local $pkgname)
+    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname since it has not been installed."; return 1; }
 
     _init_package $pkgfullname $pre_func $post_func
 
@@ -243,32 +287,63 @@ function _deinit_package(){
 function pearl_package_list(){
     local pattern=".*"
     [ -z "$1" ] || pattern="$1"
-    builtin cd $PEARL_ROOT
-    for pkg in $(get_list_removed_packages $pattern)
+    cd $PEARL_ROOT
+    for pkg in $(get_list_uninstalled_packages "$pattern")
     do
         _print_package $pkg false
     done
-    for pkg in $(get_list_installed_packages $pattern)
+    for pkg in $(get_list_installed_packages "$pattern")
     do
         _print_package $pkg true
     done
-    builtin cd $OLDPWD
+    cd $OLDPWD
 }
 
-function get_list_installed_packages(){
+#######################################
+# Get the list of all installed packages by reading the local directory.
+#
+# Globals:
+#   PEARL_HOME (RO): Used to access to the local directory
+# Arguments:
+#   pattern ($1): The name of the package
+# Returns:
+#   None
+# Output:
+#   The package full name of all installed packages
+#######################################
+function get_list_installed_packages() {
     local pattern=$1
-    for pkgfullname in "${!PEARL_INTERNAL_PACKAGES[@]}"
+
+    for reponame in $(ls ${PEARL_HOME}/packages/)
     do
-        [ -e $PEARL_HOME/packages/$pkgfullname/.git ] && { echo $pkgfullname | grep "$pattern"; }
+        for pkgname in $(ls ${PEARL_HOME}/packages/${reponame}/)
+        do
+            [[ "$reponame/$pkgname" =~ .*$pattern.* ]] && echo "$reponame/$pkgname"
+        done
     done
+    return 0
 }
 
-function get_list_removed_packages(){
+#######################################
+# Get the list of all uninstalled packages from the repository.
+#
+# Globals:
+#   PEARL_HOME (RO): Used to access to the local directory
+# Arguments:
+#   pattern ($1): The name of the package
+# Returns:
+#   None
+# Output:
+#   The package full name of all uninstalled packages
+#######################################
+function get_list_uninstalled_packages() {
     local pattern=$1
+
     for pkgfullname in "${!PEARL_INTERNAL_PACKAGES[@]}"
     do
-        [ ! -e $PEARL_HOME/packages/$pkgfullname/.git ] && { echo $pkgfullname | grep "$pattern"; }
+        [ ! -d $PEARL_HOME/packages/$pkgfullname/ ] && [[ "$pkgfullname" =~ .*$pattern.* ]] && echo $pkgfullname
     done
+    return 0
 }
 
 function _print_package() {

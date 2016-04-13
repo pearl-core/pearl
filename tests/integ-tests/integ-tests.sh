@@ -39,6 +39,8 @@ source $PEARL_ROOT/boot/pearl.sh
 [ -d "$PEARL_HOME" ] || { echo "$PEARL_HOME does not exist"; exit 4; }
 [ -d "$PEARL_TEMPORARY" ] || { echo "$PEARL_TEMPORARY does not exist"; exit 5; }
 
+pearl list
+
 info Install ALL pearl packages
 for package in $(bash -c 'declare -A PEARL_PACKAGES; source $PEARL_HOME/repos/*/repo.conf; echo ${!PEARL_PACKAGES[@]};')
 do
@@ -52,6 +54,8 @@ for package in $(get_all_packages)
 do
     yes "" | pearl update $package
 done
+
+pearl list
 
 info Remove ALL pearl packages
 for package in $(get_all_packages)

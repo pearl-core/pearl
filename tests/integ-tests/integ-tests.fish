@@ -43,6 +43,8 @@ source $PEARL_ROOT/boot/pearl.fish; or die "Error on sourcing pearl.fish"
 [ -e $PEARL_HOME ]; or die "$PEARL_HOME does not exist"
 [ -e $PEARL_TEMPORARY ]; or die "$PEARL_TEMPORARY does not exist"
 
+pearl list
+
 info Install ALL pearl packages
 for package in (bash -c 'declare -A PEARL_PACKAGES; source $PEARL_HOME/repos/*/repo.conf; for p in ${!PEARL_PACKAGES[@]}; do echo $p; done;')
     yes "" | pearl install $package; or die "Error on pearl install $package"
@@ -54,6 +56,8 @@ info Update ALL Pearl packages
 for package in (get_all_packages)
     yes "" | pearl update $package; or die "Error on pearl update $package"
 end
+
+pearl list
 
 info Remove ALL pearl packages
 for package in (get_all_packages)

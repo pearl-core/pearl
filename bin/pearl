@@ -31,7 +31,7 @@ usage() {
     echo -e "  init                           Init $PEARL_HOME config directory"
     echo -e "  l[ist]                         List all the available $NAME packages"
     echo -e "  s[earch]    <pattern>          Search the available $NAME packages that match pattern"
-    echo -e "  i[nstall]   [repo/]pkg1...     Install $NAME or the packages if specified"
+    echo -e "  i[nstall]   [repo/]pkg1...     Install the packages"
     echo -e "  u[pdate]    [[repo/]pkg1...]   Update $NAME or the packages if specified"
     echo -e "  r[emove]    [[repo/]pkg1...]   Remove $NAME or the packages if specified"
     echo -e "  h[elp], [-h], [--help]         Show this help message"
