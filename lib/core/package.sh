@@ -169,9 +169,9 @@ function pearl_package_install(){
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
-        $GIT clone --quiet --depth 1 "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
+        $GIT clone --quiet "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
         cd "$PEARL_PKGDIR"
-        $GIT submodule --quiet update --depth 1 --init --remote
+        $GIT submodule --quiet update --init --remote
     fi
     cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
@@ -228,7 +228,7 @@ function pearl_package_update(){
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
         $GIT pull --quiet origin master
-        $GIT submodule --quiet update --depth 1 --init --remote
+        $GIT submodule --quiet update --init --remote
     fi
     if type -t $post_func &> /dev/null
     then
