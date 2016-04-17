@@ -1,7 +1,7 @@
 #!/bin/bash
 source "$(dirname $0)/utils.sh"
 
-source "$(dirname $0)/../../lib/utils.sh"
+source "$(dirname $0)/../../lib/utils/utils.sh"
 source "$(dirname $0)/../../lib/utils/trycatch.sh"
 source "$(dirname $0)/../../lib/core/package.sh"
 

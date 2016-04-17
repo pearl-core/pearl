@@ -12,8 +12,8 @@ function pearlRootSetUp(){
     mkdir -p $PEARL_ROOT/bin
     mkdir -p $PEARL_ROOT/etc
     touch $PEARL_ROOT/etc/pearl.conf.template
-    mkdir -p $PEARL_ROOT/lib
-    echo "echo sourced utils.sh" > $PEARL_ROOT/lib/utils.sh
+    mkdir -p $PEARL_ROOT/lib/utils
+    echo "echo sourced utils.sh" > $PEARL_ROOT/lib/utils/utils.sh
     echo "1.2.3" > $PEARL_ROOT/VERSION
 }
 

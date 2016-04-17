@@ -2,7 +2,7 @@
 # handling the pearl packages.
 #
 # Dependencies:
-# - lib/utils.sh
+# - lib/utils/utils.sh
 #
 # vim: ft=sh
 

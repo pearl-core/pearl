@@ -13,7 +13,7 @@ VERSION='v1.0.0'
 PEARL_LOCAL_ROOT="${PEARL_LOCAL_ROOT:-$(readlink -f $(dirname $(readlink -f "$0"))/..)}"
 PEARL_HOME="${PEARL_HOME:-${HOME}/.config/pearl}"
 
-source "${PEARL_LOCAL_ROOT}/lib/utils.sh"
+source "${PEARL_LOCAL_ROOT}/lib/utils/utils.sh"
 source "${PEARL_LOCAL_ROOT}/lib/utils/trycatch.sh"
 source "${PEARL_LOCAL_ROOT}/lib/core/package.sh"
 source "${PEARL_LOCAL_ROOT}/lib/core/system.sh"

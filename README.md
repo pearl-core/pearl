@@ -231,8 +231,8 @@ The following variables can be used in any of the previous scripts:
 - *PEARL_ROOT*    - Pearl script location
 - *PEARL_PKGDIR*  - Pearl package location
 
-Additionally, the script *install.sh* can use the utility functions in
-[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) that
+Additionally, the script *install.sh* can use the utility functions available in
+[*utils*](https://github.com/pearl-core/pearl/blob/master/lib/utils) directory that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
@@ -269,7 +269,7 @@ if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
 All these functions belong to the
-[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) script.
+[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils/utils.sh) script.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
