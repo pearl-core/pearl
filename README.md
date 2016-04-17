@@ -43,9 +43,11 @@ The main advantages on using Pearl are:
 - Create your own Pearl package ***in seconds*** (any git repository is already a Pearl package)!
 - Full control and sync of your dotfiles across different systems.
 - No more hassles to use different package/plugin managers that only control specific editors, shells, etc.
-- Automatic booting of the package content whenever shells or editors are started.
+- Automatic bootstrap of the package content whenever shells or editors get started.
 - Access to a wide range of existing packages via the [OPH (Official Pearl Hub)](https://github.com/pearl-hub).
 - Allows to create your own package repository that can be shared with your friends!
+- Stable codebase with 100+ unit tests and exhaustive integration tests with [Travis](https://travis-ci.org/pearl-core/pearl).
+- Few [dependencies](#dependencies) needed that ensure compatibility with most systems.
 
 Quickstart
 ==========

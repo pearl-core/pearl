@@ -2,6 +2,7 @@
 source "$(dirname $0)/utils.sh"
 
 source "$(dirname $0)/../../lib/utils.sh"
+source "$(dirname $0)/../../lib/utils/trycatch.sh"
 source "$(dirname $0)/../../lib/core/package.sh"
 
 # Disable the exiterr
@@ -190,7 +191,7 @@ function test_pearl_package_install_errors_on_hooks(){
     }
     GIT=git_mock
 
-    assertCommandFailOnStatus 4 load_repo_first pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_install "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_install"
@@ -216,7 +217,7 @@ function test_pearl_package_install_deinit(){
 function test_pearl_package_install_already_installed(){
     local pkgname="ls-colors"
     scenario_misc_mods
-    assertCommandFailOnStatus 1 load_repo_first pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $ALREADY_INSTALLED_EXCEPTION load_repo_first pearl_package_install "$pkgname"
 }
 
 function test_pearl_package_install_no_install_file(){
@@ -252,7 +253,7 @@ function test_pearl_package_install_empty_install(){
 function test_pearl_package_install_not_existing_package(){
     local pkgname="blahblah"
     scenario_misc_mods
-    assertCommandFailOnStatus 2 load_repo_first pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
 }
 
 function test_pearl_local_package_install(){
@@ -271,7 +272,7 @@ function test_pearl_local_package_install_not_existing_directory(){
     scenario_local_pkgs
     create_pearl_conf "$pkgname" "$HOME/my-vim-rails/no-exist"
 
-    assertCommandFailOnStatus 3 load_repo_first pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDERRF | grep -q "not a directory"
@@ -284,7 +285,7 @@ function test_pearl_local_package_install_not_readable(){
     chmod -r "$HOME/my-vim-rails"
     create_pearl_conf "$pkgname" "$HOME/my-vim-rails"
 
-    assertCommandFailOnStatus 3 load_repo_first pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDERRF | grep -q "not readable"
@@ -308,14 +309,14 @@ function test_pearl_package_remove_errors_on_hooks(){
     local pkgname="ls-colors"
     scenario_misc_mods
     create_bad_install $pkgname pre_remove
-    assertCommandFailOnStatus 3 load_repo_first pearl_package_remove "$pkgname"
+    assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_remove "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "pre_remove"
     assertEquals 0 $?
 
     create_bad_install $pkgname post_remove
-    assertCommandFailOnStatus 4 load_repo_first pearl_package_remove "$pkgname"
+    assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_remove "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_remove"
@@ -338,7 +339,7 @@ function test_pearl_package_remove_deinit(){
 function test_pearl_package_remove_not_installed(){
     local pkgname="pearl-utils"
     scenario_misc_mods
-    assertCommandFailOnStatus 1 load_repo_first pearl_package_remove $pkgname
+    assertCommandFailOnStatus $NOT_INSTALLED_EXCEPTION load_repo_first pearl_package_remove $pkgname
 }
 
 function test_pearl_package_remove_empty_install(){
@@ -456,14 +457,14 @@ function test_pearl_package_update_errors_on_hooks(){
     GIT=git_mock
 
     create_bad_install $pkgname pre_update
-    assertCommandFailOnStatus 3 load_repo_first pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "pre_update"
     assertEquals 0 $?
 
     create_bad_install $pkgname post_update
-    assertCommandFailOnStatus 4 load_repo_first pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_update"
@@ -491,7 +492,7 @@ function test_pearl_package_update_deinit(){
 function test_pearl_package_update_not_installed(){
     local pkgname="pearl-utils"
     scenario_misc_mods
-    assertCommandFailOnStatus 1 load_repo_first pearl_package_update $pkgname
+    assertCommandFailOnStatus $NOT_INSTALLED_EXCEPTION load_repo_first pearl_package_update $pkgname
 }
 
 function test_pearl_package_update_empty_install(){
@@ -512,7 +513,7 @@ function test_pearl_package_update_empty_install(){
 function test_pearl_package_update_not_existing_package(){
     local pkgname="vim-rails"
     scenario_misc_mods
-    assertCommandFailOnStatus 2 load_repo_first pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 }
 
 function test_pearl_local_package_update(){
@@ -537,7 +538,7 @@ function test_pearl_local_update_install_not_existing_directory(){
     scenario_local_pkgs
     create_pearl_conf "$pkgname" "$HOME/my-vim-rails/no-exist"
 
-    assertCommandFailOnStatus 3 load_repo_first pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 
     [ -d $PEARL_HOME/packages/default/$pkgname/ ]
     assertEquals 0 $?
@@ -553,7 +554,7 @@ function test_pearl_local_update_install_not_readable(){
     chmod -r "$HOME/my-vim-rails"
     create_pearl_conf "$pkgname" "$HOME/my-vim-rails"
 
-    assertCommandFailOnStatus 3 load_repo_first pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 
     [ -d $PEARL_HOME/packages/default/$pkgname/ ]
     assertEquals 0 $?

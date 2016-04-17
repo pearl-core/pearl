@@ -17,6 +17,12 @@ CP=cp
 GIT=git
 OLD_PWD=${PWD}
 
+HOOK_EXCEPTION=101
+ALREADY_INSTALLED_EXCEPTION=102
+NOT_INSTALLED_EXCEPTION=103
+NOT_IN_REPOSITORY_EXCEPTION=104
+LOCAL_COPY_EXCEPTION=105
+
 # Load the information coming from the pearl.conf and the repositories.
 # This function build namespaces based on the repository name. This will avoid
 # potential clashes between packages belonging to different repositories.
@@ -152,8 +158,8 @@ function pearl_package_install(){
     local post_func=post_install
 
     local pkgfullname=$(_package_full_name $pkgname)
-    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; return 2; }
-    _is_installed $pkgfullname && { warn "Skipping $pkgname since it is already installed."; return 1; }
+    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
+    _is_installed $pkgfullname && { warn "Skipping $pkgname since it is already installed."; throw $ALREADY_INSTALLED_EXCEPTION; }
 
     bold_white; echo -n "* "; normal
     echo "Installing $pkgfullname package"
@@ -161,7 +167,7 @@ function pearl_package_install(){
     mkdir -p $(dirname "$PEARL_PKGDIR")
     if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
     then
-        _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; return 3; }
+        _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
         $GIT clone --quiet --depth 1 "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
         cd "$PEARL_PKGDIR"
@@ -171,7 +177,7 @@ function pearl_package_install(){
     _init_package "$pkgfullname" "" $post_func
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 4; }
+        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
     fi
 
     _deinit_package $pkgfullname $pre_func $post_func
@@ -191,8 +197,8 @@ function pearl_package_update(){
     local post_func=post_update
 
     local pkgfullname=$(_package_full_name $pkgname)
-    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; return 2; }
-    ! _is_installed $pkgfullname && { warn "Skipping $pkgname since it has not been installed."; return 1; }
+    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
+    ! _is_installed $pkgfullname && { warn "Skipping $pkgname since it has not been installed."; throw $NOT_INSTALLED_EXCEPTION; }
 
     _init_package $pkgfullname $pre_func $post_func
 
@@ -215,18 +221,18 @@ function pearl_package_update(){
 
     if type -t $pre_func &> /dev/null
     then
-        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 3; }
+        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
     fi
     if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
     then
-        _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; return 3; }
+        _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
         $GIT pull --quiet origin master
         $GIT submodule --quiet update --depth 1 --init --remote
     fi
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 4; }
+        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
     fi
 
     _deinit_package $pkgfullname $pre_func $post_func
@@ -238,7 +244,7 @@ function pearl_package_remove(){
     local post_func=post_remove
 
     local pkgfullname=$(_package_full_name_from_local $pkgname)
-    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname since it has not been installed."; return 1; }
+    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname since it has not been installed."; throw $NOT_INSTALLED_EXCEPTION; }
 
     _init_package $pkgfullname $pre_func $post_func
 
@@ -248,13 +254,13 @@ function pearl_package_remove(){
     cd $PEARL_PKGDIR
     if type -t $pre_func &> /dev/null
     then
-        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 3; }
+        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
     fi
     cd $PEARL_HOME
     _check_and_remove "${PEARL_PKGDIR}"
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; return 4; }
+        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
     fi
 
     _deinit_package $pkgfullname $pre_func $post_func

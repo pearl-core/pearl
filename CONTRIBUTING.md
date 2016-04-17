@@ -210,6 +210,51 @@ to [OPH](https://github.com/pearl-hub) repository?
 
 * Use [google shell styleguide](https://google.github.io/styleguide/shell.xml)
 
+#### Function documentation ####
+For function documentation follows the example below:
+
+    #######################################
+    # Cleanup files from the backup dir.
+    #
+    # Globals:
+    #   VAR1 (RO)         : `my_func` access to VAR1.
+    #   VAR2 (WO)         : `my_func` change the value of VAR2.
+    #   VAR3 (RW)         : `my_func` read and write to VAR3.
+    # Arguments:
+    #   arg1 ($1)         : Directory to cleanup.
+    #   arg2 ($2-)        : Command to execute for the cleanup.
+    # Returns:
+    #   0                 : Cleanup completed successfully.
+    #   101               : Backup directory is not readable.
+    #   $NOT_DIR_ERROR    : Backup directory is not a directory.
+    # Output:
+    #   None
+    #######################################
+    my_func() {
+        local arg1=$1
+        shift
+        local arg2=$@
+        ...
+    }
+
+The documentation is divided by a description of the function, a `Globals`,
+`Arguments`, `Returns` and `Output` sections. If a section does not need details
+use the word `None` inside of it.
+
+`Globals` section provides all global variables that interact with the function.
+
+`Arguments` section provides the list of arguments to pass to the function. Use
+the parenthesis to indicate the position of the arguments:
+
+- `$1`    : Argument is in position one.
+- `$2-`   : Argument takes all args from position two up to the end.
+- `$@`    : Argument takes all args.
+- `$3?`   : Argument is optional.
+
+`Returns` section contains the exit status of the function.
+
+`Output` section describe the string printed to stdout.
+
 ## Versioning ##
 
 * Pearl uses the following [semantic versioning](http://semver.org/)
