@@ -177,7 +177,12 @@ function pearl_package_install(){
     _init_package "$pkgfullname" "" $post_func
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
+        try $post_func
+        catch || {
+            error "Error on executing '$post_func' hook.";
+            _deinit_package $pkgfullname $pre_func $post_func;
+            throw $HOOK_EXCEPTION;
+        }
     fi
 
     _deinit_package $pkgfullname $pre_func $post_func
@@ -213,15 +218,20 @@ function pearl_package_update(){
         echo "The Git URL for $pkgfullname has changed to ${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
         if ask "Do you want to replace the package with the new repository?" "N"
         then
-            pearl_package_remove $pkgfullname || return 5
-            pearl_package_install $pkgfullname || return 6
+            pearl_package_remove $pkgfullname
+            pearl_package_install $pkgfullname
         fi
         return 0
     fi
 
     if type -t $pre_func &> /dev/null
     then
-        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
+        try $pre_func
+        catch || {
+            error "Error on executing '$pre_func' hook.";
+            _deinit_package $pkgfullname $pre_func $post_func;
+            throw $HOOK_EXCEPTION;
+        }
     fi
     if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
     then
@@ -232,7 +242,12 @@ function pearl_package_update(){
     fi
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
+        try $post_func
+        catch || {
+            error "Error on executing '$post_func' hook.";
+            _deinit_package $pkgfullname $pre_func $post_func;
+            throw $HOOK_EXCEPTION;
+        }
     fi
 
     _deinit_package $pkgfullname $pre_func $post_func
@@ -254,13 +269,23 @@ function pearl_package_remove(){
     cd $PEARL_PKGDIR
     if type -t $pre_func &> /dev/null
     then
-        $pre_func || { error "Error on executing '$pre_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
+        try $pre_func
+        catch || {
+            error "Error on executing '$pre_func' hook.";
+            _deinit_package $pkgfullname $pre_func $post_func;
+            throw $HOOK_EXCEPTION;
+        }
     fi
     cd $PEARL_HOME
     _check_and_remove "${PEARL_PKGDIR}"
     if type -t $post_func &> /dev/null
     then
-        $post_func || { error "Error on executing '$post_func' hook."; _deinit_package $pkgfullname $pre_func $post_func; throw $HOOK_EXCEPTION; }
+        try $post_func
+        catch || {
+            error "Error on executing '$post_func' hook.";
+            _deinit_package $pkgfullname $pre_func $post_func;
+            throw $HOOK_EXCEPTION;
+        }
     fi
 
     _deinit_package $pkgfullname $pre_func $post_func

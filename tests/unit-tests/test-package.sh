@@ -121,7 +121,8 @@ function create_bad_install(){
     local install_content=$(cat <<EOF
 function $hookfunc(){
     echo "$hookfunc"
-    return 1
+    unknown_command
+    return 0
 }
 EOF
 )
