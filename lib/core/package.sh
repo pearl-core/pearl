@@ -23,6 +23,7 @@ NOT_INSTALLED_EXCEPTION=103
 NOT_IN_REPOSITORY_EXCEPTION=104
 LOCAL_COPY_EXCEPTION=105
 
+#######################################
 # Load the information coming from the pearl.conf and the repositories.
 # This function build namespaces based on the repository name. This will avoid
 # potential clashes between packages belonging to different repositories.
@@ -32,6 +33,23 @@ LOCAL_COPY_EXCEPTION=105
 #
 # This function will erase PEARL_PACKAGES and PEARL_REPOS as soon as PEARL_INTERNAL* are built.
 #
+# Globals:
+#   PEARL_REPOS (RO)                   : Array containing the list
+#                                        of repos defined in pearl.conf.
+#   PEARL_PACKAGES (RO)                : Array containing the list
+#                                        of packages defined in pearl.conf.
+#   PEARL_INTERNAL_REPOS_NAME (WO)     : Array containing the list
+#                                        of repo names
+#   PEARL_INTERNAL_PACKAGES (WO)       : Array containing the list of packages.
+#   PEARL_INTERNAL_PACKAGES_DESCR (WO) : Array containing the list
+#                                        of package descriptions.
+# Arguments:
+#   None
+# Returns:
+#   None
+# Output:
+#   Logging information.
+#######################################
 function pearl_load_repos() {
     declare -a PEARL_REPOS
     _load_internal_repo "$PEARL_HOME/pearl.conf"
@@ -79,11 +97,11 @@ function _load_repo() {
 # Globals:
 #   None
 # Arguments:
-#   pkgname ($1): The name of the package
+#   pkgname ($1): The name of the package.
 # Returns:
 #   None
 # Output:
-#   The package full name
+#   The package full name.
 #######################################
 function _package_full_name() {
     local pkgname=$1
@@ -106,13 +124,13 @@ function _package_full_name() {
 # Provide the full name of a package by reading the local directory.
 #
 # Globals:
-#   PEARL_HOME (RO): Used to access to the local directory
+#   PEARL_HOME (RO): Used to access to the local directory.
 # Arguments:
-#   pkgname ($1): The name of the package
+#   pkgname ($1): The name of the package.
 # Returns:
 #   None
 # Output:
-#   The package full name
+#   The package full name.
 #######################################
 function _package_full_name_from_local() {
     local pkgname=$1
@@ -153,6 +171,22 @@ function _check_and_copy(){
     $CP -r "${sourcedir}"/* "${destdir}"
 }
 
+#######################################
+# Install the Pearl package.
+#
+# Globals:
+#   PEARL_HOME (RO)                 : Used to access to the local directory.
+#   PEARL_INTERNAL_PACKAGES (RO)    : Used to get the package location.
+# Arguments:
+#   pkgname ($1)                    : The name of the package.
+# Returns:
+#   NOT_IN_REPOSITORY_EXCEPTION     : The package is not available in repo.
+#   ALREADY_INSTALLED_EXCEPTION     : The package has already been installed.
+#   LOCAL_COPY_EXCEPTION            : Error during the local copy.
+#   HOOK_EXCEPTION                  : Error during the hook function execution.
+# Output:
+#   Logging information.
+#######################################
 function pearl_package_install(){
     local pkgname=$1
     local post_func=post_install
@@ -196,6 +230,24 @@ function _is_url_changed(){
     [ "$existingurl" != "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" ]
 }
 
+#######################################
+# Update the Pearl package.
+# If the Pearl package location changed (i.e. repo has been updated),
+# the function will ask to replace the existing package.
+#
+# Globals:
+#   PEARL_HOME (RO)                 : Used to access to the local directory.
+#   PEARL_INTERNAL_PACKAGES (RO)    : Used to get the package location.
+# Arguments:
+#   pkgname ($1)                    : The name of the package.
+# Returns:
+#   NOT_IN_REPOSITORY_EXCEPTION     : The package is not available in repo.
+#   NOT_INSTALLED_EXCEPTION         : The package has not been installed.
+#   LOCAL_COPY_EXCEPTION            : Error during the local copy.
+#   HOOK_EXCEPTION                  : Error during the hook function execution.
+# Output:
+#   Logging information.
+#######################################
 function pearl_package_update(){
     local pkgname=$1
     local pre_func=pre_update
@@ -253,6 +305,19 @@ function pearl_package_update(){
     _deinit_package $pkgfullname $pre_func $post_func
 }
 
+#######################################
+# Remove the Pearl package.
+#
+# Globals:
+#   PEARL_HOME (RO)                 : Used to access to the local directory.
+# Arguments:
+#   pkgname ($1)                    : The name of the package.
+# Returns:
+#   NOT_INSTALLED_EXCEPTION         : The package has not been installed.
+#   HOOK_EXCEPTION                  : Error during the hook function execution.
+# Output:
+#   Logging information.
+#######################################
 function pearl_package_remove(){
     local pkgname=$1
     local pre_func=pre_remove
@@ -315,10 +380,21 @@ function _deinit_package(){
     unset ${pre_func} ${post_func}
 }
 
+#######################################
+# List/Search for the Pearl packages.
+#
+# Globals:
+#   PEARL_HOME (RO)                 : Used to access to the local directory.
+# Arguments:
+#   pattern ($1)                    : Pattern of the packages to search.
+# Returns:
+#   None
+# Output:
+#   The list of installed/uninstalled packages.
+#######################################
 function pearl_package_list(){
     local pattern=".*"
     [ -z "$1" ] || pattern="$1"
-    cd $PEARL_ROOT
     for pkg in $(get_list_uninstalled_packages "$pattern")
     do
         _print_package $pkg false
@@ -327,20 +403,19 @@ function pearl_package_list(){
     do
         _print_package $pkg true
     done
-    cd $OLDPWD
 }
 
 #######################################
 # Get the list of all installed packages by reading the local directory.
 #
 # Globals:
-#   PEARL_HOME (RO): Used to access to the local directory
+#   PEARL_HOME (RO)     : Used to access to the local directory.
 # Arguments:
-#   pattern ($1): The name of the package
+#   pattern ($1)        : The name of the package.
 # Returns:
 #   None
 # Output:
-#   The package full name of all installed packages
+#   The package full name of all installed packages.
 #######################################
 function get_list_installed_packages() {
     local pattern=$1
@@ -359,13 +434,13 @@ function get_list_installed_packages() {
 # Get the list of all uninstalled packages from the repository.
 #
 # Globals:
-#   PEARL_HOME (RO): Used to access to the local directory
+#   PEARL_HOME (RO)   : Used to access to the local directory.
 # Arguments:
-#   pattern ($1): The name of the package
+#   pattern ($1)      : The name of the package.
 # Returns:
 #   None
 # Output:
-#   The package full name of all uninstalled packages
+#   The package full name of all uninstalled packages.
 #######################################
 function get_list_uninstalled_packages() {
     local pattern=$1
