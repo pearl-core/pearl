@@ -32,9 +32,9 @@ Description
 **Pearl** is a package manager for dotfiles, plugins, programs
 and any form of source code accessible via git.
 
-As soon as a package is installed, its content can be activated out of the box
-according to certain events, like for instance a shell startup (Bash, Zsh or Fish) or
-an editor startup (vim or emacs). This is possible via a smart and simple
+As soon as a package gets installed, its content can be activated out of the box
+according to certain events, like, for instance, a shell startup (Bash, Zsh or Fish) or
+an editor startup (Vim or Emacs). This is possible via a smart and simple
 [hook mechanism](#create-your-own-pearl-package-in-seconds)
 that integrates the package content within the Pearl ecosystem.
 
@@ -43,9 +43,11 @@ The main advantages on using Pearl are:
 - Create your own Pearl package ***in seconds*** (any git repository is already a Pearl package)!
 - Full control and sync of your dotfiles across different systems.
 - No more hassles to use different package/plugin managers that only control specific editors, shells, etc.
-- Automatic booting of the package content whenever shells or editors are started.
+- Automatic bootstrap of the package content whenever shells or editors get started.
 - Access to a wide range of existing packages via the [OPH (Official Pearl Hub)](https://github.com/pearl-hub).
 - Allows to create your own package repository that can be shared with your friends!
+- Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl).
+- Small number of [dependencies](#dependencies) needed that ensures compatibility with most of the systems.
 
 Quickstart
 ==========
@@ -229,8 +231,8 @@ The following variables can be used in any of the previous scripts:
 - *PEARL_ROOT*    - Pearl script location
 - *PEARL_PKGDIR*  - Pearl package location
 
-Additionally, the script *install.sh* can use the utility functions in
-[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) that
+Additionally, the script *install.sh* can use the utility functions available in
+[*utils*](https://github.com/pearl-core/pearl/blob/master/lib/utils) directory that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
@@ -267,7 +269,7 @@ if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
 All these functions belong to the
-[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils.sh) script.
+[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils/utils.sh) script.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful

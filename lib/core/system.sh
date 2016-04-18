@@ -2,7 +2,7 @@
 # handling the pearl core system.
 #
 # Dependencies:
-# - lib/utils.sh
+# - lib/utils/utils.sh
 # - lib/core/package.sh
 #
 # vim: ft=sh
