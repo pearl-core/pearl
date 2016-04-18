@@ -262,7 +262,7 @@ function test_pearl_local_package_install(){
     scenario_local_pkgs
 
     assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
-    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_install"
     assertEquals 0 $?
@@ -522,7 +522,7 @@ function test_pearl_local_package_update(){
     scenario_local_pkgs
 
     assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
-    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -f $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh ]
     assertEquals 0 $?
@@ -541,7 +541,7 @@ function test_pearl_local_update_install_not_existing_directory(){
 
     assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 
-    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -e $PEARL_HOME/packages/default/$pkgname/file_django ]
     assertEquals 0 $?
@@ -557,7 +557,7 @@ function test_pearl_local_update_install_not_readable(){
 
     assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 
-    [ -d $PEARL_HOME/packages/default/$pkgname/ ]
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -e $PEARL_HOME/packages/default/$pkgname/file_django ]
     assertEquals 0 $?

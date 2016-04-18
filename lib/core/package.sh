@@ -139,7 +139,12 @@ function _package_full_name_from_local() {
     cd $PEARL_HOME/packages
     if [[ $pkgname == *[/]* ]]
     then
-        echo $pkgname
+        if [ -d "$pkgname" ]
+        then
+            echo "$pkgname"
+        else
+            echo ""
+        fi
         return
     fi
 
@@ -167,8 +172,7 @@ function _check_and_copy(){
     [ -d "${sourcedir}" ] || { error "Error: $sourcedir is not a directory"; return 1; }
     [ -r "${sourcedir}" ] || { error "Error: $sourcedir is not readable"; return 2; }
     _check_and_remove "${destdir}"
-    mkdir -p "${destdir}"
-    $CP -r "${sourcedir}"/* "${destdir}"
+    $CP -r "${sourcedir}" "${destdir}"
 }
 
 #######################################
