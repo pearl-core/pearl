@@ -32,9 +32,9 @@ Description
 **Pearl** is a package manager for dotfiles, plugins, programs
 and any form of source code accessible via git.
 
-As soon as a package is installed, its content can be activated out of the box
-according to certain events, like for instance a shell startup (Bash, Zsh or Fish) or
-an editor startup (vim or emacs). This is possible via a smart and simple
+As soon as a package gets installed, its content can be activated out of the box
+according to certain events, like, for instance, a shell startup (Bash, Zsh or Fish) or
+an editor startup (Vim or Emacs). This is possible via a smart and simple
 [hook mechanism](#create-your-own-pearl-package-in-seconds)
 that integrates the package content within the Pearl ecosystem.
 
@@ -46,8 +46,8 @@ The main advantages on using Pearl are:
 - Automatic bootstrap of the package content whenever shells or editors get started.
 - Access to a wide range of existing packages via the [OPH (Official Pearl Hub)](https://github.com/pearl-hub).
 - Allows to create your own package repository that can be shared with your friends!
-- Stable codebase with 100+ unit tests and exhaustive integration tests with [Travis](https://travis-ci.org/pearl-core/pearl).
-- Few [dependencies](#dependencies) needed that ensure compatibility with most systems.
+- Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl).
+- Small number of [dependencies](#dependencies) needed that ensures compatibility with most of the systems.
 
 Quickstart
 ==========

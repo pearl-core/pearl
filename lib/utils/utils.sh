@@ -24,19 +24,22 @@ SOURCE_LINES[tmux]="source {}"
 SOURCE_LINES[vim]="source {}"
 SOURCE_LINES[zsh]="source \"{}\""
 
+NULL_EXCEPTION=11
+WRONG_ANSWER=33
+
 #######################################
 # Check if the argument is null.
 #
 # Globals:
 #   None
 # Arguments:
-#   argument ($1): Argument to check
+#   argument ($1)    : Argument to check
 # Returns:
-#   0 if argument is not null
-#   11 if argument is null
+#   0                : If argument is not null
+#   NULL_EXCEPTION   : If argument is null
 #######################################
 function check_not_null() {
-    [ -z "$1" ] && { error "Error: null argument $1"; return 11; }
+    [ -z "$1" ] && { error "Error: null argument $1"; return $NULL_EXCEPTION; }
     return 0
 }
 
@@ -193,12 +196,12 @@ function normal(){
 # Globals:
 #   None
 # Arguments:
-#   question ($1):
-#   default_answer ($2): Possible values: 'Y', 'y', 'N', 'n' (default: 'Y')
+#   question ($1)       : The question to ask.
+#   default_answer ($2) : Possible values: 'Y', 'y', 'N', 'n' (default: 'Y')
 # Returns:
-#   0   if function received either 'Y' or 'y'
-#   1   if function received either 'N' or 'n'
-#   33  if default_answer is not one of the possible values
+#   0                   : If user replied with either 'Y' or 'y'.
+#   1                   : If user replied with either 'N' or 'n'.
+#   WRONG_ANSWER        : If `default_answer` is not one of the possible values.
 #######################################
 function ask(){
     local question=$1
@@ -206,7 +209,7 @@ function ask(){
     check_not_null $question
 
     local answers="Y y N n"
-    [[ "$answers" =~ "$default_answer" ]] || { error "The default answer: $default_answer is wrong."; return 33; }
+    [[ "$answers" =~ "$default_answer" ]] || { error "The default answer: $default_answer is wrong."; return $WRONG_ANSWER; }
 
     local default="Y"
     [ -z "$default_answer" ] || default=$(echo "$default_answer" | tr '[:lower:]' '[:upper:]')
@@ -242,10 +245,10 @@ function ask(){
 # Globals:
 #   None
 # Arguments:
-#   string_to_apply ($1): String to apply
-#   config_file ($2):     The file in which the string
-#                         needs to be applied
-#   apply_at_top ($3):    If true puts the string at the top,
+#   string_to_apply ($1) : String to apply.
+#   config_file ($2)     : The file in which the string
+#                         needs to be applied.
+#   apply_at_top ($3)    : If true puts the string at the top,
 #                         otherwise append it (default true).
 # Returns:
 #   None

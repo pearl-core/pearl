@@ -217,11 +217,11 @@ For function documentation follows the example below:
     # Cleanup files from the backup dir.
     #
     # Globals:
-    #   VAR1 (RO)         : `my_func` access to VAR1.
+    #   VAR1 (RO,bool)    : `my_func` access to VAR1.
     #   VAR2 (WO)         : `my_func` change the value of VAR2.
     #   VAR3 (RW)         : `my_func` read and write to VAR3.
     # Arguments:
-    #   arg1 ($1)         : Directory to cleanup.
+    #   arg1 ($1,int)     : Directory to cleanup.
     #   arg2 ($2-)        : Command to execute for the cleanup.
     # Returns:
     #   0                 : Cleanup completed successfully.
@@ -250,6 +250,13 @@ the parenthesis to indicate the position of the arguments:
 - `$2-`   : Argument takes all args from position two up to the end.
 - `$@`    : Argument takes all args.
 - `$3?`   : Argument is optional.
+
+Variables defined in `Globals` and `Arguments` sections can have the following
+types:
+
+- `int`   : Integer variable.
+- `str`   : String variable (default).
+- `bool`  : Bool variable.
 
 `Returns` section contains the exit status of the function.
 
