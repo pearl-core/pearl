@@ -597,14 +597,18 @@ function test_pearl_load_repos_new(){
 
 function test_package_full_name_from_local() {
     scenario_misc_mods
-    assertCommandSuccess _package_full_name_from_local ls-colors
-    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+    _package_full_name_from_local ls-colors
+    assertEquals 0 $?
+    assertEquals "default/ls-colors" "$RESULT"
+    unset RESULT
 }
 
 function test_package_full_name_from_local_with_fullname() {
     scenario_misc_mods
-    assertCommandSuccess _package_full_name_from_local default/ls-colors
-    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+    _package_full_name_from_local default/ls-colors
+    assertEquals 0 $?
+    assertEquals "default/ls-colors" "$RESULT"
+    unset RESULT
 }
 
 function test_package_full_name_from_local_null_arg() {
@@ -614,20 +618,26 @@ function test_package_full_name_from_local_null_arg() {
 
 function test_package_full_name_from_local_no_pkg() {
     scenario_misc_mods
-    assertCommandSuccess _package_full_name_from_local ls-colors2
-    assertEquals "" "$(cat $STDOUTF)"
+    _package_full_name_from_local ls-colors2
+    assertEquals 0 $?
+    assertEquals "" "$RESULT"
+    unset RESULT
 }
 
 function test_package_full_name() {
     scenario_misc_mods
-    assertCommandSuccess _package_full_name ls-colors
-    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+    _package_full_name ls-colors
+    assertEquals 0 $?
+    assertEquals "default/ls-colors" "$RESULT"
+    unset RESULT
 }
 
 function test_package_full_name_with_fullname() {
     scenario_misc_mods
-    assertCommandSuccess _package_full_name default/ls-colors
-    assertEquals "default/ls-colors" "$(cat $STDOUTF)"
+    _package_full_name default/ls-colors
+    assertEquals 0 $?
+    assertEquals "default/ls-colors" "$RESULT"
+    unset RESULT
 }
 
 function test_package_full_name_null_arg() {
@@ -637,61 +647,83 @@ function test_package_full_name_null_arg() {
 
 function test_package_full_name_no_pkg() {
     scenario_misc_mods
-    assertCommandSuccess _package_full_name ls-colors2
-    assertEquals "" "$(cat $STDOUTF)"
+    _package_full_name ls-colors2
+    assertEquals 0 $?
+    assertEquals "" "$RESULT"
+    unset RESULT
 }
 
 function test_get_list_installed_packages() {
     scenario_misc_mods
-    assertCommandSuccess get_list_installed_packages ".*"
-    assertEquals "$(echo -e "default/ls-colors\ndefault/pearl-ssh\ndefault/vim-rails")" "$(cat $STDOUTF)"
+    get_list_installed_packages ".*"
+    assertEquals 0 $?
+    local expected="$(echo -e "default/ls-colors default/pearl-ssh default/vim-rails")"
+    assertEquals "$expected" "$(echo "${RESULT[@]}")"
+    unset RESULT
 }
 
 function test_get_list_installed_packages_with_pattern() {
     scenario_misc_mods
-    assertCommandSuccess get_list_installed_packages "pearl"
-    assertEquals "default/pearl-ssh" "$(cat $STDOUTF)"
+    get_list_installed_packages "pearl"
+    assertEquals 0 $?
+    assertEquals "default/pearl-ssh" "${RESULT[@]}"
+    unset RESULT
 }
 
 function test_get_list_installed_packages_no_pattern() {
     scenario_misc_mods
-    assertCommandSuccess get_list_installed_packages ""
-    assertEquals "$(echo -e "default/ls-colors\ndefault/pearl-ssh\ndefault/vim-rails")" "$(cat $STDOUTF)"
+    get_list_installed_packages ""
+    assertEquals 0 $?
+    local expected="$(echo -e "default/ls-colors default/pearl-ssh default/vim-rails")"
+    assertEquals "$expected" "$(echo "${RESULT[@]}")"
+    unset RESULT
 }
 
 function test_get_list_installed_packages_no_match() {
     scenario_misc_mods
-    assertCommandSuccess get_list_installed_packages "no-match"
-    assertEquals "" "$(cat $STDOUTF)"
+    get_list_installed_packages "no-match"
+    assertEquals 0 $?
+    assertEquals "x" "x${RESULT[@]}"
+    unset RESULT
 }
 
 function test_get_list_installed_packages_empty() {
-    assertCommandSuccess get_list_installed_packages ".*"
-    assertEquals "" "$(cat $STDOUTF)"
+    get_list_installed_packages ".*"
+    assertEquals 0 $?
+    assertEquals "x" "x${RESULT[@]}"
+    unset RESULT
 }
 
 function test_get_list_uninstalled_packages() {
     scenario_misc_mods
-    assertCommandSuccess get_list_uninstalled_packages ".*"
-    assertEquals "$(echo -e "default/pearl-utils")" "$(cat $STDOUTF)"
+    get_list_uninstalled_packages ".*"
+    assertEquals 0 $?
+    assertEquals "default/pearl-utils" "${RESULT[@]}"
+    unset RESULT
 }
 
 function test_get_list_uninstalled_packages_with_pattern() {
     scenario_misc_mods
-    assertCommandSuccess get_list_uninstalled_packages "pearl"
-    assertEquals "$(echo -e "default/pearl-utils")" "$(cat $STDOUTF)"
+    get_list_uninstalled_packages "pearl"
+    assertEquals 0 $?
+    assertEquals "default/pearl-utils" "${RESULT[@]}"
+    unset RESULT
 }
 
 function test_get_list_uninstalled_packages_no_pattern() {
     scenario_misc_mods
-    assertCommandSuccess get_list_uninstalled_packages "pearl"
-    assertEquals "$(echo -e "default/pearl-utils")" "$(cat $STDOUTF)"
+    get_list_uninstalled_packages ""
+    assertEquals 0 $?
+    assertEquals "default/pearl-utils" "${RESULT[@]}"
+    unset RESULT
 }
 
 function test_get_list_uninstalled_packages_no_match() {
     scenario_misc_mods
-    assertCommandSuccess get_list_uninstalled_packages "no-match"
-    assertEquals "" "$(cat $STDOUTF)"
+    get_list_uninstalled_packages "no-match"
+    assertEquals 0 $?
+    assertEquals "x" "x${RESULT[@]}"
+    unset RESULT
 }
 
 source $(dirname $0)/shunit2

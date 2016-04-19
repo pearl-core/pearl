@@ -21,7 +21,8 @@ function tearDown(){
 }
 
 function get_list_installed_packages(){
-    echo "ls-colors"
+    declare -ga RESULT
+    RESULT+=("ls-colors")
 }
 
 function pearl_package_update(){
@@ -56,7 +57,7 @@ function test_pearl_update(){
     }
     GIT=git_mock
     assertCommandSuccess pearl_update
-    cat $STDOUTF | grep "updating: ls-colors"
+    cat $STDOUTF | grep -q "updating: ls-colors"
     assertEquals 0 $?
 }
 
