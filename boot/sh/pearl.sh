@@ -34,4 +34,4 @@ do
 	done
 done
 
-trap "source ${PEARL_ROOT}/boot/pearl.sh" USR1
+trap "source ${PEARL_ROOT}/boot/sh/pearl.sh" USR1

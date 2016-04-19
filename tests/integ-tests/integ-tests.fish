@@ -38,7 +38,7 @@ pearl init; or die "Error on pearl install"
 [ -d $PEARL_HOME/packages ]; or die "$PEARL_HOME/packages does not exist after install"
 [ -d $PEARL_HOME/repos ]; or die "$PEARL_HOME/repos does not exist after install"
 
-source $PEARL_ROOT/boot/pearl.fish; or die "Error on sourcing pearl.fish"
+source $PEARL_ROOT/boot/fish/pearl.fish; or die "Error on sourcing pearl.fish"
 [ -e $PEARL_ROOT ]; or die "$PEARL_ROOT does not exist"
 [ -e $PEARL_HOME ]; or die "$PEARL_HOME does not exist"
 [ -e $PEARL_TEMPORARY ]; or die "$PEARL_TEMPORARY does not exist"

@@ -43,14 +43,14 @@ function bash_wrapper(){
 
 function test_pearl_no_pearl_root_var(){
     unset PEARL_ROOT
-    assertCommandFailOnStatus 1 source $(dirname $0)/../../boot/pearl.sh
-    assertCommandFailOnStatus 1 fish_wrapper "source $(dirname $0)/../../boot/pearl.fish"
+    assertCommandFailOnStatus 1 source $(dirname $0)/../../boot/sh/pearl.sh
+    assertCommandFailOnStatus 1 fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
 }
 
 function test_pearl_wrong_pearl_root_var(){
     export PEARL_ROOT="/tmmmmp"
-    assertCommandFailOnStatus 2 source $(dirname $0)/../../boot/pearl.sh
-    assertCommandFailOnStatus 2 fish_wrapper "source $(dirname $0)/../../boot/pearl.fish"
+    assertCommandFailOnStatus 2 source $(dirname $0)/../../boot/sh/pearl.sh
+    assertCommandFailOnStatus 2 fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
 }
 
 function test_pearl(){
@@ -67,13 +67,13 @@ EOF
 
     ZSH_NAME="SOMENAME"
     BASH="SOMENAME"
-    assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/pearl.sh
+    assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/sh/pearl.sh
     assertEquals "$(echo -e "sourced utils.sh\nsourced config.sh\n$PEARL_HOME/packages/pearl/ls-colors\nsourced config.bash\n$PEARL_HOME/packages/pearl/ls-colors\nsourced config.zsh\n$PEARL_HOME/packages/pearl/ls-colors")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_fish(){
     local test_content=$(cat <<EOF
-    source $(dirname $0)/../../boot/pearl.fish;
+    source $(dirname $0)/../../boot/fish/pearl.fish;
     env | grep -q PEARL_HOME;
     env | grep -q PEARL_ROOT;
     env | grep -q PEARL_TEMPORARY;
@@ -87,7 +87,7 @@ EOF
 
 function test_pearl_config_error(){
     echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/config.sh
-    assertCommandFailOnStatus 123 source $(dirname $0)/../../boot/pearl.sh
+    assertCommandFailOnStatus 123 source $(dirname $0)/../../boot/sh/pearl.sh
 }
 
 function test_pearl_fish_config_error(){
@@ -95,7 +95,7 @@ function test_pearl_fish_config_error(){
     # Fish will return 0 in this case
     # (more info: https://github.com/fish-shell/fish-shell/issues/805)
     echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/config.fish
-    assertCommandSuccess fish_wrapper "source $(dirname $0)/../../boot/pearl.fish"
+    assertCommandSuccess fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
 }
 
 source $(dirname $0)/shunit2

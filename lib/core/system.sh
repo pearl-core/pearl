@@ -16,13 +16,13 @@ function pearl_init(){
 
     [ -e "$PEARL_HOME/pearl.conf" ] || cp "$PEARL_ROOT/etc/pearl.conf.template" "$PEARL_HOME/pearl.conf"
 
-    apply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.bashrc
+    apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.bashrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Bash"
-    apply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.zshrc
+    apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.zshrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.zshrc
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Zsh"
-    apply "source ${PEARL_ROOT}/boot/pearl.fish" ${HOME}/.config/fish/config.fish
+    apply "source ${PEARL_ROOT}/boot/fish/pearl.fish" ${HOME}/.config/fish/config.fish
     apply "set -x PEARL_ROOT ${PEARL_ROOT}" ${HOME}/.config/fish/config.fish
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Fish shell"
     apply "source ${PEARL_ROOT}/boot/vim/pearl.vim" ${HOME}/.vimrc
@@ -47,13 +47,13 @@ function pearl_remove(){
     fi
     if ask "Are you sure to REMOVE all the Pearl hooks?" "N"
     then
-        unapply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.bashrc
+        unapply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.bashrc
         unapply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc
         echo "* Deactivated Pearl for Bash"
-        unapply "source ${PEARL_ROOT}/boot/pearl.sh" ${HOME}/.zshrc
+        unapply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.zshrc
         unapply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.zshrc
         echo "* Deactivated Pearl for Zsh"
-        unapply "source ${PEARL_ROOT}/boot/pearl.fish" ${HOME}/.config/fish/config.fish
+        unapply "source ${PEARL_ROOT}/boot/fish/pearl.fish" ${HOME}/.config/fish/config.fish
         unapply "set -x PEARL_ROOT ${PEARL_ROOT}" ${HOME}/.config/fish/config.fish
         echo "* Deactivated Pearl for Fish shell"
         unapply "source ${PEARL_ROOT}/boot/vim/pearl.vim" ${HOME}/.vimrc

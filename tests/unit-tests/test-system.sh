@@ -45,9 +45,9 @@ function test_pearl_init(){
     [ -e $PEARL_HOME/pearl.conf ]
     assertEquals 0 $?
 
-    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.bashrc)"
-    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.zshrc)"
-    assertEquals "$(echo -e "set -x PEARL_ROOT $PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.fish")" "$(cat $HOME/.config/fish/config.fish)"
+    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.bashrc)"
+    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.zshrc)"
+    assertEquals "$(echo -e "set -x PEARL_ROOT $PEARL_ROOT\nsource ${PEARL_ROOT}/boot/fish/pearl.fish")" "$(cat $HOME/.config/fish/config.fish)"
     assertEquals "$(echo -e "source ${PEARL_ROOT}/boot/vim/pearl.vim")" "$(cat $HOME/.vimrc)"
 }
 
@@ -70,12 +70,12 @@ function test_pearl_remove(){
     }
     GIT=git_mock
     echo "export PEARL_ROOT=${PEARL_ROOT}" > ${HOME}/.bashrc
-    echo "source ${PEARL_ROOT}/boot/pearl.sh" >> ${HOME}/.bashrc
+    echo "source ${PEARL_ROOT}/boot/sh/pearl.sh" >> ${HOME}/.bashrc
     echo "export PEARL_ROOT=${PEARL_ROOT}" > ${HOME}/.zshrc
-    echo "source ${PEARL_ROOT}/boot/pearl.sh" >> ${HOME}/.zshrc
+    echo "source ${PEARL_ROOT}/boot/sh/pearl.sh" >> ${HOME}/.zshrc
     mkdir -p ${HOME}/.config/fish
     echo "set -x PEARL_ROOT ${PEARL_ROOT}" > ${HOME}/.config/fish/config.fish
-    echo "source ${PEARL_ROOT}/boot/pearl.fish" >> ${HOME}/.config/fish/config.fish
+    echo "source ${PEARL_ROOT}/boot/sh/pearl.fish" >> ${HOME}/.config/fish/config.fish
     echo "source ${PEARL_ROOT}/boot/vim/pearl.vim" > ${HOME}/.vimrc
 
     assertCommandSuccess pearl_remove
@@ -84,9 +84,9 @@ function test_pearl_remove(){
     cat $STDOUTF | grep -q "removing: ls-colors"
     assertEquals 0 $?
 
-    assertNotEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.bashrc)"
-    assertNotEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.zshrc)"
-    assertNotEquals "$(echo -e "set -x PEARL_ROOT $PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.fish")" "$(cat $HOME/.config/fish/config.fish)"
+    assertNotEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.bashrc)"
+    assertNotEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.zshrc)"
+    assertNotEquals "$(echo -e "set -x PEARL_ROOT $PEARL_ROOT\nsource ${PEARL_ROOT}/boot/fish/pearl.fish")" "$(cat $HOME/.config/fish/config.fish)"
     assertNotEquals "$(echo -e "source ${PEARL_ROOT}/boot/vim/pearl.vim")" "$(cat $HOME/.vimrc)"
 }
 
@@ -100,12 +100,12 @@ function test_pearl_remove_no(){
     }
     GIT=git_mock
     echo "export PEARL_ROOT=${PEARL_ROOT}" > ${HOME}/.bashrc
-    echo "source ${PEARL_ROOT}/boot/pearl.sh" >> ${HOME}/.bashrc
+    echo "source ${PEARL_ROOT}/boot/sh/pearl.sh" >> ${HOME}/.bashrc
     echo "export PEARL_ROOT=${PEARL_ROOT}" > ${HOME}/.zshrc
-    echo "source ${PEARL_ROOT}/boot/pearl.sh" >> ${HOME}/.zshrc
+    echo "source ${PEARL_ROOT}/boot/sh/pearl.sh" >> ${HOME}/.zshrc
     mkdir -p ${HOME}/.config/fish
     echo "set -x PEARL_ROOT ${PEARL_ROOT}" > ${HOME}/.config/fish/config.fish
-    echo "source ${PEARL_ROOT}/boot/pearl.fish" >> ${HOME}/.config/fish/config.fish
+    echo "source ${PEARL_ROOT}/boot/fish/pearl.fish" >> ${HOME}/.config/fish/config.fish
     echo "source ${PEARL_ROOT}/boot/vim/pearl.vim" > ${HOME}/.vimrc
 
     assertCommandSuccess pearl_remove
@@ -115,9 +115,9 @@ function test_pearl_remove_no(){
 
     assertEquals "" "$(cat $STDOUTF)"
 
-    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.bashrc)"
-    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.sh")" "$(cat $HOME/.zshrc)"
-    assertEquals "$(echo -e "set -x PEARL_ROOT $PEARL_ROOT\nsource ${PEARL_ROOT}/boot/pearl.fish")" "$(cat $HOME/.config/fish/config.fish)"
+    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.bashrc)"
+    assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.zshrc)"
+    assertEquals "$(echo -e "set -x PEARL_ROOT $PEARL_ROOT\nsource ${PEARL_ROOT}/boot/fish/pearl.fish")" "$(cat $HOME/.config/fish/config.fish)"
     assertEquals "$(echo -e "source ${PEARL_ROOT}/boot/vim/pearl.vim")" "$(cat $HOME/.vimrc)"
 }
 

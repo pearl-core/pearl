@@ -34,7 +34,7 @@ pearl init
 [ -d $PEARL_HOME/packages ] || { echo "$PEARL_HOME/packages does not exist after install"; exit 1; }
 [ -d $PEARL_HOME/repos ] || { echo "$PEARL_HOME/repos does not exist after install"; exit 2; }
 
-source $PEARL_ROOT/boot/pearl.sh
+source $PEARL_ROOT/boot/sh/pearl.sh
 [ -d "$PEARL_ROOT" ] || { echo "$PEARL_ROOT does not exist"; exit 3; }
 [ -d "$PEARL_HOME" ] || { echo "$PEARL_HOME does not exist"; exit 4; }
 [ -d "$PEARL_TEMPORARY" ] || { echo "$PEARL_TEMPORARY does not exist"; exit 5; }
