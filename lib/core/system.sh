@@ -38,10 +38,12 @@ function pearl_remove(){
     cd $PEARL_ROOT
     if ask "Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder?" "N"
     then
-        for pkgname in $(get_list_installed_packages)
+        get_list_installed_packages
+        for pkgname in "${RESULT[@]}"
         do
             pearl_package_remove $pkgname
         done
+        unset RESULT
     fi
     if ask "Are you sure to REMOVE all the Pearl hooks?" "N"
     then
@@ -69,9 +71,11 @@ function pearl_update(){
     $GIT fetch --quiet --all
     $GIT reset --quiet --hard origin/master
 
-    for pkgname in $(get_list_installed_packages)
+    get_list_installed_packages
+    for pkgname in "${RESULT[@]}"
     do
         pearl_package_update $pkgname
     done
+    unset RESULT
 }
 
