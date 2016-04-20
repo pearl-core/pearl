@@ -265,3 +265,15 @@ types:
 ## Versioning ##
 
 * Pearl uses the following [semantic versioning](http://semver.org/)
+
+### Public API ###
+
+The public API refers to the following parts of Pearl system:
+
+- Pearl script CLI
+- Hooks on bash, zsh, fish, vim and emacs config files
+- `pearl.conf` file
+
+Any potential code change that cause backwards incompatible changes to the
+public API requires the major version to be incremented.
+

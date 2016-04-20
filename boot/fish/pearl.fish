@@ -31,4 +31,4 @@ for reponame in (ls $PEARL_HOME/packages)
 	end
 end
 
-trap "source $PEARL_ROOT/boot/pearl.fish" USR1
+trap "source $PEARL_ROOT/boot/fish/pearl.fish" USR1
