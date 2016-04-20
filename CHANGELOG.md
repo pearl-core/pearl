@@ -1,5 +1,14 @@
 # Change Log #
 
+## [1.3.0][v130] - 2016-04-20 ##
+
+* Provide the definition of public API
+* Add the emacs hook
+* Use a better approach to return values from bash functions
+* Change location of the boot files for pearl.fish and pearl.sh
+* Introduce the standard documentation for functions
+* Use try/catch approach to handle errors
+
 ## [1.2.0][v120] - 2016-04-14 ##
 
 * Fix the removal of packages by querying the local directory
@@ -28,3 +37,4 @@
 [v101]: https://github.com/pearl-core/pearl/releases/tag/1.0.1
 [v110]: https://github.com/pearl-core/pearl/releases/tag/1.1.0
 [v120]: https://github.com/pearl-core/pearl/releases/tag/1.2.0
+[v130]: https://github.com/pearl-core/pearl/releases/tag/1.3.0
