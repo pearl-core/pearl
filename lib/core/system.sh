@@ -19,14 +19,21 @@ function pearl_init(){
     apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.bashrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Bash"
+
     apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.zshrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.zshrc
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Zsh"
+
     apply "source ${PEARL_ROOT}/boot/fish/pearl.fish" ${HOME}/.config/fish/config.fish
     apply "set -x PEARL_ROOT ${PEARL_ROOT}" ${HOME}/.config/fish/config.fish
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Fish shell"
-    apply "source ${PEARL_ROOT}/boot/vim/pearl.vim" ${HOME}/.vimrc
+
+    link vim "${PEARL_ROOT}/boot/vim/pearl.vim"
     bold_white; echo -n "* "; normal; echo "Activated Pearl for Vim editor"
+
+    link emacs "${PEARL_ROOT}/boot/emacs/pearl.el"
+    bold_white; echo -n "* "; normal; echo "Activated Pearl for Emacs editor"
+
     echo
     info "Done! Open a new terminal and have fun!"
     echo
@@ -50,14 +57,20 @@ function pearl_remove(){
         unapply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.bashrc
         unapply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc
         echo "* Deactivated Pearl for Bash"
+
         unapply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.zshrc
         unapply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.zshrc
         echo "* Deactivated Pearl for Zsh"
+
         unapply "source ${PEARL_ROOT}/boot/fish/pearl.fish" ${HOME}/.config/fish/config.fish
         unapply "set -x PEARL_ROOT ${PEARL_ROOT}" ${HOME}/.config/fish/config.fish
         echo "* Deactivated Pearl for Fish shell"
-        unapply "source ${PEARL_ROOT}/boot/vim/pearl.vim" ${HOME}/.vimrc
+
+        unlink vim "${PEARL_ROOT}/boot/vim/pearl.vim"
         echo "* Deactivated Pearl for Vim editor"
+
+        unlink emacs "${PEARL_ROOT}/boot/emacs/pearl.el"
+        echo "* Deactivated Pearl for Emacs editor"
     fi
     if ask "Are you sure to REMOVE the Pearl config $PEARL_HOME directory (NOT RECOMMENDED)?" "N"
     then

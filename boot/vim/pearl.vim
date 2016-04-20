@@ -10,7 +10,7 @@ syntax on
 
 
 """"""""""""""""""
-" Module loader
+" Package loader
 """"""""""""""""""
 for config_path in split(globpath($PEARL_HOME."/packages/*/*/pearl-metadata", 'config.vim'), "\n")
     if filereadable(config_path)

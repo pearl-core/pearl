@@ -223,7 +223,7 @@ The metadata files are also **optional** scripts:
 - *config.zsh* - will be sourced whenever a new Zsh shell is starting up.
 - *config.fish* - will be sourced whenever a new Fish shell is starting up.
 - *config.vim* - will be executed whenever vim editor is starting up.
-- *config.el* - (coming soon!) will be sourced whenever emacs editor is starting up.
+- *config.el* - will be sourced whenever emacs editor is starting up.
 
 The following variables can be used in any of the previous scripts:
 
