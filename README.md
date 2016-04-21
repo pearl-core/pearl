@@ -172,7 +172,7 @@ Dependencies
 ------------
 The main Pearl dependencies are the following:
 
-- [bash (>=4.2)](https://www.gnu.org/software/bash/)
+- [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8)](https://git-scm.com/)
 - [coreutils](https://www.gnu.org/software/coreutils/)
 - [grep](https://www.gnu.org/software/grep/)

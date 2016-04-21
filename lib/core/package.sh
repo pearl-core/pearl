@@ -406,13 +406,14 @@ function _deinit_package(){
 function pearl_package_list(){
     local pattern=".*"
     [ -z "$1" ] || pattern="$1"
+    declare -a RESULT
     get_list_uninstalled_packages "$pattern"
-    echo "${RESULT[@]}"
     for pkg in "${RESULT[@]}"
     do
         _print_package $pkg false
     done
     unset RESULT
+    declare -a RESULT
     get_list_installed_packages "$pattern"
     for pkg in "${RESULT[@]}"
     do
@@ -436,7 +437,6 @@ function pearl_package_list(){
 #######################################
 function get_list_installed_packages() {
     local pattern=$1
-    declare -ga RESULT
 
     for reponame in $(ls ${PEARL_HOME}/packages/)
     do
@@ -463,7 +463,6 @@ function get_list_installed_packages() {
 #######################################
 function get_list_uninstalled_packages() {
     local pattern=$1
-    declare -ga RESULT
 
     for pkgfullname in "${!PEARL_INTERNAL_PACKAGES[@]}"
     do
