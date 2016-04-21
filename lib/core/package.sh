@@ -408,7 +408,6 @@ function pearl_package_list(){
     [ -z "$1" ] || pattern="$1"
     declare -a RESULT
     get_list_uninstalled_packages "$pattern"
-    echo "${RESULT[@]}"
     for pkg in "${RESULT[@]}"
     do
         _print_package $pkg false
