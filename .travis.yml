@@ -6,6 +6,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y zsh
   - ./tests/integ-tests/install-fish.sh "2.2.0"
+  - ./tests/integ-tests/install-bash.sh "4.1"
 
 install:
   - PATH=$PWD/bin:$PATH
