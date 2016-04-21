@@ -8,6 +8,9 @@ source "$(dirname $0)/../../lib/core/system.sh"
 # Disable the exiterr
 set +e
 
+declare -A CONFIG_FILES
+declare -a RESULT
+
 function oneTimeSetUp(){
     setUpUnitTests
 }
@@ -15,7 +18,6 @@ function oneTimeSetUp(){
 function setUp(){
     pearlSetUp
     # The following ensure to override CONFIG_FILES with the right HOME variable
-    declare -gA CONFIG_FILES
     CONFIG_FILES[bash]="$HOME/.bashrc"
     CONFIG_FILES[emacs]="$HOME/.emacs"
     CONFIG_FILES[fish]="$HOME/.config/fish/config.fish"
@@ -28,7 +30,6 @@ function tearDown(){
 }
 
 function get_list_installed_packages(){
-    declare -ga RESULT
     RESULT+=("ls-colors")
 }
 
