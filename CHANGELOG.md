@@ -1,5 +1,10 @@
 # Change Log #
 
+## [1.3.1][v131] - 2016-04-21 ##
+
+* Fix compatibility with Bash 4.1
+* Integration tests with fixed Bash and Git versions
+
 ## [1.3.0][v130] - 2016-04-20 ##
 
 * Provide the definition of public API
@@ -38,3 +43,4 @@
 [v110]: https://github.com/pearl-core/pearl/releases/tag/1.1.0
 [v120]: https://github.com/pearl-core/pearl/releases/tag/1.2.0
 [v130]: https://github.com/pearl-core/pearl/releases/tag/1.3.0
+[v131]: https://github.com/pearl-core/pearl/releases/tag/1.3.1
