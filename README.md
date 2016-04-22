@@ -227,9 +227,10 @@ The metadata files are also **optional** scripts:
 
 The following variables can be used in any of the previous scripts:
 
-- *PEARL_HOME*    - Pearl location (default: *$HOME/.config/pearl*)
-- *PEARL_ROOT*    - Pearl script location
-- *PEARL_PKGDIR*  - Pearl package location
+- *PEARL_HOME*       - Pearl location (default: *$HOME/.config/pearl*)
+- *PEARL_ROOT*       - Pearl script location
+- *PEARL_PKGDIR*     - Pearl package location
+- *PEARL_PKGVARDIR*  - Pearl package location containing data needed for package
 
 Additionally, the script *install.sh* can use the utility functions available in
 [*utils*](https://github.com/pearl-core/pearl/blob/master/lib/utils) directory that

@@ -205,4 +205,12 @@ function test_check_cli(){
     assertCommandFail pearl_wrap -h install
 }
 
+function test_warn_bash_version(){
+    export BASH_VERSION="4.0"
+    assertCommandSuccess source $PEARL_LOCAL_ROOT/bin/pearl -h
+    cat $STDOUTF | grep -q "Warn.*bash is too old"
+    assertEquals 0 $?
+    export -n BASH_VERSION
+}
+
 source $(dirname $0)/shunit2

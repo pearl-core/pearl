@@ -44,6 +44,7 @@ function create_package(){
     local pkgname=$1
     mkdir -p $PEARL_HOME/packages/default/$pkgname/.git
     mkdir -p $PEARL_HOME/packages/default/$pkgname/pearl-metadata
+    mkdir -p $PEARL_HOME/var/default/$pkgname
 }
 
 function scenario_local_pkgs(){
@@ -99,6 +100,7 @@ function $hookfunc(){
         [ \$PEARL_HOME != \${PWD} ] && return 1
     else
         [ \$PEARL_PKGDIR != \${PWD} ] && return 1
+        [ -z "\$PEARL_PKGVARDIR" ] && return 1
     fi
     echo "$hookfunc"
 }
@@ -179,6 +181,8 @@ function test_pearl_package_install(){
     assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDOUTF | grep -q "post_install"
     assertEquals 0 $?
 }
@@ -194,6 +198,8 @@ function test_pearl_package_install_errors_on_hooks(){
 
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_install "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_install"
     assertEquals 0 $?
@@ -212,6 +218,8 @@ function test_pearl_package_install_deinit(){
     type -t post_install
     assertEquals 1 $?
     [ -z "$PEARL_PKGDIR" ]
+    assertEquals 0 $?
+    [ -z "$PEARL_PKGVARDIR" ]
     assertEquals 0 $?
 }
 
@@ -232,6 +240,8 @@ function test_pearl_package_install_no_install_file(){
     assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDOUTF | grep -q "post_install"
     assertEquals 1 $?
 }
@@ -247,6 +257,8 @@ function test_pearl_package_install_empty_install(){
 
     assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     assertEquals "" "$(cat "$STDOUTF" | grep -v "Installing")"
 }
@@ -264,6 +276,8 @@ function test_pearl_local_package_install(){
     assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDOUTF | grep -q "post_install"
     assertEquals 0 $?
 }
@@ -275,6 +289,8 @@ function test_pearl_local_package_install_not_existing_directory(){
 
     assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/ ]
+    assertEquals 0 $?
+    [ ! -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDERRF | grep -q "not a directory"
     assertEquals 0 $?
@@ -289,6 +305,8 @@ function test_pearl_local_package_install_not_readable(){
     assertCommandFailOnStatus $LOCAL_COPY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/ ]
     assertEquals 0 $?
+    [ ! -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDERRF | grep -q "not readable"
     assertEquals 0 $?
     chmod +r "$HOME/my-vim-rails"
@@ -299,6 +317,8 @@ function test_pearl_package_remove(){
     scenario_misc_mods
     assertCommandSuccess load_repo_first pearl_package_remove "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "pre_remove"
     assertEquals 0 $?
@@ -313,12 +333,16 @@ function test_pearl_package_remove_errors_on_hooks(){
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_remove "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDOUTF | grep -q "pre_remove"
     assertEquals 0 $?
 
     create_bad_install $pkgname post_remove
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_remove "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_remove"
     assertEquals 0 $?
@@ -335,6 +359,8 @@ function test_pearl_package_remove_deinit(){
     assertEquals 1 $?
     [ -z "$PEARL_PKGDIR" ]
     assertEquals 0 $?
+    [ -z "$PEARL_PKGVARDIR" ]
+    assertEquals 0 $?
 }
 
 function test_pearl_package_remove_not_installed(){
@@ -350,6 +376,8 @@ function test_pearl_package_remove_empty_install(){
     assertCommandSuccess load_repo_first pearl_package_remove $pkgname
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     assertEquals "" "$(cat "$STDOUTF" | grep -v "Removing")"
 }
 
@@ -359,6 +387,8 @@ function test_pearl_package_remove_not_existing_package(){
     unset PEARL_PACKAGES[ls-colors]
     assertCommandSuccess load_repo_first pearl_package_remove "$pkgname"
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
 }
 
@@ -373,6 +403,8 @@ function test_pearl_package_update(){
 
     assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat "$STDOUTF" | grep -q "pre_update"
     assertEquals 0 $?
@@ -407,6 +439,8 @@ function test_pearl_package_update_url_changed(){
     assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat "$STDOUTF" | grep -q "pre_remove"
     assertEquals 0 $?
     cat "$STDOUTF" | grep -q "post_remove"
@@ -438,6 +472,8 @@ function test_pearl_package_update_git_config_error(){
     assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat "$STDOUTF" | grep -q "pre_update"
     assertEquals 0 $?
     cat "$STDOUTF" | grep -q "post_update"
@@ -461,12 +497,16 @@ function test_pearl_package_update_errors_on_hooks(){
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDOUTF | grep -q "pre_update"
     assertEquals 0 $?
 
     create_bad_install $pkgname post_update
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDOUTF | grep -q "post_update"
     assertEquals 0 $?
@@ -488,6 +528,8 @@ function test_pearl_package_update_deinit(){
     assertEquals 1 $?
     [ -z "$PEARL_PKGDIR" ]
     assertEquals 0 $?
+    [ -z "$PEARL_PKGVARDIR" ]
+    assertEquals 0 $?
 }
 
 function test_pearl_package_update_not_installed(){
@@ -507,6 +549,8 @@ function test_pearl_package_update_empty_install(){
     echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
     assertCommandSuccess load_repo_first pearl_package_update $pkgname
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     assertEquals "" "$(cat "$STDOUTF" | grep -v "Updating")"
 }
@@ -528,6 +572,8 @@ function test_pearl_local_package_update(){
     assertEquals 0 $?
     [ ! -e $PEARL_HOME/packages/default/$pkgname/file_django ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDOUTF | grep -qv "post_update"
     assertEquals 0 $?
     cat $STDOUTF | grep -qv "pre_update"
@@ -545,6 +591,8 @@ function test_pearl_local_update_install_not_existing_directory(){
     assertEquals 0 $?
     [ -e $PEARL_HOME/packages/default/$pkgname/file_django ]
     assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
     cat $STDERRF | grep -q "not a directory"
     assertEquals 0 $?
 }
@@ -560,6 +608,8 @@ function test_pearl_local_update_install_not_readable(){
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -e $PEARL_HOME/packages/default/$pkgname/file_django ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     cat $STDERRF | grep -q "not readable"
     assertEquals 0 $?

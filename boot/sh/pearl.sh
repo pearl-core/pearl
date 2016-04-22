@@ -10,8 +10,6 @@ export PEARL_HOME=${HOME}/.config/pearl
 export PEARL_TEMPORARY=${PEARL_HOME}/tmp/$(tty)
 mkdir -p ${PEARL_TEMPORARY}
 
-source ${PEARL_ROOT}/lib/utils/utils.sh
-
 PATH=${PEARL_ROOT}/bin:${PATH}
 MANPATH=${MANPATH}:${PEARL_ROOT}/man
 

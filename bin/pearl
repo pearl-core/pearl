@@ -5,6 +5,16 @@ set -e -o pipefail
 [ -z "$PEARL_ROOT" ] && { echo "Error: The variable PEARL_ROOT must be specified in order to run this script."; exit 1; }
 [ -d "$PEARL_ROOT" ] || { echo "Error: The value in variable PEARL_ROOT is not a directory."; exit 2; }
 
+BASH_VERSION_MIN="4.1"
+[[ "$BASH_VERSION" < "$BASH_VERSION_MIN" ]] && \
+    echo "Warn: Pearl might not work properly since bash is too old: $BASH_VERSION < $BASH_VERSION_MIN"
+
+GIT_VERSION_MIN="git version 1.8.0"
+GIT_VERSION="$(git version 2> /dev/null)"
+[[ "$GIT_VERSION" < "$GIT_VERSION_MIN" ]] && \
+    echo "Warn: Pearl might not work properly since git is too old: $GIT_VERSION < $GIT_VERSION_MIN"
+
+
 NAME='Pearl'
 CMD='pearl'
 DESCRIPTION='Because only in the best shells you will find a Pearl...'
