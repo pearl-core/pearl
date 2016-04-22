@@ -216,6 +216,8 @@ function pearl_package_install(){
     fi
     cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
+    PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
+    mkdir -p "$PEARL_PKGVARDIR"
     if type -t $post_func &> /dev/null
     then
         try $post_func
@@ -271,6 +273,7 @@ function pearl_package_update(){
     bold_white; echo -n "* "; normal
     echo "Updating $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
+    PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
     cd $PEARL_PKGDIR
 
     if ! _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" && \
@@ -342,6 +345,7 @@ function pearl_package_remove(){
     bold_white; echo -n "* "; normal
     echo "Removing $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
+    PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
     cd $PEARL_PKGDIR
     if type -t $pre_func &> /dev/null
     then
@@ -388,6 +392,7 @@ function _deinit_package(){
     local pre_func=$2
     local post_func=$3
     unset PEARL_PKGDIR
+    unset PEARL_PKGVARDIR
     unset ${pre_func} ${post_func}
 }
 
