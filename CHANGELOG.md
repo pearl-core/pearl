@@ -1,5 +1,13 @@
 # Change Log #
 
+## [1.4.0][v140] - 2016-04-23 ##
+
+* Add a dedicated directory `$PEARL_PKGVARDIR` for the Pearl packages in order to store data
+  needed during the execution of the package itself
+* Add warning in case of an old version of git or bash
+* Introduce `$PEARL_PKGDIR` environment variable for emacs and vim config files
+* Change the definition of public API
+
 ## [1.3.1][v131] - 2016-04-21 ##
 
 * Fix compatibility with Bash 4.1
@@ -44,3 +52,4 @@
 [v120]: https://github.com/pearl-core/pearl/releases/tag/1.2.0
 [v130]: https://github.com/pearl-core/pearl/releases/tag/1.3.0
 [v131]: https://github.com/pearl-core/pearl/releases/tag/1.3.1
+[v140]: https://github.com/pearl-core/pearl/releases/tag/1.4.0
