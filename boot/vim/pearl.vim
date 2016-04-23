@@ -14,6 +14,7 @@ syntax on
 """"""""""""""""""
 for config_path in split(globpath($PEARL_HOME."/packages/*/*/pearl-metadata", 'config.vim'), "\n")
     if filereadable(config_path)
+        let $PEARL_PKGDIR = substitute(config_path, "\/pearl-metadata\/.*$", "", "")
         :exec ":source ".config_path
     endif
 endfor
