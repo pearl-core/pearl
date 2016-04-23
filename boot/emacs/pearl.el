@@ -8,6 +8,11 @@
   )
 )
 
-(dolist (config-file pearl-config-files)
+(defun source-config-file (config-file)
+  (setenv "PEARL_PKGDIR" (replace-regexp-in-string "\/pearl-metadata\/.*$" "" config-file))
   (load-file config-file)
+)
+
+(dolist (config-file pearl-config-files)
+  (source-config-file config-file)
 )
