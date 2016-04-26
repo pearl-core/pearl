@@ -22,13 +22,15 @@ set MANPATH $MANPATH $PEARL_ROOT/man
 
 ################################# MAIN ##############################
 for reponame in (ls $PEARL_HOME/packages)
-	for pkgname in (ls $PEARL_HOME/packages/$reponame)
+    for pkgname in (ls $PEARL_HOME/packages/$reponame)
         set PEARL_PKGDIR "$PEARL_HOME/packages/$reponame/$pkgname"
-		if [ -e $PEARL_PKGDIR/pearl-metadata/config.fish ]
-			source $PEARL_PKGDIR/pearl-metadata/config.fish
-		end
-		set -e PEARL_PKGDIR
-	end
+        set PEARL_PKGVARDIR "$PEARL_HOME/var/$reponame/$pkgname"
+        if [ -e $PEARL_PKGDIR/pearl-metadata/config.fish ]
+            source $PEARL_PKGDIR/pearl-metadata/config.fish
+        end
+        set -e PEARL_PKGDIR
+        set -e PEARL_PKGVARDIR
+    end
 end
 
 trap "source $PEARL_ROOT/boot/fish/pearl.fish" USR1
