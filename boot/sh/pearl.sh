@@ -16,20 +16,21 @@ MANPATH=${MANPATH}:${PEARL_ROOT}/man
 ################################# MAIN ##############################
 for reponame in $(ls ${PEARL_HOME}/packages/)
 do
-	for pkgname in $(ls ${PEARL_HOME}/packages/${reponame}/)
-	do
-		PEARL_PKGDIR=${PEARL_HOME}/packages/${reponame}/${pkgname}
-		if [ -e ${PEARL_PKGDIR}/pearl-metadata/config.sh ]; then
-			source ${PEARL_PKGDIR}/pearl-metadata/config.sh
-		fi
-		if [ -n "$BASH" ] && [ -e ${PEARL_PKGDIR}/pearl-metadata/config.bash ]; then
-			source ${PEARL_PKGDIR}/pearl-metadata/config.bash
-		fi
-		if [ -n "$ZSH_NAME" ] && [ -e ${PEARL_PKGDIR}/pearl-metadata/config.zsh ]; then
-			source ${PEARL_PKGDIR}/pearl-metadata/config.zsh
-		fi
-		unset PEARL_PKGDIR
-	done
+    for pkgname in $(ls ${PEARL_HOME}/packages/${reponame}/)
+    do
+        PEARL_PKGDIR=${PEARL_HOME}/packages/${reponame}/${pkgname}
+        PEARL_PKGVARDIR=${PEARL_HOME}/var/${reponame}/${pkgname}
+        if [ -e ${PEARL_PKGDIR}/pearl-metadata/config.sh ]; then
+            source ${PEARL_PKGDIR}/pearl-metadata/config.sh
+        fi
+        if [ -n "$BASH" ] && [ -e ${PEARL_PKGDIR}/pearl-metadata/config.bash ]; then
+            source ${PEARL_PKGDIR}/pearl-metadata/config.bash
+        fi
+        if [ -n "$ZSH_NAME" ] && [ -e ${PEARL_PKGDIR}/pearl-metadata/config.zsh ]; then
+            source ${PEARL_PKGDIR}/pearl-metadata/config.zsh
+        fi
+        unset PEARL_PKGDIR PEARL_PKGVARDIR
+    done
 done
 
 trap "source ${PEARL_ROOT}/boot/sh/pearl.sh" USR1
