@@ -4,7 +4,8 @@ Pearl
 Because only in the best Shells you will find a Pearl...
 
 ```sh
-curl -sL https://git.io/vV4yE | sh
+wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+bash install.sh
 ```
 
 <h1 align="center">
@@ -165,7 +166,8 @@ Installation
 ============
 
 ```sh
-curl -sL https://git.io/vV4yE | sh
+wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+bash install.sh
 ```
 
 Dependencies
