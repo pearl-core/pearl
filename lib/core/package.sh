@@ -81,7 +81,7 @@ function _load_repo() {
         bold_white; echo -n "* "; normal
         echo "Updating $repo repository"
         cd "$PEARL_HOME/repos/$sum"
-        $GIT pull --quiet origin master
+        $GIT pull --quiet
         cd "$OLD_PWD"
     else
         bold_white; echo -n "* "; normal
