@@ -628,7 +628,7 @@ function test_pearl_load_repos(){
     echo "echo \"sourced repo.conf\"" > $PEARL_HOME/repos/31c8bf07d0de14c822e9f085156aeca2/repo.conf
     assertCommandSuccess pearl_load_repos
     assertEquals \
-        "$(echo -e "pull --quiet origin master\nsourced repo.conf")" "$(cat $STDOUTF | grep -v "Updating")"
+        "$(echo -e "pull --quiet\nsourced repo.conf")" "$(cat $STDOUTF | grep -v "Updating")"
 }
 
 function test_pearl_load_repos_new(){
