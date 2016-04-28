@@ -201,6 +201,7 @@ to [OPH](https://github.com/pearl-hub) repository?
     * :arrow_up: `:arrow_up:` when upgrading dependencies
     * :arrow_down: `:arrow_down:` when downgrading dependencies
     * :shirt: `:shirt:` when removing linter warnings
+    * :package: `:package:` when bumping the version
 
 ### Documentation Styleguide ###
 
