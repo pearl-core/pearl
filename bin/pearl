@@ -18,7 +18,6 @@ GIT_VERSION="$(git version 2> /dev/null)"
 NAME='Pearl'
 CMD='pearl'
 DESCRIPTION='Because only in the best shells you will find a Pearl...'
-VERSION='v1.0.0'
 
 PEARL_LOCAL_ROOT="${PEARL_LOCAL_ROOT:-$(readlink -f $(dirname $(readlink -f "$0"))/..)}"
 PEARL_HOME="${PEARL_HOME:-${HOME}/.config/pearl}"
