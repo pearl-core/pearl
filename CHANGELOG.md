@@ -1,5 +1,13 @@
 # Change Log #
 
+## [1.4.1][v141] - 2016-04-30 ##
+
+* Introduce `$PEARL_PKGVARDIR` on boot scripts
+* Packages do not need to have `master` as default branch
+* Change the installation process to avoid [pipe bash problem](https://www.idontplaydarts.com/2016/04/detecting-curl-pipe-bash-server-side/)
+* Ensure to get the most updated `post_update` function
+* Refactor unit tests in `test-package.sh`
+
 ## [1.4.0][v140] - 2016-04-23 ##
 
 * Add a dedicated directory `$PEARL_PKGVARDIR` for the Pearl packages in order to store data
@@ -53,3 +61,4 @@
 [v130]: https://github.com/pearl-core/pearl/releases/tag/1.3.0
 [v131]: https://github.com/pearl-core/pearl/releases/tag/1.3.1
 [v140]: https://github.com/pearl-core/pearl/releases/tag/1.4.0
+[v141]: https://github.com/pearl-core/pearl/releases/tag/1.4.1
