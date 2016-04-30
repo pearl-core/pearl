@@ -397,6 +397,7 @@ function test_pearl_package_update(){
     scenario_misc_mods
     git_mock() {
         [ "$1" == "config" ] && { echo "https://ls-colors"; return; }
+        [ "$1" == "submodule" ] && { echo "git submodule"; return; }
         echo "git pull"
     }
     GIT=git_mock
@@ -553,6 +554,26 @@ function test_pearl_package_update_empty_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     assertEquals "" "$(cat "$STDOUTF" | grep -v "Updating")"
+}
+
+function test_pearl_package_update_post_func_changed(){
+    local pkgname="ls-colors"
+    scenario_misc_mods
+    git_mock() {
+        [ "$1" == "config" ] && { echo "https://ls-colors"; return; }
+        local content=$(cat <<EOF
+function post_update(){
+    echo "new_post_update"
+}
+EOF
+)
+        echo "$content" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
+        return 0
+    }
+    GIT=git_mock
+    assertCommandSuccess load_repo_first pearl_package_update $pkgname
+    cat "$STDOUTF" | grep -q "new_post_update"
+    assertEquals 0 $?
 }
 
 function test_pearl_package_update_not_existing_package(){

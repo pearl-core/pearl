@@ -297,6 +297,7 @@ function pearl_package_update(){
             throw $HOOK_EXCEPTION;
         }
     fi
+
     if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
@@ -304,6 +305,8 @@ function pearl_package_update(){
         $GIT pull --quiet
         $GIT submodule --quiet update --init
     fi
+
+    _init_package $pkgfullname $pre_func $post_func
     if type -t $post_func &> /dev/null
     then
         try $post_func
