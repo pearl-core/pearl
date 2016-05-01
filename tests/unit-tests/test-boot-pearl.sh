@@ -10,15 +10,18 @@ function oneTimeSetUp(){
 
 function setUp(){
     pearlSetUp
+}
+
+function tearDown(){
+    pearlTearDown
+}
+
+function ls_colors_scenario() {
     mkdir -p ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata
     create_config_file config.sh
     create_config_file config.bash
     create_config_file config.zsh
     create_config_file config.fish
-}
-
-function tearDown(){
-    pearlTearDown
 }
 
 function create_config_file() {
@@ -55,6 +58,7 @@ function test_pearl_wrong_pearl_root_var(){
 }
 
 function test_pearl(){
+    ls_colors_scenario
     local test_content=$(cat <<EOF
     # Make sure that PEARL_HOME, PEARL_ROOT, PEARL_TEMPORARY are set with export
     env | grep -q PEARL_HOME
@@ -72,7 +76,22 @@ EOF
     assertEquals "$(echo -e "sourced config.sh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.bash\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.zsh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
 }
 
+function test_pearl_add_path_once() {
+    local test_content=$(cat <<EOF
+    echo \$PATH | tr ":" "\n" | grep \$PEARL_ROOT/bin | wc -l
+    echo \$MANPATH | tr ":" "\n" | grep \$PEARL_ROOT/man | wc -l
+EOF
+)
+    echo -e "$test_content" > ${OUTPUT_DIR}/sourced_file
+
+    PATH=$PATH:$PEARL_ROOT/bin
+    MANPATH=$MANPATH:$PEARL_ROOT/man
+    assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/sh/pearl.sh
+    assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
+}
+
 function test_pearl_fish(){
+    ls_colors_scenario
     local test_content=$(cat <<EOF
     source $(dirname $0)/../../boot/fish/pearl.fish;
     env | grep -q PEARL_HOME;
@@ -86,12 +105,27 @@ EOF
     assertEquals "$(echo -e "sourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
 }
 
+function test_pearl_fish_add_path_once() {
+    local test_content=$(cat <<EOF
+    source $(dirname $0)/../../boot/fish/pearl.fish;
+    echo \$PATH | tr " " "\n" | grep \$PEARL_ROOT/bin | wc -l
+    echo \$MANPATH | tr " " "\n" | grep \$PEARL_ROOT/man | wc -l
+EOF
+)
+    PATH=$PATH:$PEARL_ROOT/bin
+    MANPATH=$MANPATH:$PEARL_ROOT/man
+    assertCommandSuccess fish_wrapper "$test_content"
+    assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
+}
+
 function test_pearl_config_error(){
+    ls_colors_scenario
     echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/config.sh
     assertCommandFailOnStatus 123 source $(dirname $0)/../../boot/sh/pearl.sh
 }
 
 function test_pearl_fish_config_error(){
+    ls_colors_scenario
     # Unfortunately there is not an equivalent to the bash 'set -e'
     # Fish will return 0 in this case
     # (more info: https://github.com/fish-shell/fish-shell/issues/805)

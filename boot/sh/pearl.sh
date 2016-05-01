@@ -10,8 +10,14 @@ export PEARL_HOME=${HOME}/.config/pearl
 export PEARL_TEMPORARY=${PEARL_HOME}/tmp/$(tty)
 mkdir -p ${PEARL_TEMPORARY}
 
-PATH=${PEARL_ROOT}/bin:${PATH}
-MANPATH=${MANPATH}:${PEARL_ROOT}/man
+if [[ $PATH != *"${PEARL_ROOT}/bin"* ]]
+then
+    PATH=$PATH:${PEARL_ROOT}/bin
+fi
+if [[ $MANPATH != *"${PEARL_ROOT}/man"* ]]
+then
+    MANPATH=$MANPATH:${PEARL_ROOT}/man
+fi
 
 ################################# MAIN ##############################
 for reponame in $(ls ${PEARL_HOME}/packages/)

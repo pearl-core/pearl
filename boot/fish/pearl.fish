@@ -17,8 +17,12 @@ set -x PEARL_HOME $HOME/.config/pearl
 set -x PEARL_TEMPORARY $PEARL_HOME/tmp/(tty)
 mkdir -p $PEARL_TEMPORARY
 
-set PATH $PEARL_ROOT/bin $PATH
-set MANPATH $MANPATH $PEARL_ROOT/man
+if not contains $PEARL_ROOT/bin $PATH
+    set PATH $PATH $PEARL_ROOT/bin
+end
+if not contains $PEARL_ROOT/man $MANPATH
+    set MANPATH $MANPATH $PEARL_ROOT/man
+end
 
 ################################# MAIN ##############################
 for reponame in (ls $PEARL_HOME/packages)
