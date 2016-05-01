@@ -10,9 +10,9 @@ export PEARL_HOME=${HOME}/.config/pearl
 export PEARL_TEMPORARY=${PEARL_HOME}/tmp/$(tty)
 mkdir -p ${PEARL_TEMPORARY}
 
-if [[ $PATH != *"${PEARL_ROOT}/bin"* ]]
+if [[ $PATH != *"${PEARL_HOME}/bin"* ]]
 then
-    PATH=$PATH:${PEARL_ROOT}/bin
+    PATH=$PATH:${PEARL_HOME}/bin
 fi
 if [[ $MANPATH != *"${PEARL_ROOT}/man"* ]]
 then

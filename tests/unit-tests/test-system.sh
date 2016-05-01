@@ -45,13 +45,21 @@ function test_pearl_init(){
     rm -rf $PEARL_HOME
     assertCommandSuccess pearl_init
 
-    [ -d $PEARL_HOME/repos ]
+    [ -d $PEARL_HOME/bin ]
     assertEquals 0 $?
     [ -d $PEARL_HOME/packages ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/repos ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/tmp ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var ]
     assertEquals 0 $?
 
     [ -e $PEARL_HOME/pearl.conf ]
     assertEquals 0 $?
+
+    assertEquals "$(readlink -f $PEARL_HOME/bin/pearl)" "$PEARL_ROOT/bin/pearl"
 
     assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.bashrc)"
     assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.zshrc)"
