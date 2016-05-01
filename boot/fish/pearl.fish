@@ -17,8 +17,8 @@ set -x PEARL_HOME $HOME/.config/pearl
 set -x PEARL_TEMPORARY $PEARL_HOME/tmp/(tty)
 mkdir -p $PEARL_TEMPORARY
 
-if not contains $PEARL_ROOT/bin $PATH
-    set PATH $PATH $PEARL_ROOT/bin
+if not contains $PEARL_HOME/bin $PATH
+    set PATH $PATH $PEARL_HOME/bin
 end
 if not contains $PEARL_ROOT/man $MANPATH
     set MANPATH $MANPATH $PEARL_ROOT/man

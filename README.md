@@ -360,8 +360,28 @@ update the *pearl.conf* file by adding the following line:
 Troubleshooting
 ===============
 
-This section has been left blank intentionally.
-It will be filled up as soon as troubles come in!
+##Corrupted Pearl Home directory##
+
+> **Q**: What should I do if I accidentally removed files/packages in `$PEARL_HOME`?
+
+> **A**: You can recover the structure of the `$PEARL_HOME` by running:
+
+    $> pearl init
+
+> The command will create all the essential directories and symlinks in `$PEARL_HOME`.
+> It is harmless to run the `init` command multiple times since it is idempotent.
+
+##Corrupted package##
+
+> **Q**: Why I can no longer update/remove a package?
+
+> **A**: This is probably because either one of the hook functions
+> is failing or the package content is corrupted. You can forcely delete a package by simply
+> removing its directory:
+
+    $> rm -rf $PEARL_HOME/packages/pearl/<packagename>
+
+> After that, you can reinstall the package again.
 
 Contributing
 ============

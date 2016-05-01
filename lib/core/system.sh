@@ -11,8 +11,14 @@ GIT=git
 
 function pearl_init(){
     bold_white; echo -n "* "; normal; echo "Creating Pearl configuration in $PEARL_HOME"
-    mkdir -p $PEARL_HOME/repos
+    mkdir -p $PEARL_HOME/bin
     mkdir -p $PEARL_HOME/packages
+    mkdir -p $PEARL_HOME/repos
+    mkdir -p $PEARL_HOME/tmp
+    mkdir -p $PEARL_HOME/var
+
+    [ -e "$PEARL_HOME/bin/pearl" ] && rm -f "$PEARL_HOME/bin/pearl"
+    ln -s "$PEARL_ROOT/bin/pearl" "$PEARL_HOME/bin"
 
     [ -e "$PEARL_HOME/pearl.conf" ] || cp "$PEARL_ROOT/etc/pearl.conf.template" "$PEARL_HOME/pearl.conf"
 

@@ -64,7 +64,7 @@ function test_pearl(){
     env | grep -q PEARL_HOME
     env | grep -q PEARL_ROOT
     env | grep -q PEARL_TEMPORARY
-    echo \$PATH | grep -q \$PEARL_ROOT/bin
+    echo \$PATH | grep -q \$PEARL_HOME/bin
     echo \$MANPATH | grep -q \$PEARL_ROOT/man
 EOF
 )
@@ -78,13 +78,13 @@ EOF
 
 function test_pearl_add_path_once() {
     local test_content=$(cat <<EOF
-    echo \$PATH | tr ":" "\n" | grep \$PEARL_ROOT/bin | wc -l
+    echo \$PATH | tr ":" "\n" | grep \$PEARL_HOME/bin | wc -l
     echo \$MANPATH | tr ":" "\n" | grep \$PEARL_ROOT/man | wc -l
 EOF
 )
     echo -e "$test_content" > ${OUTPUT_DIR}/sourced_file
 
-    PATH=$PATH:$PEARL_ROOT/bin
+    PATH=$PATH:$PEARL_HOME/bin
     MANPATH=$MANPATH:$PEARL_ROOT/man
     assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/sh/pearl.sh
     assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
@@ -97,7 +97,7 @@ function test_pearl_fish(){
     env | grep -q PEARL_HOME;
     env | grep -q PEARL_ROOT;
     env | grep -q PEARL_TEMPORARY;
-    echo \$PATH | grep -q \$PEARL_ROOT/bin;
+    echo \$PATH | grep -q \$PEARL_HOME/bin;
     echo \$MANPATH | grep -q \$PEARL_ROOT/man;
 EOF
 )
@@ -108,11 +108,11 @@ EOF
 function test_pearl_fish_add_path_once() {
     local test_content=$(cat <<EOF
     source $(dirname $0)/../../boot/fish/pearl.fish;
-    echo \$PATH | tr " " "\n" | grep \$PEARL_ROOT/bin | wc -l
+    echo \$PATH | tr " " "\n" | grep \$PEARL_HOME/bin | wc -l
     echo \$MANPATH | tr " " "\n" | grep \$PEARL_ROOT/man | wc -l
 EOF
 )
-    PATH=$PATH:$PEARL_ROOT/bin
+    PATH=$PATH:$PEARL_HOME/bin
     MANPATH=$MANPATH:$PEARL_ROOT/man
     assertCommandSuccess fish_wrapper "$test_content"
     assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
