@@ -78,13 +78,13 @@ function _load_repo() {
     local repo=$1
     local sum=$(echo "$repo" | md5sum | cut -d ' ' -f1)
     if [ -d "$PEARL_HOME/repos/$sum/.git" ]; then
-        bold_white; echo -n "* "; normal
+        bold_cyan; echo -n "* "; normal
         echo "Updating $repo repository"
         cd "$PEARL_HOME/repos/$sum"
         $GIT pull --quiet
         cd "$OLD_PWD"
     else
-        bold_white; echo -n "* "; normal
+        bold_cyan; echo -n "* "; normal
         echo "Initializing $repo repository"
         $GIT clone --quiet --depth 1 "$repo" "$PEARL_HOME/repos/$sum"
     fi
@@ -202,7 +202,7 @@ function pearl_package_install(){
     [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
     _is_installed $pkgfullname && { warn "Skipping $pkgname since it is already installed."; throw $ALREADY_INSTALLED_EXCEPTION; }
 
-    bold_white; echo -n "* "; normal
+    bold_cyan; echo -n "* "; normal
     echo "Installing $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
     mkdir -p $(dirname "$PEARL_PKGDIR")
@@ -270,7 +270,7 @@ function pearl_package_update(){
 
     _init_package $pkgfullname $pre_func $post_func
 
-    bold_white; echo -n "* "; normal
+    bold_cyan; echo -n "* "; normal
     echo "Updating $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
     PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
@@ -345,7 +345,7 @@ function pearl_package_remove(){
 
     _init_package $pkgfullname $pre_func $post_func
 
-    bold_white; echo -n "* "; normal
+    bold_cyan; echo -n "* "; normal
     echo "Removing $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
     PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
@@ -488,7 +488,7 @@ function _print_package() {
     local pkgname=${pkg_array[1]}
     bold_red
     echo -n "$reponame/"
-    bold_white
+    bold_cyan
     echo -n "$pkgname"
     bold_cyan
     echo " $installed"

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 source "$(dirname $0)/utils.sh"
 
 source "$(dirname $0)/../../lib/utils/utils.sh"

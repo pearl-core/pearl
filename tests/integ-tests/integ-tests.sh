@@ -13,6 +13,9 @@ then
     exit 33
 fi
 
+[ -n "$ZSH_NAME" ] && source ${HOME}/.zshrc
+[ -n "$BASH" ] && source ${HOME}/.bashrc
+
 export PEARL_ROOT="$1"
 export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
 export PEARL_HOME="${HOME}/.config/pearl"

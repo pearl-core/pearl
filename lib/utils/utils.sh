@@ -144,7 +144,7 @@ function warn() {
 #   Message printed to stdout.
 #######################################
 function info(){
-    echo -e "\033[1;37m$@\033[0m"
+    echo -e "\033[1;36m$@\033[0m"
 }
 
 #######################################
@@ -161,6 +161,22 @@ function info(){
 #######################################
 function bold_white(){
     echo -ne "\033[1;37m"
+}
+
+#######################################
+# Print escape chars to activate the bold cyan style.
+#
+# Globals:
+#   None
+# Arguments:
+#   None
+# Returns:
+#   None
+# Output:
+#   Print the bold white escape chars.
+#######################################
+function bold_cyan(){
+    echo -ne "\033[1;36m"
 }
 
 #######################################
@@ -232,8 +248,11 @@ function ask(){
     local default_answer=$2
     check_not_null $question
 
-    local answers="Y y N n"
-    [[ "$answers" =~ "$default_answer" ]] || { error "The default answer: $default_answer is wrong."; return $WRONG_ANSWER; }
+    if [ ! -z "$default_answer" ]
+    then
+        local answers="Y y N n"
+        [[ "$answers" =~ "$default_answer" ]] || { error "The default answer: $default_answer is wrong."; return $WRONG_ANSWER; }
+    fi
 
     local default="Y"
     [ -z "$default_answer" ] || default=$(echo "$default_answer" | tr '[:lower:]' '[:upper:]')

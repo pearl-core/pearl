@@ -59,7 +59,7 @@ function test_pearl_init(){
     [ -e $PEARL_HOME/pearl.conf ]
     assertEquals 0 $?
 
-    assertEquals "$(readlink -f $PEARL_HOME/bin/pearl)" "$PEARL_ROOT/bin/pearl"
+    assertEquals "$(readlink -f $PEARL_HOME/bin/pearl)" "$(readlink -f $PEARL_ROOT/bin/pearl)"
 
     assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.bashrc)"
     assertEquals "$(echo -e "export PEARL_ROOT=$PEARL_ROOT\nsource ${PEARL_ROOT}/boot/sh/pearl.sh")" "$(cat $HOME/.zshrc)"

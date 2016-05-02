@@ -14,7 +14,6 @@ GIT_VERSION="$(git version 2> /dev/null)"
 [[ "$GIT_VERSION" < "$GIT_VERSION_MIN" ]] && \
     echo "Warn: Pearl might not work properly since git is too old: $GIT_VERSION < $GIT_VERSION_MIN"
 
-
 NAME='Pearl'
 CMD='pearl'
 DESCRIPTION='Because only in the best shells you will find a Pearl...'
