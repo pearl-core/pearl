@@ -382,6 +382,13 @@ Troubleshooting
     $> rm -rf $PEARL_HOME/packages/pearl/<packagename>
 
 > After that, you can reinstall the package again.
+> The Pearl packages contain a dedicated directory `var` for storing
+> data needed for the package itself.
+> The `var` data are always managed by the package and they never gets deleted by Pearl
+> during the package removal.
+> If you want to delete the content in `var` package:
+
+    $> rm -rf $PEARL_HOME/var/pearl/<packagename>
 
 Contributing
 ============
