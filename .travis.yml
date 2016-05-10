@@ -1,23 +1,28 @@
 # vim: ft=yaml
+os:
+  - linux
+  - osx
+
 language: bash
 sudo: required
 
+env:
+  - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.0"
+
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y zsh
-  - ./tests/integ-tests/install-fish.sh "2.2.0"
-  - ./tests/integ-tests/install-bash.sh "4.1"
-  - ./tests/integ-tests/install-git.sh "1.8.0"
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./tests/integ-tests/install-linux-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./tests/integ-tests/install-osx-deps.sh; fi;
 
 install:
   - PATH=$PWD/bin:$PATH
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"; fi;
 
 script:
   - git --version
   - bash --version
   - zsh --version
   - fish --version
-  - ./tests/unit-tests/unit-tests.sh
+  - bash ./tests/unit-tests/unit-tests.sh
   - bash ./tests/integ-tests/integ-tests.sh $PWD
   - zsh ./tests/integ-tests/integ-tests.sh $PWD
   - fish ./tests/integ-tests/integ-tests.fish $PWD

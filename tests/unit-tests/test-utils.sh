@@ -49,7 +49,7 @@ function test_warn(){
 
 function test_info(){
     assertCommandSuccess info "Test"
-    local expected=$(echo -e "\033[1;37mTest\033[0m")
+    local expected=$(echo -e "\033[1;36mTest\033[0m")
     assertEquals "$expected" "$(cat $STDOUTF)"
 }
 

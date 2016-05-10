@@ -23,6 +23,9 @@ bash install.sh
 - [Description](#description)
 - [Quickstart](#quickstart)
 - [Installation](#installation)
+  - [Dependencies](#dependencies)
+  - [Linux](#linux)
+  - [OSX](#osx)
 - [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds)
 - [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds)
 - [Troubleshooting](#troubleshooting)
@@ -31,7 +34,7 @@ bash install.sh
 Description
 ===========
 **Pearl** is a package manager for dotfiles, plugins, programs
-and any form of source code accessible via git.
+and any form of code accessible via git for Linux and OSX.
 
 As soon as a package gets installed, its content can be activated out of the box
 according to certain events, like, for instance, a shell startup (Bash, Zsh or Fish) or
@@ -47,7 +50,7 @@ The main advantages on using Pearl are:
 - Automatic bootstrap of the package content whenever shells or editors get started.
 - Access to a wide range of existing packages via the [OPH (Official Pearl Hub)](https://github.com/pearl-hub).
 - Allows to create your own package repository that can be shared with your friends!
-- Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl).
+- Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl) for Linux and OSX.
 - Small number of [dependencies](#dependencies) needed that ensures compatibility with most of the systems.
 
 Quickstart
@@ -165,19 +168,46 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 Installation
 ============
 
+Dependencies
+------------
+Before installing Pearl be sure that all dependencies are properly installed in your system.
+The Pearl dependencies are the following:
+
+- [bash (>=4.1)](https://www.gnu.org/software/bash/)
+- [git (>=1.8)](https://git-scm.com/)
+- [GNU coreutils](https://www.gnu.org/software/coreutils/)
+- [grep](https://www.gnu.org/software/grep/)
+
+Linux
+-----
+Assuming all Pearl dependencies are properly installed in the system, to install Pearl
+run the following:
 ```sh
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 bash install.sh
 ```
 
-Dependencies
-------------
-The main Pearl dependencies are the following:
+OSX
+---
+In order to install all Pearl dependencies, you first need to install [Homebrew](http://brew.sh/).
 
-- [bash (>=4.1)](https://www.gnu.org/software/bash/)
-- [git (>=1.8)](https://git-scm.com/)
-- [coreutils](https://www.gnu.org/software/coreutils/)
-- [grep](https://www.gnu.org/software/grep/)
+To install all the needed dependencies via Homebrew:
+```sh
+brew update
+brew install bash git coreutils
+PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+```
+
+You need to update `PATH` variable by adding the path `/usr/local/opt/coreutils/libexec/gnubin`
+in the config file of your favourite shell
+(i.e. `~/.bashrc`, `~/.zshrc` or `~/.config/fish/fish.config`).
+
+Once all Pearl dependencies are properly installed in the system, to install Pearl
+run the following:
+```sh
+wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+bash install.sh
+```
 
 Create your own Pearl package in seconds!
 ===============

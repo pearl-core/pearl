@@ -7,6 +7,8 @@ if [ -z $argv[1] ]
     exit 33
 end
 
+source $HOME/.config/fish/config.fish
+
 set -x PEARL_ROOT $argv[1]
 set -x HOME (mktemp -d -t pearl-user-home.XXXXXXX)
 set -x PEARL_HOME "$HOME/.config/pearl"

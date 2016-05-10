@@ -10,7 +10,7 @@
 GIT=git
 
 function pearl_init(){
-    bold_white; echo -n "* "; normal; echo "Creating Pearl configuration in $PEARL_HOME"
+    bold_cyan; echo -n "* "; normal; echo "Creating Pearl configuration in $PEARL_HOME"
     mkdir -p $PEARL_HOME/bin
     mkdir -p $PEARL_HOME/packages
     mkdir -p $PEARL_HOME/repos
@@ -24,21 +24,21 @@ function pearl_init(){
 
     apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.bashrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc
-    bold_white; echo -n "* "; normal; echo "Activated Pearl for Bash"
+    bold_cyan; echo -n "* "; normal; echo "Activated Pearl for Bash"
 
     apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.zshrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.zshrc
-    bold_white; echo -n "* "; normal; echo "Activated Pearl for Zsh"
+    bold_cyan; echo -n "* "; normal; echo "Activated Pearl for Zsh"
 
     apply "source ${PEARL_ROOT}/boot/fish/pearl.fish" ${HOME}/.config/fish/config.fish
     apply "set -x PEARL_ROOT ${PEARL_ROOT}" ${HOME}/.config/fish/config.fish
-    bold_white; echo -n "* "; normal; echo "Activated Pearl for Fish shell"
+    bold_cyan; echo -n "* "; normal; echo "Activated Pearl for Fish shell"
 
     link vim "${PEARL_ROOT}/boot/vim/pearl.vim"
-    bold_white; echo -n "* "; normal; echo "Activated Pearl for Vim editor"
+    bold_cyan; echo -n "* "; normal; echo "Activated Pearl for Vim editor"
 
     link emacs "${PEARL_ROOT}/boot/emacs/pearl.el"
-    bold_white; echo -n "* "; normal; echo "Activated Pearl for Emacs editor"
+    bold_cyan; echo -n "* "; normal; echo "Activated Pearl for Emacs editor"
 
     echo
     info "Done! Open a new terminal and have fun!"
@@ -86,7 +86,7 @@ function pearl_remove(){
 
 function pearl_update(){
     cd $PEARL_ROOT
-    bold_white; echo -n "* "; normal; echo "Updating Pearl script"
+    bold_cyan; echo -n "* "; normal; echo "Updating Pearl script"
     $GIT fetch --quiet --all
     $GIT reset --quiet --hard origin/master
 
