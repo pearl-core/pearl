@@ -1,5 +1,12 @@
 # Change Log #
 
+## [1.4.2][v142] - 2016-05-10 ##
+
+* Add support for OSX
+* Add check for existing `PEARL_HOME` variable for emacs/vim boot scripts
+* Add `PEARL_HOME/bin` directory to have symlinks for the Pearl packages executables
+* Avoid polluting `PATH` variable by introducing a check first
+
 ## [1.4.1][v141] - 2016-04-30 ##
 
 * Introduce `$PEARL_PKGVARDIR` on boot scripts
@@ -62,3 +69,4 @@
 [v131]: https://github.com/pearl-core/pearl/releases/tag/1.3.1
 [v140]: https://github.com/pearl-core/pearl/releases/tag/1.4.0
 [v141]: https://github.com/pearl-core/pearl/releases/tag/1.4.1
+[v142]: https://github.com/pearl-core/pearl/releases/tag/1.4.2
