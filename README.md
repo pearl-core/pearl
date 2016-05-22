@@ -66,7 +66,7 @@ List
 ```sh
 $ pearl list
 ...
-pearl/git
+pearl/dot-git
     Awesome git dotfiles (https://github.com/pearl-hub/git)
 pearl/sesaila [installed]
     Awesome aliases for Bash, Zsh and Fish shells (https://github.com/pearl-hub/sesaila)
@@ -84,18 +84,18 @@ Search
 ```sh
 $ pearl search vim
 * Updating https://github.com/pearl-hub/repo.git repository
-pearl/vim
+pearl/dot-vim
     Awesome vim dotfiles (https://github.com/pearl-hub/vim)
 ```
 
 Install
 -------
-- Install `pearl/vim` package (as soon as the package is installed the package is ready out of the box in vim editor!):
+- Install `pearl/dot-vim` package (as soon as the package is installed the package is ready out of the box in vim editor!):
 
 ```sh
-$ pearl install vim
+$ pearl install dot-vim
 * Updating https://github.com/pearl-hub/repo.git repository
-* Installing pearl/vim package
+* Installing pearl/dot-vim package
 ```
 
 - Install `pearl/trash` package:
@@ -118,12 +118,12 @@ Options:
 
 Update
 -------
-- Update `pearl/vim` package:
+- Update `pearl/dot-vim` package:
 
 ```sh
-$ pearl update vim
+$ pearl update dot-vim
 * Updating https://github.com/pearl-hub/repo.git repository
-* Updating pearl/vim package
+* Updating pearl/dot-vim package
 ```
 
 - Update Pearl and all its packages installed:
@@ -132,7 +132,8 @@ $ pearl update vim
 $ pearl update
 ...
 * Updating https://github.com/pearl-hub/repo.git repository
-* Updating pearl/vim package
+* Updating Pearl script
+* Updating pearl/dot-vim package
 * Updating pearl/airline package
 * Updating pearl/trash package
 * Updating pearl/caprica package
@@ -141,15 +142,12 @@ $ pearl update
 
 Remove
 -------
-- Remove `pearl/vim` package:
+- Remove `pearl/dot-vim` package:
 
 ```sh
-$ pearl remove vim
+$ pearl remove dot-vim
 * Updating https://github.com/pearl-hub/repo.git repository
-* Removing pearl/vim package
-* Removing pearl/airline package
-* Removing pearl/trash package
-* Removing pearl/caprica package
+* Removing pearl/dot-vim package
 ```
 
 - Remove Pearl and all its packages installed:
@@ -159,8 +157,10 @@ $ pearl remove
 ...
 Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 * Updating https://github.com/pearl-hub/repo.git repository
-* Removing pearl/vim package
-...
+* Removing pearl/dot-vim package
+* Removing pearl/airline package
+* Removing pearl/trash package
+* Removing pearl/caprica package
 ...
 ```
 
@@ -177,8 +177,8 @@ The Pearl dependencies are the following:
 - [GNU coreutils](https://www.gnu.org/software/coreutils/)
 - [grep](https://www.gnu.org/software/grep/)
 
-The following are ***optional*** dependencies in case you use a different shell from
-bash:
+The following are ***optional*** dependencies in case you are using a different shell from
+`bash`:
 
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
@@ -200,12 +200,7 @@ To install all the needed dependencies via Homebrew:
 ```sh
 brew update
 brew install bash git coreutils
-PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 ```
-
-You need to update `PATH` variable by adding the path `/usr/local/opt/coreutils/libexec/gnubin`
-in the config file of your favourite shell
-(i.e. `~/.bashrc`, `~/.zshrc` or `~/.config/fish/fish.config`).
 
 Once all Pearl dependencies are properly installed in the system, to install Pearl
 run the following:

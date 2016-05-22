@@ -15,7 +15,6 @@ before_install:
 
 install:
   - PATH=$PWD/bin:$PATH
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"; fi;
 
 script:
   - git --version
