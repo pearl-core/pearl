@@ -23,7 +23,7 @@ GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
 # Output:
 #   None
 #######################################
-function pearl_update_path_osx() {
+function pearl_update_path() {
     [ -d "$GNUBIN" ] && PATH="$GNUBIN:$PATH"
     return 0
 }
@@ -37,7 +37,7 @@ function pearl_update_path_osx() {
 # This function is useful for OSX systems in order to ensure that
 # GNU executables have major priority against the local executables.
 #
-# The difference with pearl_update_path_osx is that the current function does
+# The difference with pearl_update_path is that the current function does
 # not pollute PATH variable.
 #
 # Globals:
@@ -50,7 +50,7 @@ function pearl_update_path_osx() {
 # Output:
 #   -            : The command output.
 #######################################
-function pearl_attempt_command_osx() {
+function pearl_attempt_command() {
     local cmd=$1
     shift
     if [ -x "$GNUBIN/$cmd" ]
