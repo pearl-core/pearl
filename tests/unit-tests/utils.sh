@@ -14,6 +14,7 @@ function pearlRootSetUp(){
     touch $PEARL_ROOT/etc/pearl.conf.template
     mkdir -p $PEARL_ROOT/lib/utils
     echo "echo sourced utils.sh" > $PEARL_ROOT/lib/utils/utils.sh
+    echo "echo sourced osx-compat.sh" > $PEARL_ROOT/lib/utils/osx-compat.sh
     echo "1.2.3" > $PEARL_ROOT/VERSION
 }
 
