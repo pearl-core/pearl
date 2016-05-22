@@ -177,6 +177,12 @@ The Pearl dependencies are the following:
 - [GNU coreutils](https://www.gnu.org/software/coreutils/)
 - [grep](https://www.gnu.org/software/grep/)
 
+The following are ***optional*** dependencies in case you use a different shell from
+bash:
+
+- [fish (>=2.2.0)](https://fishshell.com/)
+- [zsh (>=5.2)](http://www.zsh.org/)
+
 Linux
 -----
 Assuming all Pearl dependencies are properly installed in the system, to install Pearl
