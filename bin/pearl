@@ -2,6 +2,10 @@
 
 set -e -o pipefail
 
+# PATH needs to be updated since GNU Coreutils is required in OSX environments
+GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
+[ -d "$GNUBIN" ] && PATH="$GNUBIN:$PATH"
+
 [ -z "$PEARL_ROOT" ] && { echo "Error: The variable PEARL_ROOT must be specified in order to run this script."; exit 1; }
 [ -d "$PEARL_ROOT" ] || { echo "Error: The value in variable PEARL_ROOT is not a directory."; exit 2; }
 

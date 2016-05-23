@@ -12,10 +12,5 @@ sudo ln -s /usr/local/bin/bash /bin/bash
 sudo rm -f /bin/zsh
 sudo ln -s /usr/local/bin/zsh /bin/zsh
 
-echo "PATH=/usr/local/opt/coreutils/libexec/gnubin:\$PATH" >> ${HOME}/.bashrc
-echo "PATH=/usr/local/opt/coreutils/libexec/gnubin:\$PATH" >> ${HOME}/.zshrc
-mkdir -p ${HOME}/.config/fish
-echo "set -x PATH /usr/local/opt/coreutils/libexec/gnubin \$PATH" >> ${HOME}/.config/fish/config.fish
-
 ./tests/integ-tests/install-git.sh "$TRAVIS_GIT_VERSION"
 
