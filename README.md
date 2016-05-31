@@ -265,7 +265,7 @@ The following variables can be used in any of the previous scripts:
 - *PEARL_PKGVARDIR*  - Pearl package location containing data needed for package
 
 Additionally, the script *install.sh* can use the utility functions available in
-[*utils*](https://github.com/pearl-core/pearl/blob/master/lib/utils) directory that
+[*utils*](lib/utils) directory that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
@@ -302,7 +302,7 @@ if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
 All these functions belong to the
-[*utils.sh*](https://github.com/pearl-core/pearl/blob/master/lib/utils/utils.sh) script.
+[*utils.sh*](lib/utils/utils.sh) script.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
@@ -425,6 +425,6 @@ Contributing
 
 You could help improving Pearl and the [OPH](https://github.com/pearl-hub) in the following ways:
 
-- [Reporting Bugs](https://github.com/pearl-core/pearl/blob/master/CONTRIBUTING.md#reporting-bugs)
-- [Suggesting Enhancements](https://github.com/pearl-core/pearl/blob/master/CONTRIBUTING.md#suggesting-enhancements)
-- [Writing Code](https://github.com/pearl-core/pearl/blob/master/CONTRIBUTING.md#your-first-code-contribution)
+- [Reporting Bugs](CONTRIBUTING.md#reporting-bugs)
+- [Suggesting Enhancements](CONTRIBUTING.md#suggesting-enhancements)
+- [Writing Code](CONTRIBUTING.md#your-first-code-contribution)
