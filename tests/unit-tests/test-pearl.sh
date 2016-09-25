@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 pearlSetUp
 PEARL_LOCAL_ROOT="$(dirname $0)/../.."
@@ -10,6 +10,10 @@ set +e
 
 function oneTimeSetUp(){
     setUpUnitTests
+}
+
+function oneTimeTearDown(){
+    pearlTearDown
 }
 
 function setUp(){
@@ -94,6 +98,7 @@ function test_pearl_no_pearl_root_defined(){
     assertCommandFailOnStatus 1 source $PEARL_LOCAL_ROOT/bin/pearl -h
     PEARL_ROOT=$OLD_PEARL_ROOT
 }
+
 function test_pearl_no_pearl_root_directory(){
     OLD_PEARL_ROOT=$PEARL_ROOT
     PEARL_ROOT="not-a-directory"
@@ -213,4 +218,4 @@ function test_warn_bash_version(){
     export -n BASH_VERSION
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2

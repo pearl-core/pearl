@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 # Disable the exiterr
 set +e
@@ -46,15 +46,19 @@ function bash_wrapper(){
 }
 
 function test_pearl_no_pearl_root_var(){
+    OLD_PEARL_ROOT=$PEARL_ROOT
     unset PEARL_ROOT
     assertCommandFailOnStatus 1 source $(dirname $0)/../../boot/sh/pearl.sh
     assertCommandFailOnStatus 1 fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
+    PEARL_ROOT=$OLD_PEARL_ROOT
 }
 
 function test_pearl_wrong_pearl_root_var(){
+    OLD_PEARL_ROOT=$PEARL_ROOT
     export PEARL_ROOT="/tmmmmp"
     assertCommandFailOnStatus 2 source $(dirname $0)/../../boot/sh/pearl.sh
     assertCommandFailOnStatus 2 fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
+    PEARL_ROOT=$OLD_PEARL_ROOT
 }
 
 function test_pearl(){
@@ -133,4 +137,4 @@ function test_pearl_fish_config_error(){
     assertCommandSuccess fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2

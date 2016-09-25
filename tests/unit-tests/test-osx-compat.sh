@@ -1,6 +1,5 @@
 #!/bin/bash
-
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 source "$(dirname $0)/../../lib/utils/osx-compat.sh"
 
@@ -22,10 +21,12 @@ function tearDown(){
 
 function test_pearl_update_path_gnubin_no_exists() {
     OLDPATH=$PATH
+    OLD_GNUBIN=$GNUBIN
     GNUBIN="/not-a-directory"
     pearl_update_path
     assertEquals "$OLDPATH" "$PATH"
     PATH=$OLDPATH
+    GNUBIN=$OLD_GNUBIN
 }
 
 function test_pearl_update_path() {
@@ -58,4 +59,4 @@ function test_pearl_attempt_command_no_executable() {
     assertCommandFailOnStatus 127 pearl_attempt_command mycmd
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2

@@ -32,10 +32,21 @@ source "${PEARL_LOCAL_ROOT}/lib/core/system.sh"
 
 KILL_CMD=kill
 
-###################################
-### General functions           ###
-###################################
-
+#######################################
+# Provide the usage information.
+#
+# Globals:
+#   CMD (RO)          :  The name of the program on CLI.
+#   NAME (RO)         :  The name of the program.
+#   DESCRIPTION (RO)  :  The description of the program.
+#   PEARL_ROOT (RO)   :  The location of the program.
+# Arguments:
+#   None
+# Returns:
+#   0
+# Output:
+#   The usage helper.
+#######################################
 usage() {
     echo -e "$NAME (v$(cat $PEARL_ROOT/VERSION)): $DESCRIPTION"
     echo -e "Usage: $CMD <command> [args]"
@@ -51,16 +62,37 @@ usage() {
     echo
 }
 
+#######################################
+# Check if the option provided to the command
+# are correct.
+#
+# Globals:
+#   COMMAND_INIT (RO,bool)    :  true if the command has been specified.
+#   COMMAND_SEARCH (RO,bool)  :  true if the command has been specified.
+#   COMMAND_LIST (RO,bool)    :  true if the command has been specified.
+#   COMMAND_INSTALL (RO,bool) :  true if the command has been specified.
+#   COMMAND_UPDATE (RO,bool)  :  true if the command has been specified.
+#   COMMAND_REMOVE (RO,bool)  :  true if the command has been specified.
+#   OPT_HELP (RO,bool)        :  true if the command has been specified.
+#   ARGS (RO)                 :  the non positional arguments.
+#   COMMAND_ARGS (RO)         :  the command arguments.
+# Arguments:
+#   None
+# Returns:
+#   0                         : Checks succeeded.
+#   1                         : Checks did not succeed.
+# Output:
+#   The error message in case checks will not succeed.
+#######################################
 check_cli(){
     $COMMAND_INIT || $COMMAND_SEARCH || $COMMAND_LIST || \
-	$COMMAND_INSTALL || \
-	$COMMAND_UPDATE || $COMMAND_REMOVE || \
-	$OPT_HELP || die "No command has been specified. Run: $CMD --help"
+    $COMMAND_INSTALL || $COMMAND_UPDATE || $COMMAND_REMOVE || \
+    $OPT_HELP || die "No command has been specified. Run: $CMD --help"
     if $OPT_HELP
     then
         if $COMMAND_SEARCH || $COMMAND_LIST || \
-		$COMMAND_INSTALL || \
-		$COMMAND_UPDATE || $COMMAND_REMOVE
+        $COMMAND_INSTALL || \
+        $COMMAND_UPDATE || $COMMAND_REMOVE
         then
             die "The help option must be used exclusively"
         fi
@@ -74,6 +106,27 @@ check_cli(){
 }
 
 
+#######################################
+# Parse the command input.
+#
+# Globals:
+#   COMMAND_INIT (WO,bool)    :  true if the command has been specified.
+#   COMMAND_SEARCH (WO,bool)  :  true if the command has been specified.
+#   COMMAND_LIST (WO,bool)    :  true if the command has been specified.
+#   COMMAND_INSTALL (WO,bool) :  true if the command has been specified.
+#   COMMAND_UPDATE (WO,bool)  :  true if the command has been specified.
+#   COMMAND_REMOVE (WO,bool)  :  true if the command has been specified.
+#   OPT_HELP (WO,bool)        :  true if the command has been specified.
+#   ARGS (WO)                 :  the non positional arguments.
+#   COMMAND_ARGS (WO)         :  the command arguments.
+# Arguments:
+#   opts ($@)                 :  the program arguments.
+# Returns:
+#   0                         : Parsing succeeded.
+#   1                         : Parsing did not succeed.
+# Output:
+#   The error message in case parsing will not succeed.
+#######################################
 function parse_arguments(){
     COMMAND_INIT=false
     COMMAND_LIST=false
@@ -86,35 +139,55 @@ function parse_arguments(){
 
     for opt in "$@"
     do
-	case "$1" in
-	    init)
-		COMMAND_INIT=true; shift ;;
-	    list|l)
-		COMMAND_LIST=true; shift ;;
-	    search|s)
-		COMMAND_SEARCH=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
-	    install|i)
-		COMMAND_INSTALL=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
-	    update|u)
-		COMMAND_UPDATE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
-	    remove|r)
-		COMMAND_REMOVE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+    case "$opt" in
+        init)
+        COMMAND_INIT=true; shift ;;
+        list|l)
+        COMMAND_LIST=true; shift ;;
+        search|s)
+        COMMAND_SEARCH=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+        install|i)
+        COMMAND_INSTALL=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+        update|u)
+        COMMAND_UPDATE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+        remove|r)
+        COMMAND_REMOVE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
 
-	    help|h|-h|--help) OPT_HELP=true ; shift ;;
+        help|h|-h|--help) OPT_HELP=true ; shift ;;
 
-	    --) shift ; break ;;
-	    -*) die "Invalid option $1" ;;
-	    *) break ;;
-	esac
+        --) shift ; break ;;
+        -*) die "Invalid option $1" ;;
+        *) break ;;
+    esac
     done
 
     ARGS=()
     for arg in "$@"
     do
-	ARGS+=("$arg")
+        ARGS+=("$arg")
     done
 }
 
+#######################################
+# Execute the specified command.
+#
+# Globals:
+#   COMMAND_INIT (RO,bool)    :  true if the command has been specified.
+#   COMMAND_SEARCH (RO,bool)  :  true if the command has been specified.
+#   COMMAND_LIST (RO,bool)    :  true if the command has been specified.
+#   COMMAND_INSTALL (RO,bool) :  true if the command has been specified.
+#   COMMAND_UPDATE (RO,bool)  :  true if the command has been specified.
+#   COMMAND_REMOVE (RO,bool)  :  true if the command has been specified.
+#   OPT_HELP (RO,bool)        :  true if the command has been specified.
+#   ARGS (RO)                 :  the non positional arguments.
+#   COMMAND_ARGS (RO)         :  the command arguments.
+# Arguments:
+#   None
+# Returns:
+#   Depends on the command specified.
+# Output:
+#   Depends on the command specified.
+#######################################
 function execute_operation(){
     $OPT_HELP && usage && return
     $COMMAND_INIT && { pearl_init; pearl_load_repos; return; }
@@ -162,10 +235,25 @@ function execute_operation(){
         done
     fi
 
-	source_pearl
+    source_pearl
     return $final_res
 }
 
+#######################################
+# Send a signal to parent process for sourcing
+# the Pearl boot script.
+#
+# Globals:
+#   PEARL_ROOT (RO,bool)   : Pearl location.
+#   KILL_CMD (RO,bool)     : The kill command.
+#   PPID (RO)              : The parent pid process.
+# Arguments:
+#   None
+# Returns:
+#   0
+# Output:
+#   None
+#######################################
 function source_pearl(){
     # Send signal to parent in order to (re)source pearl
     [ -z "$PEARL_ROOT" ] || $KILL_CMD -USR1 $PPID

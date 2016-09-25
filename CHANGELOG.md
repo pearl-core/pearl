@@ -1,5 +1,9 @@
 # Change Log #
 
+## [1.4.4][v144] - 2016-09-26 ##
+
+* Improving doc and add checkstyle
+
 ## [1.4.3][v143] - 2016-05-25 ##
 
 * Remove the requirement of updating the PATH on OSX
@@ -75,3 +79,4 @@
 [v141]: https://github.com/pearl-core/pearl/releases/tag/1.4.1
 [v142]: https://github.com/pearl-core/pearl/releases/tag/1.4.2
 [v143]: https://github.com/pearl-core/pearl/releases/tag/1.4.3
+[v144]: https://github.com/pearl-core/pearl/releases/tag/1.4.4

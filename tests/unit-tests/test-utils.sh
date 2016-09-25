@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 unset HOME
 export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
@@ -295,4 +295,4 @@ function test_unlink_not_a_program(){
     assertCommandFailOnStatus 33 unlink "notvim" $FILEPATH
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2
