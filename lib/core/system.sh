@@ -9,6 +9,21 @@
 
 GIT=git
 
+#######################################
+# Initialize the Pearl environment by
+# setting up the PEARL_HOME configurations.
+#
+# Globals:
+#   PEARL_HOME (RO)   :  The Pearl user configuration location.
+#   HOME (RO)         :  The user home location.
+#   PEARL_ROOT (RO)   :  Pearl program configuration location.
+# Arguments:
+#   None
+# Returns:
+#   0
+# Output:
+#   Logging information.
+#######################################
 function pearl_init(){
     bold_cyan; echo -n "* "; normal; echo "Creating Pearl configuration in $PEARL_HOME"
     mkdir -p $PEARL_HOME/bin
@@ -47,6 +62,20 @@ function pearl_init(){
     echo "    >> pearl list"
 }
 
+#######################################
+# Remove completely the Pearl environment.
+#
+# Globals:
+#   PEARL_HOME (RO)   :  The Pearl user configuration location.
+#   HOME (RO)         :  The user home location.
+#   PEARL_ROOT (RO)   :  Pearl program configuration location.
+# Arguments:
+#   None
+# Returns:
+#   0
+# Output:
+#   Logging information.
+#######################################
 function pearl_remove(){
     cd $PEARL_ROOT
     if ask "Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder?" "N"
@@ -84,6 +113,19 @@ function pearl_remove(){
     fi
 }
 
+#######################################
+# Update the Pearl environment.
+#
+# Globals:
+#   GIT (RO)         :  The git command.
+#   PEARL_ROOT (RO)  :  Pearl program configuration location.
+# Arguments:
+#   None
+# Returns:
+#   0
+# Output:
+#   Logging information.
+#######################################
 function pearl_update(){
     cd $PEARL_ROOT
     bold_cyan; echo -n "* "; normal; echo "Updating Pearl script"

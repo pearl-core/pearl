@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 source "$(dirname $0)/../../lib/utils/utils.sh"
 source "$(dirname $0)/../../lib/core/package.sh"
@@ -142,4 +142,4 @@ function test_pearl_remove_no(){
     assertEquals "$(echo -e "(load-file \"${PEARL_ROOT}/boot/emacs/pearl.el\")")" "$(cat $HOME/.emacs)"
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2

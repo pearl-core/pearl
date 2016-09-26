@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 source "$(dirname $0)/../../lib/utils/utils.sh"
 source "$(dirname $0)/../../lib/utils/trycatch.sh"
@@ -824,4 +824,4 @@ function test_get_list_uninstalled_packages_no_match() {
     unset RESULT
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2

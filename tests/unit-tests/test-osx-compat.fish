@@ -1,6 +1,5 @@
 #!/bin/bash
-
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 # Disable the exiterr
 set +e
@@ -57,4 +56,4 @@ function test_pearl_attempt_command_no_executable() {
     assertCommandFailOnStatus 127 fish_wrapper "source $(dirname $0)/../../lib/utils/osx-compat.fish; set GNUBIN '$GNUBIN'; pearl_attempt_command mycmd"
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2

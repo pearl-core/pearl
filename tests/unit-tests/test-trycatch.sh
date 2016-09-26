@@ -1,6 +1,5 @@
 #!/bin/bash
-
-source "$(dirname $0)/utils.sh"
+source "$(dirname $0)/../utils/utils.sh"
 
 source "$(dirname $0)/../../lib/utils/utils.sh"
 source "$(dirname $0)/../../lib/utils/trycatch.sh"
@@ -89,4 +88,4 @@ function test_try_catch_throw() {
     catch || assertEquals 99 $?
 }
 
-source $(dirname $0)/shunit2
+source $(dirname $0)/../utils/shunit2
