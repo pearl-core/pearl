@@ -1,7 +1,11 @@
 # vim: ft=yaml
 os:
   - linux
-  - osx
+
+matrix:
+  include:
+    - os: osx
+      osx_image: beta-xcode6.1
 
 language: bash
 sudo: required
