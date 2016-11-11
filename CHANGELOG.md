@@ -1,5 +1,9 @@
 # Change Log #
 
+## [1.4.5][v145] - 2016-11-11 ##
+
+* provide (un)link from/to PATH variable in utils.sh
+
 ## [1.4.4][v144] - 2016-09-26 ##
 
 * Improving doc and add checkstyle
@@ -80,3 +84,4 @@
 [v142]: https://github.com/pearl-core/pearl/releases/tag/1.4.2
 [v143]: https://github.com/pearl-core/pearl/releases/tag/1.4.3
 [v144]: https://github.com/pearl-core/pearl/releases/tag/1.4.4
+[v145]: https://github.com/pearl-core/pearl/releases/tag/1.4.5

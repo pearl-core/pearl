@@ -26,6 +26,7 @@ SOURCE_LINES[zsh]="source \"{}\""
 
 NULL_EXCEPTION=11
 WRONG_ANSWER=33
+NO_FILE_OR_DIRECTORY=2
 
 #######################################
 # Check if the argument is null.
@@ -462,3 +463,79 @@ function unlink() {
     unapply "${source_line/\{\}/$config_file_to_apply}" "$config_file"
 }
 
+#######################################
+# Link binary file to PATH variable by creating a symlink to the default
+# $PEARL_HOME/bin directory.
+#
+# The function is idempotent, so calling this function multiple
+# times will link the binary once.
+#
+# If $binary_path does not exist, the function will fail.
+#
+# Example of usage:
+#    link_to_path "~/mybinaryfile"
+#
+# Globals:
+#   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
+# Arguments:
+#   binary_path ($1)     : The path of the binary file.
+# Returns:
+#   NO_FILE_OR_DIRECTORY : $binary_path does not exist.
+#   0                    : Successfully linked.
+# Output:
+#   None
+#######################################
+function link_to_path() {
+    local binary_path=$1
+    check_not_null ${binary_path}
+
+    [[ ! -e "${binary_path}" ]] \
+        && { error "The path $binary_path does not exist" ; return $NO_FILE_OR_DIRECTORY; }
+
+    unlink_from_path "${binary_path}"
+    ln -s "${binary_path}" "${PEARL_HOME}/bin"
+
+    return 0
+}
+
+#######################################
+# Unlink binary file to PATH variable by removing the symlink from the default
+# $PEARL_HOME/bin directory.
+#
+# The function is idempotent, so calling this function multiple
+# times will unlink the binary once.
+#
+# If the symlink is broken, the symlink will be deleted.
+# If the symlink corresponds to a different source binary path
+# from $binary_path, the symlink will not be deleted.
+#
+# Example of usage:
+#    unlink_from_path "~/mybinaryfile"
+#
+# Globals:
+#   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
+# Arguments:
+#   binary_path ($1)     : The path of the binary file.
+# Returns:
+#   0                    : Successfully unlinked.
+#   36                   : Symlink exists on a differt source file.
+# Output:
+#   None
+#######################################
+function unlink_from_path() {
+    local binary_path=$1
+    check_not_null ${binary_path}
+
+    local binary_path=$(readlink -f "${binary_path}")
+    local binary_name=$(basename "$binary_path")
+    if [[ -e ${PEARL_HOME}/bin/${binary_name}  ]]
+    then
+        local existing_path=$(readlink -f "${PEARL_HOME}/bin/${binary_name}")
+
+        [[ "$existing_path" != "$binary_path" ]] \
+            && { warn "Could not unlink: Symlink ${PEARL_HOME}/bin/${binary_name} already exists from source ${existing_path} which is different from $binary_path"; return 36; }
+    fi
+    [[ -L ${PEARL_HOME}/bin/${binary_name} ]] && rm -f ${PEARL_HOME}/bin/${binary_name}
+
+    return 0
+}
