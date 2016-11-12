@@ -44,6 +44,7 @@ function git_clone_mock() {
 
 function git_pearl_basic_install_mock() {
     git_command_mock "submodule" $@ && return
+    git_command_mock "--no-pager" $@ && return
     if [ "$1" == "clone" ]
     then
         git_command_mock "clone" $@
@@ -56,6 +57,8 @@ function git_pearl_basic_install_mock() {
 
 function git_pearl_basic_update_mock() {
     git_config_mock $1 "https://ls-colors" && return
+    git_command_mock "--no-pager" $@ && return
+    git_command_mock "rev-parse" $@ && return
     git_command_mock "submodule" $@ && return
     git_command_mock "pull" $@ && return
     return 111
@@ -239,7 +242,7 @@ function test_pearl_package_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule\npost_install")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
 }
 
 function test_pearl_package_install_errors_on_hooks(){
@@ -247,6 +250,7 @@ function test_pearl_package_install_errors_on_hooks(){
     scenario_generic_pkgs
     git_pearl_install_mock() {
         git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
         if [ "$1" == "clone" ]
         then
             git_command_mock "clone" $@
@@ -264,7 +268,7 @@ function test_pearl_package_install_errors_on_hooks(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule\npost_install")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
 }
 
 function test_pearl_package_install_deinit(){
@@ -292,6 +296,7 @@ function test_pearl_package_install_no_install_file(){
     scenario_generic_pkgs
     git_pearl_install_mock() {
         git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
         if [ "$1" == "clone" ]
         then
             git_command_mock "clone" $@
@@ -308,7 +313,7 @@ function test_pearl_package_install_no_install_file(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager")" "$actual_out"
 }
 
 function test_pearl_package_install_empty_install(){
@@ -316,6 +321,7 @@ function test_pearl_package_install_empty_install(){
     scenario_generic_pkgs
     git_pearl_install_mock() {
         git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
         if [ "$1" == "clone" ]
         then
             git_command_mock "clone" $@
@@ -333,7 +339,7 @@ function test_pearl_package_install_empty_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager")" "$actual_out"
 }
 
 function test_pearl_package_install_not_existing_package(){
@@ -475,7 +481,7 @@ function test_pearl_package_update(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\npost_update")" "$actual_out"
+    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
 }
 
 function test_pearl_package_update_url_changed(){
@@ -487,6 +493,7 @@ function test_pearl_package_update_url_changed(){
     git_pearl_update_mock() {
         git_config_mock $1 "https://ls-colors2" && return
         git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
         git_command_mock "pull" $@ && return
         git_clone_mock $@ && return
         return 111
@@ -500,7 +507,7 @@ function test_pearl_package_update_url_changed(){
     assertEquals 0 $?
 
     local actual_out="$(cat $STDOUTF | grep -v "*" | grep -v "The Git URL")"
-    assertEquals "$(echo -e "pre_remove\npost_remove\ngit clone\ngit submodule\npost_install")" "$actual_out"
+    assertEquals "$(echo -e "pre_remove\npost_remove\ngit clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
 }
 
 function test_pearl_package_update_git_config_error(){
@@ -509,6 +516,8 @@ function test_pearl_package_update_git_config_error(){
     git_pearl_update_mock() {
         git_config_mock $1 "" && return
         git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
+        git_command_mock "rev-parse" $@ && return
         git_command_mock "pull" $@ && return
         return 111
     }
@@ -520,7 +529,7 @@ function test_pearl_package_update_git_config_error(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\npost_update")" "$actual_out"
+    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
 }
 
 function test_pearl_package_update_errors_on_hooks(){
@@ -544,7 +553,7 @@ function test_pearl_package_update_errors_on_hooks(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git pull\ngit submodule\npost_update")" "$actual_out"
+    assertEquals "$(echo -e "git pull\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
 }
 
 function test_pearl_package_update_deinit(){
@@ -582,7 +591,7 @@ function test_pearl_package_update_empty_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git pull\ngit submodule")" "$actual_out"
+    assertEquals "$(echo -e "git pull\ngit submodule\ngit --no-pager")" "$actual_out"
 }
 
 function test_pearl_package_update_post_func_changed(){
@@ -591,6 +600,8 @@ function test_pearl_package_update_post_func_changed(){
     git_pearl_update_mock() {
         git_config_mock $1 "https://ls-colors" && return
         git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
+        git_command_mock "rev-parse" $@ && return
         if [ "$1" == "pull" ]
         then
             echo "git pull"
@@ -602,7 +613,7 @@ function test_pearl_package_update_post_func_changed(){
     GIT=git_pearl_update_mock
     assertCommandSuccess load_repo_first pearl_package_update $pkgname
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\nnew_post_update")" "$actual_out"
+    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\ngit --no-pager\nnew_post_update")" "$actual_out"
 }
 
 function test_pearl_package_update_not_existing_package(){

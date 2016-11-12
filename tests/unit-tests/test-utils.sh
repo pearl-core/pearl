@@ -342,8 +342,6 @@ function test_link_to_path_already_existing_same_symlink(){
     ln -s $HOME/binary $PEARL_HOME/bin
     assertCommandSuccess link_to_path "$HOME/binary"
     assertEquals "Content" "$(cat $PEARL_HOME/bin/binary)"
-    cat $STDOUTF
-    cat $STDERRF
 }
 
 function test_unlink_from_path_null_binary_path(){
@@ -360,8 +358,6 @@ function test_unlink_from_path(){
     assertCommandSuccess unlink_from_path "$HOME/binary"
     [[ ! -L "$PEARL_HOME/bin/binary" ]]
     assertEquals 0 $?
-    cat $STDOUTF
-    cat $STDERRF
 }
 
 function test_unlink_from_path_real_file(){
@@ -377,6 +373,15 @@ function test_unlink_from_path_symlink(){
     ln -s $HOME/binary2 $PEARL_HOME/bin/binary
     assertCommandFailOnStatus 36 unlink_from_path "$HOME/binary"
     assertEquals "Old content" "$(cat $PEARL_HOME/bin/binary)"
+}
+
+function test_unlink_from_path_source_as_symlink(){
+    echo "Content" > $HOME/source-binary
+    ln -s $HOME/source-binary $HOME/binary
+    ln -s $HOME/binary $PEARL_HOME/bin/binary
+    assertCommandSuccess unlink_from_path "$HOME/binary"
+    [[ ! -L "$PEARL_HOME/bin/binary" ]]
+    assertEquals 0 $?
 }
 
 function test_unlink_from_path_broken_link(){

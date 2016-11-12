@@ -526,8 +526,8 @@ function unlink_from_path() {
     local binary_path=$1
     check_not_null ${binary_path}
 
-    local binary_path=$(readlink -f "${binary_path}")
     local binary_name=$(basename "$binary_path")
+    local binary_path=$(readlink -f "${binary_path}")
     if [[ -e ${PEARL_HOME}/bin/${binary_name}  ]]
     then
         local existing_path=$(readlink -f "${PEARL_HOME}/bin/${binary_name}")
