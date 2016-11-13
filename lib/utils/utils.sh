@@ -464,58 +464,140 @@ function unlink() {
 }
 
 #######################################
-# Link binary file to PATH variable by creating a symlink to the default
-# $PEARL_HOME/bin directory.
+# Symlink the given file to the given destination
+# path (containing the symlink name included).
 #
 # The function is idempotent, so calling this function multiple
-# times will link the binary once.
+# times will link the file once.
 #
-# If $binary_path does not exist, the function will fail.
+# If $file_path does not exist, the function will fail.
 #
 # Example of usage:
-#    link_to_path "~/mybinaryfile"
+#    link_to "~/myfile" "~/mysymlink"
 #
 # Globals:
-#   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
+#  None
 # Arguments:
-#   binary_path ($1)     : The path of the binary file.
+#   file_path ($1)       : The source file path.
+#   symlink_path ($1)    : The destination symlink path
+#                          (with symlink name included).
 # Returns:
-#   NO_FILE_OR_DIRECTORY : $binary_path does not exist.
+#   NO_FILE_OR_DIRECTORY : $file_path does not exist.
 #   0                    : Successfully linked.
 # Output:
 #   None
 #######################################
-function link_to_path() {
-    local binary_path=$1
-    check_not_null ${binary_path}
+function link_to() {
+    local file_path=$1
+    check_not_null ${file_path}
+    local symlink_path=$2
+    check_not_null ${symlink_path}
 
-    [[ ! -e "${binary_path}" ]] \
-        && { error "The path $binary_path does not exist" ; return $NO_FILE_OR_DIRECTORY; }
+    [[ ! -e "${file_path}" ]] \
+        && { error "The path $file_path does not exist" ; return $NO_FILE_OR_DIRECTORY; }
 
-    unlink_from_path "${binary_path}"
-    ln -s "${binary_path}" "${PEARL_HOME}/bin"
+    unlink_from "${file_path}" "${symlink_path}"
+    ln -s "${file_path}" "${symlink_path}"
 
     return 0
 }
 
 #######################################
-# Unlink binary file to PATH variable by removing the symlink from the default
-# $PEARL_HOME/bin directory.
+# Remove the symlink of the given file to the given destination
+# path (containing the symlink name included).
 #
 # The function is idempotent, so calling this function multiple
-# times will unlink the binary once.
+# times will unlink the file once.
 #
 # If the symlink is broken, the symlink will be deleted.
-# If the symlink corresponds to a different source binary path
-# from $binary_path, the symlink will not be deleted.
+# If the symlink corresponds to a different source file path
+# from $file_path, the symlink will not be deleted but an error
+# will be raised.
 #
 # Example of usage:
-#    unlink_from_path "~/mybinaryfile"
+#    unlink_from "~/myfile" "~/mysymlink"
+#
+# Globals:
+#   None
+# Arguments:
+#   file_path ($1)       : The source file path.
+#   symlink_path ($1)    : The destination symlink path
+#                          (with symlink name included).
+# Returns:
+#   0                    : Successfully unlinked.
+#   36                   : Symlink exists on a differt source file.
+# Output:
+#   None
+#######################################
+function unlink_from() {
+    local file_path=$1
+    check_not_null ${file_path}
+    local symlink_path=$2
+    check_not_null ${symlink_path}
+
+    if [[ -e ${symlink_path}  ]]
+    then
+        local file_real_path=$(readlink -f "${file_path}")
+        local symlink_real_path=$(readlink -f "${symlink_path}")
+
+        [[ "$symlink_real_path" != "$file_real_path" ]] \
+            && { warn "Could not unlink: Symlink ${symlink_path} already exists from source ${symlink_real_path} which is different from $file_real_path"; return 36; }
+    fi
+    [[ -L ${symlink_path} ]] && rm -f "${symlink_path}"
+
+    return 0
+}
+
+#######################################
+# Link executable file to PATH variable by creating
+# a symlink to the default $PEARL_HOME/bin directory.
+#
+# The function is idempotent, so calling this function multiple
+# times will link the executable file once.
+#
+# If $executable_path does not exist, the function will fail.
+#
+# Example of usage:
+#    link_to_path "~/myexecfile"
 #
 # Globals:
 #   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
 # Arguments:
-#   binary_path ($1)     : The path of the binary file.
+#   executable_path ($1) : The executable file path.
+# Returns:
+#   NO_FILE_OR_DIRECTORY : $executable_path does not exist.
+#   0                    : Successfully linked.
+# Output:
+#   None
+#######################################
+function link_to_path() {
+    local executable_path=$1
+    check_not_null ${executable_path}
+
+    local executable_name=$(basename "$executable_path")
+    link_to "${executable_path}" "${PEARL_HOME}/bin/${executable_name}"
+}
+
+#######################################
+# Unlink the executable file to PATH variable
+# by removing the symlink from the default
+# $PEARL_HOME/bin directory.
+#
+# The function is idempotent, so calling this function multiple
+# times will unlink the file once.
+#
+# If the symlink is broken, the symlink will be deleted.
+# If the symlink corresponds to a different source file path
+# from $executable_path, the symlink will not be deleted but an
+# error will be raised.
+#
+# Example of usage:
+#    unlink_from_path "~/myexecfile"
+#
+# Globals:
+#   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
+# Arguments:
+#   executable_path ($1) : The executable file path.
 # Returns:
 #   0                    : Successfully unlinked.
 #   36                   : Symlink exists on a differt source file.
@@ -523,19 +605,10 @@ function link_to_path() {
 #   None
 #######################################
 function unlink_from_path() {
-    local binary_path=$1
-    check_not_null ${binary_path}
+    local executable_path=$1
+    check_not_null ${executable_path}
 
-    local binary_name=$(basename "$binary_path")
-    local binary_path=$(readlink -f "${binary_path}")
-    if [[ -e ${PEARL_HOME}/bin/${binary_name}  ]]
-    then
-        local existing_path=$(readlink -f "${PEARL_HOME}/bin/${binary_name}")
+    local executable_name=$(basename "$executable_path")
 
-        [[ "$existing_path" != "$binary_path" ]] \
-            && { warn "Could not unlink: Symlink ${PEARL_HOME}/bin/${binary_name} already exists from source ${existing_path} which is different from $binary_path"; return 36; }
-    fi
-    [[ -L ${PEARL_HOME}/bin/${binary_name} ]] && rm -f ${PEARL_HOME}/bin/${binary_name}
-
-    return 0
+    unlink_from "${executable_path}" "${PEARL_HOME}/bin/${executable_name}"
 }
