@@ -1,8 +1,14 @@
 # Change Log #
 
+## [1.5.0][v150] - 2016-11-13 ##
+
+* Provide (un)link from/to in utils.sh
+* Provide list of last commits during add/update package
+* Fix `unlink_from_path` when source file is a symlink
+
 ## [1.4.5][v145] - 2016-11-11 ##
 
-* provide (un)link from/to PATH variable in utils.sh
+* Provide (un)link from/to PATH variable in utils.sh
 
 ## [1.4.4][v144] - 2016-09-26 ##
 
@@ -85,3 +91,4 @@
 [v143]: https://github.com/pearl-core/pearl/releases/tag/1.4.3
 [v144]: https://github.com/pearl-core/pearl/releases/tag/1.4.4
 [v145]: https://github.com/pearl-core/pearl/releases/tag/1.4.5
+[v150]: https://github.com/pearl-core/pearl/releases/tag/1.5.0
