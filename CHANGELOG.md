@@ -1,5 +1,9 @@
 # Change Log #
 
+## [1.5.1][v151] - 2016-11-15 ##
+
+* Fix git --no-parser log for missing newline
+
 ## [1.5.0][v150] - 2016-11-13 ##
 
 * Provide (un)link from/to in utils.sh
@@ -92,3 +96,4 @@
 [v144]: https://github.com/pearl-core/pearl/releases/tag/1.4.4
 [v145]: https://github.com/pearl-core/pearl/releases/tag/1.4.5
 [v150]: https://github.com/pearl-core/pearl/releases/tag/1.5.0
+[v151]: https://github.com/pearl-core/pearl/releases/tag/1.5.1
