@@ -213,7 +213,7 @@ function pearl_package_install(){
         $GIT clone --quiet "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
         cd "$PEARL_PKGDIR"
         $GIT submodule --quiet update --init
-        $GIT --no-pager log -n 3 --no-merges --pretty="format:    - %s (%ar)"
+        $GIT --no-pager log -n 3 --no-merges --pretty="tformat:    - %s (%ar)"
     fi
     cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
@@ -306,7 +306,7 @@ function pearl_package_update(){
         local last_commit=$($GIT rev-parse HEAD)
         $GIT pull --quiet
         $GIT submodule --quiet update --init
-        $GIT --no-pager log --no-merges --pretty="format:    - %s (%ar)" $last_commit..HEAD
+        $GIT --no-pager log --no-merges --pretty="tformat:    - %s (%ar)" $last_commit..HEAD
     fi
 
     _init_package $pkgfullname $pre_func $post_func
