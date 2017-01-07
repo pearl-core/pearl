@@ -1,5 +1,10 @@
 # Change Log #
 
+## [1.5.2][v152] - 2017-01-07 ##
+
+* Add support for new OSX image in Travis
+* Fallback to a default temp directory if `tty` does not work
+
 ## [1.5.1][v151] - 2016-11-15 ##
 
 * Fix git --no-parser log for missing newline
@@ -97,3 +102,4 @@
 [v145]: https://github.com/pearl-core/pearl/releases/tag/1.4.5
 [v150]: https://github.com/pearl-core/pearl/releases/tag/1.5.0
 [v151]: https://github.com/pearl-core/pearl/releases/tag/1.5.1
+[v152]: https://github.com/pearl-core/pearl/releases/tag/1.5.2
