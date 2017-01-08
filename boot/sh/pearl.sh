@@ -2,12 +2,18 @@
 # vim: set ft=sh ts=4 sw=4 noet:
 
 ####################### VARIABLES & IMPORTS ############################
-[ -z "${PEARL_ROOT}" ] && { echo "Error: PEARL_ROOT environment variable does not exist."; return 1; }
-[ ! -d "${PEARL_ROOT}" ] && { echo "Error: PEARL_ROOT directory '${PEARL_ROOT}' does not exist."; return 2; }
+[[ -z "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT environment variable does not exist."; return 1; }
+[[ ! -d "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT directory '${PEARL_ROOT}' does not exist."; return 2; }
 
 export PEARL_ROOT
 export PEARL_HOME=${HOME}/.config/pearl
-export PEARL_TEMPORARY=${PEARL_HOME}/tmp/$(tty)
+# Fallback to a default temp directory if tty does not work
+if tty -s
+then
+    export PEARL_TEMPORARY=${PEARL_HOME}/tmp/$(tty)
+else
+    export PEARL_TEMPORARY=${PEARL_HOME}/tmp/default-tty
+fi
 mkdir -p ${PEARL_TEMPORARY}
 
 if [[ $PATH != *"${PEARL_HOME}/bin"* ]]

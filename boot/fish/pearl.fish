@@ -14,7 +14,12 @@ if [ ! -d "$PEARL_ROOT" ]
 end
 
 set -x PEARL_HOME $HOME/.config/pearl
-set -x PEARL_TEMPORARY $PEARL_HOME/tmp/(tty)
+# Fallback to a default temp directory if tty does not work
+if tty -s
+    set -x PEARL_TEMPORARY $PEARL_HOME/tmp/(tty)
+else
+    set -x PEARL_TEMPORARY $PEARL_HOME/tmp/default-tty
+end
 mkdir -p $PEARL_TEMPORARY
 
 if not contains $PEARL_HOME/bin $PATH

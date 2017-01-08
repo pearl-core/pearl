@@ -1,10 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Update path for OSX systems
 GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
-if [ -d "$GNUBIN" ]; then
-    PATH="$GNUBIN:$PATH"
-fi
+[[ -d "$GNUBIN" ]] && PATH="$GNUBIN:$PATH"
 
 tests_succeded=true
 for tst in $(ls $(dirname $0)/test*)

@@ -27,6 +27,7 @@ function pearlHomeSetUp(){
     touch $PEARL_HOME/etc/pearl.conf
     mkdir -p $PEARL_HOME/repos
     mkdir -p $PEARL_HOME/packages
+    mkdir -p $PEARL_HOME/tmp
 }
 
 function pearlTearDown(){
