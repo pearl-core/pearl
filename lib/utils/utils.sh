@@ -275,6 +275,48 @@ function ask(){
     [ "$res" == "Y" ]
 }
 
+#######################################
+# Check before overriding a trap for the given signals.
+# If trap exists the function will NOT override it.
+#
+# Globals:
+#   None
+# Arguments:
+#   command ($1)        : The command to invoke for the given signals.
+#   sigs ($2-)          : The list of signals (to get the entire list `trap -l`).
+# Returns:
+#   0                   : Trap created successfully.
+#   1                   : If trap exists for the given signals.
+# Output:
+#   None
+#######################################
+function check_and_trap() {
+    local sigs="${@:2:${#@}}"
+    local traps="$(trap -p $sigs)"
+    [[ $traps ]] && die "Attempting to overwrite existing $sigs trap: $traps"
+    trap $@
+}
+
+#######################################
+# Check before overriding a trap for the given signals.
+# If trap exists the function will warn and override it.
+#
+# Globals:
+#   None
+# Arguments:
+#   command ($1)        : The command to invoke for the given signals.
+#   sigs ($2-)          : The list of signals (to get the entire list `trap -l`).
+# Returns:
+#   0                   : Trap created/overridden successfully.
+# Output:
+#   None
+#######################################
+function check_and_force_trap() {
+    local sigs="${@:2:${#@}}"
+    local traps="$(trap -p $sigs)"
+    [[ $traps ]] && warn "Attempting to overwrite existing $sigs trap: $traps"
+    trap $@
+}
 
 #######################################
 # Apply a string to a file.

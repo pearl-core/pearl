@@ -4,12 +4,12 @@
 
 ####################### VARIABLES & IMPORTS ############################
 if [ -z "$PEARL_ROOT" ]
-    echo "Error: PEARL_ROOT environment variable does not exist."
+    echo "Error: PEARL_ROOT environment variable does not exist." 1>&2
 	exit 1
 end
 
 if [ ! -d "$PEARL_ROOT" ]
-    echo "Error: PEARL_ROOT directory '$PEARL_ROOT' does not exist."
+    echo "Error: PEARL_ROOT directory '$PEARL_ROOT' does not exist." 1>&2
     exit 2
 end
 

@@ -15,6 +15,7 @@ function pearlRootSetUp(){
     mkdir -p $PEARL_ROOT/lib/utils
     echo "echo sourced utils.sh" > $PEARL_ROOT/lib/utils/utils.sh
     echo "echo sourced osx-compat.sh" > $PEARL_ROOT/lib/utils/osx-compat.sh
+    echo "echo sourced osx-compat.fish" > $PEARL_ROOT/lib/utils/osx-compat.fish
     echo "1.2.3" > $PEARL_ROOT/VERSION
 }
 
@@ -23,6 +24,7 @@ function pearlHomeSetUp(){
     mkdir -p $HOME
     export PEARL_HOME=${HOME}/.config/pearl
     mkdir -p $PEARL_HOME
+    mkdir -p $PEARL_HOME/bin
     mkdir -p $PEARL_HOME/etc
     touch $PEARL_HOME/etc/pearl.conf
     mkdir -p $PEARL_HOME/repos

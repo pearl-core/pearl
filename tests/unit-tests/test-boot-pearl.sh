@@ -106,7 +106,7 @@ function test_pearl_fish(){
 EOF
 )
     assertCommandSuccess fish_wrapper "$test_content"
-    assertEquals "$(echo -e "sourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "sourced osx-compat.fish\nsourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_fish_add_path_once() {
@@ -119,7 +119,7 @@ EOF
     PATH=$PATH:$PEARL_HOME/bin
     MANPATH=$MANPATH:$PEARL_ROOT/man
     assertCommandSuccess fish_wrapper "$test_content"
-    assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "sourced osx-compat.fish\n1\n1")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_config_error(){
