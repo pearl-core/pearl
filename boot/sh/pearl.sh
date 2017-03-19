@@ -2,8 +2,8 @@
 # vim: set ft=sh ts=4 sw=4 noet:
 
 ####################### VARIABLES & IMPORTS ############################
-[[ -z "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT environment variable does not exist."; return 1; }
-[[ ! -d "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT directory '${PEARL_ROOT}' does not exist."; return 2; }
+[[ -z "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT environment variable does not exist." 1>&2; return 1; }
+[[ ! -d "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT directory '${PEARL_ROOT}' does not exist." 1>&2; return 2; }
 
 export PEARL_ROOT
 export PEARL_HOME=${HOME}/.config/pearl

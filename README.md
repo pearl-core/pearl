@@ -404,7 +404,7 @@ update the *pearl.conf* file by adding the following line:
 Troubleshooting
 ===============
 
-##Corrupted Pearl Home directory##
+## Corrupted Pearl Home directory ##
 
 > **Q**: What should I do if I accidentally removed files/packages in `$PEARL_HOME`?
 
@@ -415,7 +415,7 @@ Troubleshooting
 > The command will create all the essential directories and symlinks in `$PEARL_HOME`.
 > It is harmless to run the `init` command multiple times since it is idempotent.
 
-##Corrupted package##
+## Corrupted package ##
 
 > **Q**: Why I can no longer update/remove a package?
 
@@ -433,6 +433,16 @@ Troubleshooting
 > If you want to delete the content in `var` package:
 
     $> rm -rf $PEARL_HOME/var/pearl/<packagename>
+
+## Overridden USR1 signal ##
+
+> **Q**: Why does Pearl override the USR1 signal every time I open a new shell?
+
+> **A**: Pearl needs to trap the `USR1` signal in order to communicate with
+> the shell for reloading the Pearl configuration after installing, updating and removing packages.
+> Pearl will continue operating normally as it will override any existing trap,
+> but you may want to check out if other applications require to trap `USR1` signal
+> and resolve the conflict eventually.
 
 Contributing
 ============
