@@ -25,7 +25,7 @@ then
     MANPATH=$MANPATH:${PEARL_ROOT}/man
 fi
 
-source $PEARL_ROOT/lib/utils/osx-compat.sh
+source $PEARL_ROOT/buava/lib/osx-compat.sh
 
 ################################# MAIN ##############################
 for reponame in $(ls ${PEARL_HOME}/packages/)

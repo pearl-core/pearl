@@ -2,7 +2,7 @@
 # handling the pearl core system.
 #
 # Dependencies:
-# - lib/utils/utils.sh
+# - [buava] $PEARL_ROOT/buava/lib/utils.sh
 # - lib/core/package.sh
 #
 # vim: ft=sh

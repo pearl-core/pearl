@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-source "$(dirname $0)/../utils/utils.sh"
+PEARL_LOCATION=$(dirname $0)/../..
+source "$PEARL_LOCATION/tests/utils/utils.sh"
 
-source "$(dirname $0)/../../lib/utils/utils.sh"
-source "$(dirname $0)/../../lib/core/package.sh"
-source "$(dirname $0)/../../lib/core/system.sh"
+source "$PEARL_LOCATION/buava/lib/utils.sh"
+source "$PEARL_LOCATION/lib/core/package.sh"
+source "$PEARL_LOCATION/lib/core/system.sh"
 
 # Disable the exiterr
 set +e

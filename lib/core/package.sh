@@ -2,6 +2,7 @@
 # handling the pearl packages.
 #
 # Dependencies:
+# - [buava] $PEARL_ROOT/buava/lib/utils.sh
 # - lib/utils/utils.sh
 #
 # vim: ft=sh
@@ -212,7 +213,7 @@ function pearl_package_install(){
     else
         $GIT clone --quiet "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
         cd "$PEARL_PKGDIR"
-        $GIT submodule --quiet update --init
+        $GIT submodule --quiet update --init --recursive
         $GIT --no-pager log -n 3 --no-merges --pretty="tformat:    - %s (%ar)"
     fi
     cd "$PEARL_PKGDIR"
