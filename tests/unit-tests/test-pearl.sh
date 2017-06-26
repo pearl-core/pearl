@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-source "$(dirname $0)/../utils/utils.sh"
+PEARL_LOCAL_ROOT="$(dirname $0)/../.."
+source "$PEARL_LOCAL_ROOT/tests/bunit/utils/utils.sh"
+source "$PEARL_LOCAL_ROOT/tests/test-utils/utils.sh"
 
 pearlSetUp
-PEARL_LOCAL_ROOT="$(dirname $0)/../.."
+echo "1.2.3" > $PEARL_ROOT/VERSION
 source $PEARL_LOCAL_ROOT/bin/pearl -h &> /dev/null
 
 # Disable the exiterr
@@ -218,4 +220,4 @@ function test_warn_bash_version(){
     export -n BASH_VERSION
 }
 
-source $(dirname $0)/../utils/shunit2
+source $PEARL_LOCAL_ROOT/tests/bunit/utils/shunit2
