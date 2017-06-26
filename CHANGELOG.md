@@ -1,5 +1,12 @@
 # Change Log #
 
+## [1.5.3][v153] - 2017-06-29 ##
+
+* Add [Pear test utils](https://github.com/pearl-core/test-utils) as new dependency
+* Add [Bunit](https://github.com/fsquillace/bunit) as new dependency
+* Add [Buava](https://github.com/fsquillace/buava) as new dependency
+* Inform about the trap on USR1 signal
+
 ## [1.5.2][v152] - 2017-01-07 ##
 
 * Add support for new OSX image in Travis
@@ -103,3 +110,4 @@
 [v150]: https://github.com/pearl-core/pearl/releases/tag/1.5.0
 [v151]: https://github.com/pearl-core/pearl/releases/tag/1.5.1
 [v152]: https://github.com/pearl-core/pearl/releases/tag/1.5.2
+[v153]: https://github.com/pearl-core/pearl/releases/tag/1.5.3
