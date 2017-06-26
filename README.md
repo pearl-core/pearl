@@ -279,7 +279,7 @@ The following variables can be used in any of the previous scripts:
 - *PEARL_PKGVARDIR*  - Pearl package location containing data needed for package
 
 Additionally, the script *install.sh* can use the utility functions available in
-[*utils*](lib/utils) directory that
+[Buava](https://github.com/fsquillace/buava) and Pearl [*utils*](lib/utils) directory that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
@@ -315,8 +315,9 @@ The `link` `unlink` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
-All these functions belong to the
-[*utils.sh*](lib/utils/utils.sh) script.
+All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
+in [*utils.sh*](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and to
+the Pearl [*utils.sh*](lib/utils/utils.sh) script.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful

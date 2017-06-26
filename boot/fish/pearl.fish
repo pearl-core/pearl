@@ -29,7 +29,7 @@ if not contains $PEARL_ROOT/man $MANPATH
     set MANPATH $MANPATH $PEARL_ROOT/man
 end
 
-source $PEARL_ROOT/lib/utils/osx-compat.fish
+source $PEARL_ROOT/buava/lib/osx-compat.fish
 
 ################################# MAIN ##############################
 for reponame in (ls $PEARL_HOME/packages)

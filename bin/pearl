@@ -2,7 +2,10 @@
 
 set -e -o pipefail
 
-# PATH needs to be updated since GNU Coreutils is required in OSX environments
+# PATH needs to be updated since GNU Coreutils is required in OSX
+# environments. Buava `osx_update_path` cannot be used because in
+# order to load osx-compat.sh file the `readlink` command is
+# required first (circular dependency).
 GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
 [ -d "$GNUBIN" ] && PATH="$GNUBIN:$PATH"
 
@@ -25,8 +28,10 @@ DESCRIPTION='Because only in the best shells you will find a Pearl...'
 PEARL_LOCAL_ROOT="${PEARL_LOCAL_ROOT:-$(readlink -f $(dirname $(readlink -f "$0"))/..)}"
 PEARL_HOME="${PEARL_HOME:-${HOME}/.config/pearl}"
 
+source "${PEARL_LOCAL_ROOT}/buava/lib/utils.sh"
+source "${PEARL_LOCAL_ROOT}/buava/lib/trycatch.sh"
+
 source "${PEARL_LOCAL_ROOT}/lib/utils/utils.sh"
-source "${PEARL_LOCAL_ROOT}/lib/utils/trycatch.sh"
 source "${PEARL_LOCAL_ROOT}/lib/core/package.sh"
 source "${PEARL_LOCAL_ROOT}/lib/core/system.sh"
 

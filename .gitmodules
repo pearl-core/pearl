@@ -1,0 +1,3 @@
+[submodule "buava"]
+	path = buava
+	url = https://github.com/fsquillace/buava.git

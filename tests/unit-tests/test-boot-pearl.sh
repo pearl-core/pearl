@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-source "$(dirname $0)/../utils/utils.sh"
+PEARL_LOCATION=$(dirname $0)/../..
+source "$PEARL_LOCATION/tests/utils/utils.sh"
 
 # Disable the exiterr
 set +e
