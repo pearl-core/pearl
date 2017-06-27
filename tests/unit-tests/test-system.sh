@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 PEARL_LOCATION=$(dirname $0)/../..
-source "$PEARL_LOCATION/tests/utils/utils.sh"
+source "$PEARL_LOCATION/tests/bunit/utils/utils.sh"
+source "$PEARL_LOCATION/tests/test-utils/utils.sh"
 
 source "$PEARL_LOCATION/buava/lib/utils.sh"
 source "$PEARL_LOCATION/lib/core/package.sh"
@@ -18,6 +19,7 @@ function oneTimeSetUp(){
 
 function setUp(){
     pearlSetUp
+
     # The following ensure to override CONFIG_FILES with the right HOME variable
     CONFIG_FILES[bash]="$HOME/.bashrc"
     CONFIG_FILES[emacs]="$HOME/.emacs"
@@ -45,6 +47,7 @@ function pearl_package_remove(){
 function test_pearl_init(){
     rm -rf $PEARL_HOME
     assertCommandSuccess pearl_init
+    cat $STDERRF
 
     [ -d $PEARL_HOME/bin ]
     assertEquals 0 $?
@@ -143,4 +146,4 @@ function test_pearl_remove_no(){
     assertEquals "$(echo -e "(load-file \"${PEARL_ROOT}/boot/emacs/pearl.el\")")" "$(cat $HOME/.emacs)"
 }
 
-source $(dirname $0)/../utils/shunit2
+source $PEARL_LOCATION/tests/bunit/utils/shunit2

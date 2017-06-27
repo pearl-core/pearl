@@ -22,8 +22,8 @@ script:
   - bash --version
   - zsh --version
   - fish --version
-  - bash ./tests/unit-tests/unit-tests.sh
-  - bash ./tests/checkstyle/checkstyle.sh
+  - ./tests/bunit/bin/checkstyle.sh ./bin/ ./lib/
+  - ./tests/bunit/bin/unit-tests.sh ./tests/unit-tests
   - bash ./tests/integ-tests/integ-tests.sh $PWD
   - zsh ./tests/integ-tests/integ-tests.sh $PWD
   - fish ./tests/integ-tests/integ-tests.fish $PWD

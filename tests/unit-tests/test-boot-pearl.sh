@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 PEARL_LOCATION=$(dirname $0)/../..
-source "$PEARL_LOCATION/tests/utils/utils.sh"
+source "$PEARL_LOCATION/tests/bunit/utils/utils.sh"
+source "$PEARL_LOCATION/tests/test-utils/utils.sh"
 
 # Disable the exiterr
 set +e
@@ -11,6 +12,10 @@ function oneTimeSetUp(){
 
 function setUp(){
     pearlSetUp
+    mkdir -p $PEARL_ROOT/buava/lib
+    echo "echo sourced utils.sh" > $PEARL_ROOT/buava/lib/utils.sh
+    echo "echo sourced osx-compat.sh" > $PEARL_ROOT/buava/lib/osx-compat.sh
+    echo "echo sourced osx-compat.fish" > $PEARL_ROOT/buava/lib/osx-compat.fish
 }
 
 function tearDown(){
@@ -138,4 +143,4 @@ function test_pearl_fish_config_error(){
     assertCommandSuccess fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
 }
 
-source $(dirname $0)/../utils/shunit2
+source $PEARL_LOCATION/tests/bunit/utils/shunit2

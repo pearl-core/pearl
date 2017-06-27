@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 PEARL_LOCATION=$(dirname $0)/../..
-source "$PEARL_LOCATION/tests/utils/utils.sh"
-
-unset HOME
-export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
-unset PEARL_HOME
-export PEARL_HOME=$(TMPDIR=/tmp mktemp -d -t pearl-home.XXXXXXX)
+source "$PEARL_LOCATION/tests/bunit/utils/utils.sh"
+source "$PEARL_LOCATION/tests/test-utils/utils.sh"
 
 source "$PEARL_LOCATION/buava/lib/utils.sh"
 source "$PEARL_LOCATION/lib/utils/utils.sh"
@@ -20,6 +16,7 @@ function oneTimeSetUp(){
 }
 
 function setUp(){
+    pearlHomeSetUp
     touch $FILEPATH
     mkdir -p $HOME/symlinks
     mkdir -p $PEARL_HOME/bin
@@ -27,8 +24,7 @@ function setUp(){
 
 function tearDown(){
     rm $FILEPATH
-    rm -rf $HOME
-    rm -rf $PEARL_HOME
+    pearlHomeTearDown
 }
 
 function test_link_to_path_null_executable_path(){
@@ -55,4 +51,4 @@ function test_unlink_from_path(){
     assertEquals 0 $?
 }
 
-source $(dirname $0)/../utils/shunit2
+source $PEARL_LOCATION/tests/bunit/utils/shunit2

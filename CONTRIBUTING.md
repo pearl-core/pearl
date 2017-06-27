@@ -153,7 +153,8 @@ All Pearl issues are tracked as [GitHub issues](https://guides.github.com/featur
 #### Unit Tests ####
 To run unit tests:
 ```sh
-./tests/unit-tests/unit-tests.sh
+./tests/bunit/bin/checkstyle.sh ./bin/ ./lib/
+./tests/bunit/bin/unit-tests.sh ./tests/unit-tests
 ```
 
 #### Integration Tests ####

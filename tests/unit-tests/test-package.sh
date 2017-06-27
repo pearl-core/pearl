@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 PEARL_LOCATION=$(dirname $0)/../..
-source "$PEARL_LOCATION/tests/utils/utils.sh"
+source "$PEARL_LOCATION/tests/bunit/utils/utils.sh"
+source "$PEARL_LOCATION/tests/test-utils/utils.sh"
 
 source "$PEARL_LOCATION/buava/lib/utils.sh"
 source "$PEARL_LOCATION/buava/lib/trycatch.sh"
@@ -836,4 +837,4 @@ function test_get_list_uninstalled_packages_no_match() {
     unset RESULT
 }
 
-source $(dirname $0)/../utils/shunit2
+source $PEARL_LOCATION/tests/bunit/utils/shunit2
