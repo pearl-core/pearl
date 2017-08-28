@@ -1,5 +1,11 @@
 # Change Log #
 
+## [1.5.4][v154] - 2017-08-28 ##
+
+* Update Buava:
+  * Add `download` function
+  * vimperator gtk2 programs for `[un]link` functions
+
 ## [1.5.3][v153] - 2017-06-29 ##
 
 * Add [Pear test utils](https://github.com/pearl-core/test-utils) as new dependency
@@ -111,3 +117,4 @@
 [v151]: https://github.com/pearl-core/pearl/releases/tag/1.5.1
 [v152]: https://github.com/pearl-core/pearl/releases/tag/1.5.2
 [v153]: https://github.com/pearl-core/pearl/releases/tag/1.5.3
+[v154]: https://github.com/pearl-core/pearl/releases/tag/1.5.4
