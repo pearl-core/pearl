@@ -1,5 +1,11 @@
 # Change Log #
 
+## [1.5.5][v155] - 2017-08-31 ##
+
+* Update Buava:
+  * Update `download` function
+  * Add `choose`, `input` and `contain_elements` functions
+
 ## [1.5.4][v154] - 2017-08-28 ##
 
 * Update Buava:
@@ -118,3 +124,4 @@
 [v152]: https://github.com/pearl-core/pearl/releases/tag/1.5.2
 [v153]: https://github.com/pearl-core/pearl/releases/tag/1.5.3
 [v154]: https://github.com/pearl-core/pearl/releases/tag/1.5.4
+[v155]: https://github.com/pearl-core/pearl/releases/tag/1.5.5
