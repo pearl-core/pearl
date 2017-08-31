@@ -1,5 +1,9 @@
 # Change Log #
 
+## [1.5.6][v156] - 2017-08-31 ##
+
+* Fix Integ tests
+
 ## [1.5.5][v155] - 2017-08-31 ##
 
 * Update Buava:
@@ -125,3 +129,4 @@
 [v153]: https://github.com/pearl-core/pearl/releases/tag/1.5.3
 [v154]: https://github.com/pearl-core/pearl/releases/tag/1.5.4
 [v155]: https://github.com/pearl-core/pearl/releases/tag/1.5.5
+[v156]: https://github.com/pearl-core/pearl/releases/tag/1.5.6
