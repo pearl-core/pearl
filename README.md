@@ -167,13 +167,14 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 Recommended Pearl Hub packages to install:
 -------------------------------
 
-- [c](https://github.com/pearl-hub/c)
 - [cmd](https://github.com/pearl-hub/cmd)
 - [kyrat](https://github.com/pearl-hub/kyrat)
 - [ranger](https://github.com/pearl-hub/ranger)
 - [sesaila](https://github.com/pearl-hub/sesaila)
 - [trash](https://github.com/pearl-hub/trash)
 - [txum](https://github.com/pearl-hub/txum)
+
+For dotfiles packages take a look [here](https://github.com/pearl-hub?q=dot).
 
 Check out the [OPH (Official Pearl Hub)](https://github.com/pearl-hub)
 for more packages you might be interested.

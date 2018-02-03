@@ -20,12 +20,13 @@
 #    link_to_path "~/myexecfile"
 #
 # Globals:
-#   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
+#   PEARL_HOME (RO)       : Used to locate $PEARL_HOME/bin.
 # Arguments:
-#   executable_path ($1) : The executable file path.
+#   executable_path ($1)  : The executable file path.
+#   executable_name ($2?) : The new executable name.
 # Returns:
-#   NO_FILE_OR_DIRECTORY : $executable_path does not exist.
-#   0                    : Successfully linked.
+#   NO_FILE_OR_DIRECTORY  : $executable_path does not exist.
+#   0                     : Successfully linked.
 # Output:
 #   None
 #######################################
@@ -33,7 +34,8 @@ function link_to_path() {
     local executable_path=$1
     check_not_null ${executable_path}
 
-    local executable_name=$(basename "$executable_path")
+    local default_executable_name=$(basename "$executable_path")
+    local executable_name=${2:-${default_executable_name}}
     link_to "${executable_path}" "${PEARL_HOME}/bin/${executable_name}"
 }
 
@@ -57,6 +59,7 @@ function link_to_path() {
 #   PEARL_HOME (RO)      : Used to locate $PEARL_HOME/bin.
 # Arguments:
 #   executable_path ($1) : The executable file path.
+#   executable_name ($2?) : The new executable name.
 # Returns:
 #   0                    : Successfully unlinked.
 #   36                   : Symlink exists on a differt source file.
@@ -67,7 +70,8 @@ function unlink_from_path() {
     local executable_path=$1
     check_not_null ${executable_path}
 
-    local executable_name=$(basename "$executable_path")
+    local default_executable_name=$(basename "$executable_path")
+    local executable_name=${2:-${default_executable_name}}
 
     unlink_from "${executable_path}" "${PEARL_HOME}/bin/${executable_name}"
 }
