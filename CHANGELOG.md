@@ -1,5 +1,14 @@
 # Change Log #
 
+## [1.6.0][v160] - 2018-02-03 ##
+
+* Change directory name to `pearl-config`. Pearl version `2.0.0` will deprecate `pearl-metadata`
+* `link_to_path` to customize symlink name
+* Changes in `buava` for Pearl configs:
+  * `osx_detect` function to detect the OS platform
+  * Improved `choose` function with indexes
+  * Add `ssh` for `[un]link` function
+
 ## [1.5.6][v156] - 2017-08-31 ##
 
 * Fix Integ tests
@@ -130,3 +139,4 @@
 [v154]: https://github.com/pearl-core/pearl/releases/tag/1.5.4
 [v155]: https://github.com/pearl-core/pearl/releases/tag/1.5.5
 [v156]: https://github.com/pearl-core/pearl/releases/tag/1.5.6
+[v160]: https://github.com/pearl-core/pearl/releases/tag/1.6.0
