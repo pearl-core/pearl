@@ -246,11 +246,11 @@ Also, an optional description of the package can be defined via `PEARL_PACKAGES_
 
 ## Structure of a Pearl package ##
 Your own git repository can contain an **optional** directory
-named *pearl-metadata* used by Pearl to integrate the package with the Pearl environment.
+named *pearl-config* used by Pearl to integrate the package with the Pearl environment.
 
     / (package root)
     │
-    ├── pearl-metadata (optional directory)
+    ├── pearl-config (optional directory)
     │   │
     │   ├── install.sh
     │   ├── config.sh
@@ -262,7 +262,7 @@ named *pearl-metadata* used by Pearl to integrate the package with the Pearl env
     │
     └── (additional package content)
 
-The metadata files are also **optional** scripts:
+The files inside *pearl-config* are also **optional** scripts:
 
 - *install.sh* - contains the [hooks functions](#hook-functions) executed during the *install*, *update* and *remove* events.
 - *config.sh* - will be sourced whenever a new Bash/Zsh shell is starting up.
@@ -285,6 +285,8 @@ make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
 [Official Pearl Hub](https://github.com/pearl-hub).
+
+**Note**: Legacy Pearl versions were using a different directory named *pearl-metadata*. This directory is meant to be deprecated in the upcoming Pearl version.
 
 ### The install.sh script ###
 #### Hook functions ####
@@ -367,7 +369,7 @@ Install the package:
 Voila', your new vim plugin is ready to be used!
 
 This approach is particularly useful whenever you do not need to specify
-any pearl metadata to *"enrich"* the third-party project inside
+any pearl config to *"enrich"* the third-party project inside
 the Pearl environment.
 
 ### Create your own git repository and use git submodule ###
@@ -382,11 +384,11 @@ The filesystem structure of the package will become something like this:
 
     / (package root)
     │
-    ├── pearl-metadata (optional directory)
+    ├── pearl-config   (optional directory)
     ├── module/        (contains third-party code)
     └── (additional package content)
 
-Then, you just need to modify the metadata scripts in order to integrate the third-party
+Then, you just need to modify the config scripts in order to integrate the third-party
 project inside Pearl environment.
 
 To see examples of Pearl packages from third-party projects take a look at the
