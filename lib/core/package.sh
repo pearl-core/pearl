@@ -389,7 +389,10 @@ function _init_package(){
     local post_func=$3
 
     unset ${pre_func} ${post_func}
+    # TODO pearl-metadata directory is meant to be deprecated in the future versions
     local hook_file=${PEARL_HOME}/packages/$pkgfullname/pearl-metadata/install.sh
+    [ -f "$hook_file" ] && source "$hook_file"
+    local hook_file=${PEARL_HOME}/packages/$pkgfullname/pearl-config/install.sh
     [ -f "$hook_file" ] && source "$hook_file"
     return 0
 }
