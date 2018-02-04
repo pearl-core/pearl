@@ -131,6 +131,7 @@ function pearl_update(){
     bold_cyan; echo -n "* "; normal; echo "Updating Pearl script"
     $GIT fetch --quiet --all
     $GIT reset --quiet --hard origin/master
+    $GIT submodule update --init --recursive
 
     get_list_installed_packages
     for pkgname in "${RESULT[@]}"

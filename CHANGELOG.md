@@ -1,5 +1,10 @@
 # Change Log #
 
+## [1.6.1][v161] - 2018-02-04 ##
+
+* Fix import `osx-compat.sh`
+* Fix update Pearl submodules during updates
+
 ## [1.6.0][v160] - 2018-02-03 ##
 
 * Change directory name to `pearl-config`. Pearl version `2.0.0` will deprecate `pearl-metadata`
@@ -140,3 +145,4 @@
 [v155]: https://github.com/pearl-core/pearl/releases/tag/1.5.5
 [v156]: https://github.com/pearl-core/pearl/releases/tag/1.5.6
 [v160]: https://github.com/pearl-core/pearl/releases/tag/1.6.0
+[v161]: https://github.com/pearl-core/pearl/releases/tag/1.6.1

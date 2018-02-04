@@ -269,8 +269,8 @@ The files inside *pearl-config* are also **optional** scripts:
 - *config.bash* - will be sourced whenever a new Bash shell is starting up.
 - *config.zsh* - will be sourced whenever a new Zsh shell is starting up.
 - *config.fish* - will be sourced whenever a new Fish shell is starting up.
-- *config.vim* - will be executed whenever vim editor is starting up.
-- *config.el* - will be sourced whenever emacs editor is starting up.
+- *config.vim* - will be executed whenever Vim editor is starting up.
+- *config.el* - will be sourced whenever Emacs editor is starting up.
 
 The following variables can be used in any of the previous scripts:
 
@@ -312,7 +312,7 @@ Useful examples of Pearl packages can be checked in the
     }
 
 The `info` and `warn` are functions that print a message
-using different colors (namely white and yellow).
+using different colors (namely cyan and yellow).
 
 The `link` `unlink` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able

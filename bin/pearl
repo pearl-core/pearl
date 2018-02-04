@@ -28,7 +28,9 @@ DESCRIPTION='Because only in the best shells you will find a Pearl...'
 PEARL_LOCAL_ROOT="${PEARL_LOCAL_ROOT:-$(readlink -f $(dirname $(readlink -f "$0"))/..)}"
 PEARL_HOME="${PEARL_HOME:-${HOME}/.config/pearl}"
 
+# Below are the builtins used by the hooks fuctions in pearl package install.sh
 source "${PEARL_LOCAL_ROOT}/buava/lib/utils.sh"
+source "${PEARL_LOCAL_ROOT}/buava/lib/osx-compat.sh"
 source "${PEARL_LOCAL_ROOT}/buava/lib/trycatch.sh"
 
 source "${PEARL_LOCAL_ROOT}/lib/utils/utils.sh"
