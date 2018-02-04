@@ -14,8 +14,6 @@ function setUp(){
     pearlSetUp
     mkdir -p $PEARL_ROOT/buava/lib
     echo "echo sourced utils.sh" > $PEARL_ROOT/buava/lib/utils.sh
-    echo "echo sourced osx-compat.sh" > $PEARL_ROOT/buava/lib/osx-compat.sh
-    echo "echo sourced osx-compat.fish" > $PEARL_ROOT/buava/lib/osx-compat.fish
 }
 
 function tearDown(){
@@ -83,7 +81,7 @@ EOF
     ZSH_NAME="SOMENAME"
     BASH="SOMENAME"
     assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/sh/pearl.sh
-    assertEquals "$(echo -e "sourced osx-compat.sh\nsourced config.sh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.bash\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.zsh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "sourced config.sh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.bash\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.zsh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_add_path_once() {
@@ -97,7 +95,7 @@ EOF
     PATH=$PATH:$PEARL_HOME/bin
     MANPATH=$MANPATH:$PEARL_ROOT/man
     assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/sh/pearl.sh
-    assertEquals "$(echo -e "sourced osx-compat.sh\n1\n1")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_fish(){
@@ -112,7 +110,7 @@ function test_pearl_fish(){
 EOF
 )
     assertCommandSuccess fish_wrapper "$test_content"
-    assertEquals "$(echo -e "sourced osx-compat.fish\nsourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "sourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_fish_add_path_once() {
@@ -125,7 +123,7 @@ EOF
     PATH=$PATH:$PEARL_HOME/bin
     MANPATH=$MANPATH:$PEARL_ROOT/man
     assertCommandSuccess fish_wrapper "$test_content"
-    assertEquals "$(echo -e "sourced osx-compat.fish\n1\n1")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "1\n1")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_config_error(){

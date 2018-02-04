@@ -3,6 +3,8 @@
 #
 # Dependencies:
 # - [buava] $PEARL_ROOT/buava/lib/utils.sh
+# - [buava] $PEARL_ROOT/buava/lib/trycatch.sh
+# - [buava] $PEARL_ROOT/buava/lib/osx-compat.sh
 # - lib/utils/utils.sh
 #
 # vim: ft=sh
