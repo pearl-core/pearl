@@ -204,6 +204,8 @@ Assuming all Pearl dependencies are properly installed in the system, to install
 run the following:
 ```sh
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+# or
+curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 bash install.sh
 ```
 
@@ -221,6 +223,8 @@ Once all Pearl dependencies are properly installed in the system, to install Pea
 run the following:
 ```sh
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+# or
+curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 bash install.sh
 ```
 
