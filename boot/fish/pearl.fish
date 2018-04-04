@@ -34,6 +34,8 @@ for reponame in (ls $PEARL_HOME/packages)
     for pkgname in (ls $PEARL_HOME/packages/$reponame)
         set PEARL_PKGDIR "$PEARL_HOME/packages/$reponame/$pkgname"
         set PEARL_PKGVARDIR "$PEARL_HOME/var/$reponame/$pkgname"
+        set PEARL_PKGREPONAME "$reponame"
+        set PEARL_PKGNAME "$pkgname"
 
         # TODO pearl-metadata directory is meant to be deprecated in the future versions
         if [ -e $PEARL_PKGDIR/pearl-metadata/config.fish ]
@@ -45,6 +47,8 @@ for reponame in (ls $PEARL_HOME/packages)
         end
         set -e PEARL_PKGDIR
         set -e PEARL_PKGVARDIR
+		set -e PEARL_PKGNAME
+		set -e PEARL_PKGREPONAME
     end
 end
 

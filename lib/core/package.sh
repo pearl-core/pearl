@@ -68,7 +68,7 @@ function _load_internal_repo() {
     declare -A PEARL_PACKAGES
     declare -A PEARL_PACKAGES_DESCR
     source "$confname"
-    [ -z "$PEARL_REPO_NAME" ] && PEARL_REPO_NAME="default"
+    [[ -z "$PEARL_REPO_NAME" ]] && PEARL_REPO_NAME="default"
     PEARL_INTERNAL_REPOS_NAME+=($PEARL_REPO_NAME)
     for pkgname in "${!PEARL_PACKAGES[@]}"
     do
@@ -80,7 +80,7 @@ function _load_internal_repo() {
 function _load_repo() {
     local repo=$1
     local sum=$(echo "$repo" | md5sum | cut -d ' ' -f1)
-    if [ -d "$PEARL_HOME/repos/$sum/.git" ]; then
+    if [[ -d "$PEARL_HOME/repos/$sum/.git" ]]; then
         bold_cyan; echo -n "* "; normal
         echo "Updating $repo repository"
         cd "$PEARL_HOME/repos/$sum"
@@ -98,9 +98,9 @@ function _load_repo() {
 # Provide the full name of a package by reading the repository.
 #
 # Globals:
-#   RESULT (WO)     : Contains the package full name.
+#   RESULT (WO)  : Contains the full name: repo and package name.
 # Arguments:
-#   pkgname ($1)    : The name of the package.
+#   pkgname ($1) : The name of the package.
 # Returns:
 #   None
 # Output:
@@ -119,7 +119,10 @@ function _package_full_name() {
 
     for reponame in "${PEARL_INTERNAL_REPOS_NAME[@]}"
     do
-        [ ${PEARL_INTERNAL_PACKAGES[$reponame/$pkgname]+abc} ] && { RESULT="$reponame/$pkgname" ; return; }
+        [[ ${PEARL_INTERNAL_PACKAGES[$reponame/$pkgname]+abc} ]] && {
+            RESULT="$reponame/$pkgname"
+            return
+        }
     done
     return 0
 }
@@ -128,10 +131,10 @@ function _package_full_name() {
 # Provide the full name of a package by reading the local directory.
 #
 # Globals:
-#   PEARL_HOME (RO) : Used to access to the local directory.
-#   RESULT (WO)     : Contains the package full name.
+#   PEARL_HOME (RO)    : Used to access to the local directory.
+#   RESULT (WO)        : Contains the full name: repo and package name.
 # Arguments:
-#   pkgname ($1)    : The name of the package.
+#   pkgname ($1)       : The name of the package.
 # Returns:
 #   None
 # Output:
@@ -145,7 +148,7 @@ function _package_full_name_from_local() {
     cd $PEARL_HOME/packages
     if [[ $pkgname == *[/]* ]]
     then
-        if [ -d "$pkgname" ]
+        if [[ -d "$pkgname" ]]
         then
             RESULT="$pkgname"
         fi
@@ -154,7 +157,10 @@ function _package_full_name_from_local() {
 
     for reponame in $(ls ${PEARL_HOME}/packages/)
     do
-        [ -d "$reponame/$pkgname" ] && { RESULT="$reponame/$pkgname"; return; }
+        [[ -d "$reponame/$pkgname" ]] && {
+            RESULT="$reponame/$pkgname"
+            return
+        }
     done
     return 0
 }
@@ -166,15 +172,15 @@ function _is_local_package(){
 
 function _check_and_remove(){
     local destdir=$1
-    [ -e "${destdir}" ] && $RM -rf "${destdir}"
+    [[ -e "${destdir}" ]] && $RM -rf "${destdir}"
     return 0
 }
 
 function _check_and_copy(){
     local sourcedir=$1
     local destdir=$2
-    [ -d "${sourcedir}" ] || { error "Error: $sourcedir is not a directory"; return 1; }
-    [ -r "${sourcedir}" ] || { error "Error: $sourcedir is not readable"; return 2; }
+    [[ -d "${sourcedir}" ]] || { error "Error: $sourcedir is not a directory"; return 1; }
+    [[ -r "${sourcedir}" ]] || { error "Error: $sourcedir is not readable"; return 2; }
     _check_and_remove "${destdir}"
     $CP -r "${sourcedir}" "${destdir}"
 }
@@ -201,8 +207,10 @@ function pearl_package_install(){
 
     _package_full_name $pkgname
     local pkgfullname=$RESULT
+    local reponame="${RESULT/\/*/}"
+    local pkgshortname="${RESULT/*\//}"
     unset RESULT
-    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
+    [[ -z "$pkgfullname" ]] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
     _is_installed $pkgfullname && { warn "Skipping $pkgname since it is already installed."; throw $ALREADY_INSTALLED_EXCEPTION; }
 
     bold_cyan; echo -n "* "; normal
@@ -221,6 +229,8 @@ function pearl_package_install(){
     cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
     PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
+    PEARL_PKGNAME=$pkgshortname
+    PEARL_PKGREPONAME=$reponame
     mkdir -p "$PEARL_PKGVARDIR"
     if type -t $post_func &> /dev/null
     then
@@ -239,8 +249,8 @@ function _is_url_changed(){
     local pkgfullname=$1
     local existingurl=$($GIT config remote.origin.url)
     # Compare the Git URL only if git config produce an non empty string
-    [ -z "$existingurl" ] && return 1
-    [ "$existingurl" != "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" ]
+    [[ -z "$existingurl" ]] && return 1
+    [[ "$existingurl" != "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" ]]
 }
 
 #######################################
@@ -268,8 +278,10 @@ function pearl_package_update(){
 
     _package_full_name $pkgname
     local pkgfullname=$RESULT
+    local reponame="${RESULT/\/*/}"
+    local pkgshortname="${RESULT/*\//}"
     unset RESULT
-    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
+    [[ -z "$pkgfullname" ]] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
     ! _is_installed $pkgfullname && { warn "Skipping $pkgname since it has not been installed."; throw $NOT_INSTALLED_EXCEPTION; }
 
     _init_package $pkgfullname $pre_func $post_func
@@ -278,6 +290,8 @@ function pearl_package_update(){
     echo "Updating $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
     PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
+    PEARL_PKGNAME=$pkgshortname
+    PEARL_PKGREPONAME=$reponame
     cd $PEARL_PKGDIR
 
     if ! _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" && \
@@ -346,15 +360,18 @@ function pearl_package_remove(){
 
     _package_full_name_from_local $pkgname
     local pkgfullname=$RESULT
+    local reponame="${RESULT/\/*/}"
+    local pkgshortname="${RESULT/*\//}"
     unset RESULT
-    [ -z "$pkgfullname" ] && { warn "Skipping $pkgname since it has not been installed."; throw $NOT_INSTALLED_EXCEPTION; }
-
+    [[ -z "$pkgfullname" ]] && { warn "Skipping $pkgname since it has not been installed."; throw $NOT_INSTALLED_EXCEPTION; }
     _init_package $pkgfullname $pre_func $post_func
 
     bold_cyan; echo -n "* "; normal
     echo "Removing $pkgfullname package"
     PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
     PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
+    PEARL_PKGNAME=$pkgshortname
+    PEARL_PKGREPONAME=$reponame
     cd $PEARL_PKGDIR
     if type -t $pre_func &> /dev/null
     then
@@ -382,7 +399,7 @@ function pearl_package_remove(){
 
 function _is_installed() {
     local pkgfullname=$1
-    [ -d "$PEARL_HOME/packages/$pkgfullname" ]
+    [[ -d "$PEARL_HOME/packages/$pkgfullname" ]]
 }
 
 function _init_package(){
@@ -393,9 +410,9 @@ function _init_package(){
     unset ${pre_func} ${post_func}
     # TODO pearl-metadata directory is meant to be deprecated in the future versions
     local hook_file=${PEARL_HOME}/packages/$pkgfullname/pearl-metadata/install.sh
-    [ -f "$hook_file" ] && source "$hook_file"
+    [[ -f "$hook_file" ]] && source "$hook_file"
     local hook_file=${PEARL_HOME}/packages/$pkgfullname/pearl-config/install.sh
-    [ -f "$hook_file" ] && source "$hook_file"
+    [[ -f "$hook_file" ]] && source "$hook_file"
     return 0
 }
 
@@ -405,6 +422,8 @@ function _deinit_package(){
     local post_func=$3
     unset PEARL_PKGDIR
     unset PEARL_PKGVARDIR
+    unset PEARL_PKGNAME
+    unset PEARL_PKGREPONAME
     unset ${pre_func} ${post_func}
 }
 
@@ -422,7 +441,7 @@ function _deinit_package(){
 #######################################
 function pearl_package_list(){
     local pattern=".*"
-    [ -z "$1" ] || pattern="$1"
+    [[ -z "$1" ]] || pattern="$1"
     declare -a RESULT
     get_list_uninstalled_packages "$pattern"
     for pkg in "${RESULT[@]}"
@@ -483,7 +502,7 @@ function get_list_uninstalled_packages() {
 
     for pkgfullname in "${!PEARL_INTERNAL_PACKAGES[@]}"
     do
-        [ ! -d $PEARL_HOME/packages/$pkgfullname/ ] && [[ "$pkgfullname" =~ .*$pattern.* ]] && RESULT+=("$pkgfullname")
+        [[ ! -d $PEARL_HOME/packages/$pkgfullname/ ]] && [[ "$pkgfullname" =~ .*$pattern.* ]] && RESULT+=("$pkgfullname")
     done
     return 0
 }

@@ -34,6 +34,8 @@ function create_config_file() {
     echo sourced $configfile;
     echo \$PEARL_PKGDIR
     echo \$PEARL_PKGVARDIR
+    echo \$PEARL_PKGNAME
+    echo \$PEARL_PKGREPONAME
 EOF
 )
     echo "$content" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/$configfile
@@ -81,7 +83,7 @@ EOF
     ZSH_NAME="SOMENAME"
     BASH="SOMENAME"
     assertCommandSuccess bash_wrapper source $(dirname $0)/../../boot/sh/pearl.sh
-    assertEquals "$(echo -e "sourced config.sh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.bash\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nsourced config.zsh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "sourced config.sh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nls-colors\npearl\nsourced config.bash\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nls-colors\npearl\nsourced config.zsh\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nls-colors\npearl")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_add_path_once() {
@@ -110,7 +112,7 @@ function test_pearl_fish(){
 EOF
 )
     assertCommandSuccess fish_wrapper "$test_content"
-    assertEquals "$(echo -e "sourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors")" "$(cat $STDOUTF)"
+    assertEquals "$(echo -e "sourced config.fish\n$PEARL_HOME/packages/pearl/ls-colors\n$PEARL_HOME/var/pearl/ls-colors\nls-colors\npearl")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_fish_add_path_once() {

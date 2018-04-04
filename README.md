@@ -274,10 +274,12 @@ The files inside *pearl-config* are also **optional** scripts:
 
 The following variables can be used in any of the previous scripts:
 
-- *PEARL_HOME*       - Pearl location (default: *$HOME/.config/pearl*)
-- *PEARL_ROOT*       - Pearl script location
-- *PEARL_PKGDIR*     - Pearl package location
-- *PEARL_PKGVARDIR*  - Pearl package location containing data needed for package
+- *PEARL_HOME*          - Pearl location (default: *$HOME/.config/pearl*)
+- *PEARL_ROOT*          - Pearl script location
+- *PEARL_PKGDIR*        - Pearl package location
+- *PEARL_PKGVARDIR*     - Pearl package location containing data needed for package
+- *PEARL_PKGNAME*       - Pearl package name
+- *PEARL_PKGREPONAME*   - Pearl package repo name (useful to detect and interact with packages within the same repo)
 
 Additionally, the script *install.sh* can use the utility functions available in
 [Buava](https://github.com/fsquillace/buava) and Pearl [*utils*](lib/utils) directory that

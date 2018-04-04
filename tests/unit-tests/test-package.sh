@@ -146,6 +146,8 @@ function $hookfunc(){
     else
         [ \$PEARL_PKGDIR != \${PWD} ] && return 1
         [ -z "\$PEARL_PKGVARDIR" ] && return 1
+        [ -z "\$PEARL_PKGNAME" ] && return 1
+        [ -z "\$PEARL_PKGREPONAME" ] && return 1
     fi
     echo "$hookfunc"
 }
@@ -284,6 +286,10 @@ function test_pearl_package_install_deinit(){
     [ -z "$PEARL_PKGDIR" ]
     assertEquals 0 $?
     [ -z "$PEARL_PKGVARDIR" ]
+    assertEquals 0 $?
+    [ -z "$PEARL_PKGNAME" ]
+    assertEquals 0 $?
+    [ -z "$PEARL_PKGREPONAME" ]
     assertEquals 0 $?
 }
 
@@ -440,6 +446,10 @@ function test_pearl_package_remove_deinit(){
     assertEquals 0 $?
     [ -z "$PEARL_PKGVARDIR" ]
     assertEquals 0 $?
+    [ -z "$PEARL_PKGNAME" ]
+    assertEquals 0 $?
+    [ -z "$PEARL_PKGREPONAME" ]
+    assertEquals 0 $?
 }
 
 function test_pearl_package_remove_not_installed(){
@@ -571,6 +581,10 @@ function test_pearl_package_update_deinit(){
     [ -z "$PEARL_PKGDIR" ]
     assertEquals 0 $?
     [ -z "$PEARL_PKGVARDIR" ]
+    assertEquals 0 $?
+    [ -z "$PEARL_PKGNAME" ]
+    assertEquals 0 $?
+    [ -z "$PEARL_PKGREPONAME" ]
     assertEquals 0 $?
 }
 
@@ -710,7 +724,7 @@ function test_package_full_name_from_local() {
     scenario_generic_pkgs
     _package_full_name_from_local ls-colors
     assertEquals 0 $?
-    assertEquals "default/ls-colors" "$RESULT"
+    assertEquals "default/ls-colors" "${RESULT}"
     unset RESULT
 }
 
@@ -718,7 +732,7 @@ function test_package_full_name_from_local_with_fullname() {
     scenario_generic_pkgs
     _package_full_name_from_local default/ls-colors
     assertEquals 0 $?
-    assertEquals "default/ls-colors" "$RESULT"
+    assertEquals "default/ls-colors" "${RESULT}"
     unset RESULT
 }
 
@@ -739,7 +753,7 @@ function test_package_full_name() {
     scenario_generic_pkgs
     _package_full_name ls-colors
     assertEquals 0 $?
-    assertEquals "default/ls-colors" "$RESULT"
+    assertEquals "default/ls-colors" "${RESULT}"
     unset RESULT
 }
 
@@ -747,7 +761,7 @@ function test_package_full_name_with_fullname() {
     scenario_generic_pkgs
     _package_full_name default/ls-colors
     assertEquals 0 $?
-    assertEquals "default/ls-colors" "$RESULT"
+    assertEquals "default/ls-colors" "${RESULT}"
     unset RESULT
 }
 
