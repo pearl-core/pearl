@@ -32,6 +32,8 @@ do
     do
         PEARL_PKGDIR=${PEARL_HOME}/packages/${reponame}/${pkgname}
         PEARL_PKGVARDIR=${PEARL_HOME}/var/${reponame}/${pkgname}
+        PEARL_PKGNAME=${pkgname}
+        PEARL_PKGREPONAME=${reponame}
 
         # TODO pearl-metadata directory is meant to be deprecated in the future versions
         if [ -e ${PEARL_PKGDIR}/pearl-metadata/config.sh ]; then
@@ -53,7 +55,7 @@ do
         if [ -n "$ZSH_NAME" ] && [ -e ${PEARL_PKGDIR}/pearl-config/config.zsh ]; then
             source ${PEARL_PKGDIR}/pearl-config/config.zsh
         fi
-        unset PEARL_PKGDIR PEARL_PKGVARDIR
+        unset PEARL_PKGDIR PEARL_PKGVARDIR PEARL_PKGNAME PEARL_PKGREPONAME
     done
 done
 

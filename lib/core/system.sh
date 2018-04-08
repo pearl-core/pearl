@@ -32,10 +32,10 @@ function pearl_init(){
     mkdir -p $PEARL_HOME/tmp
     mkdir -p $PEARL_HOME/var
 
-    [ -e "$PEARL_HOME/bin/pearl" ] && rm -f "$PEARL_HOME/bin/pearl"
+    [[ -e "$PEARL_HOME/bin/pearl" ]] && rm -f "$PEARL_HOME/bin/pearl"
     ln -s "$PEARL_ROOT/bin/pearl" "$PEARL_HOME/bin"
 
-    [ -e "$PEARL_HOME/pearl.conf" ] || cp "$PEARL_ROOT/etc/pearl.conf.template" "$PEARL_HOME/pearl.conf"
+    [[ -e "$PEARL_HOME/pearl.conf" ]] || cp "$PEARL_ROOT/etc/pearl.conf.template" "$PEARL_HOME/pearl.conf"
 
     apply "source ${PEARL_ROOT}/boot/sh/pearl.sh" ${HOME}/.bashrc
     apply "export PEARL_ROOT=${PEARL_ROOT}" ${HOME}/.bashrc

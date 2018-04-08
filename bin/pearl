@@ -7,10 +7,10 @@ set -e -o pipefail
 # order to load osx-compat.sh file the `readlink` command is
 # required first (circular dependency).
 GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
-[ -d "$GNUBIN" ] && PATH="$GNUBIN:$PATH"
+[[ -d "$GNUBIN" ]] && PATH="$GNUBIN:$PATH"
 
-[ -z "$PEARL_ROOT" ] && { echo "Error: The variable PEARL_ROOT must be specified in order to run this script."; exit 1; }
-[ -d "$PEARL_ROOT" ] || { echo "Error: The value in variable PEARL_ROOT is not a directory."; exit 2; }
+[[ -z "$PEARL_ROOT" ]] && { echo "Error: The variable PEARL_ROOT must be specified in order to run this script."; exit 1; }
+[[ -d "$PEARL_ROOT" ]] || { echo "Error: The value in variable PEARL_ROOT is not a directory."; exit 2; }
 
 BASH_VERSION_MIN="4.1"
 [[ "$BASH_VERSION" < "$BASH_VERSION_MIN" ]] && \
@@ -104,7 +104,7 @@ check_cli(){
             die "The help option must be used exclusively"
         fi
     fi
-    if [ "$ARGS" != "" ]
+    if [[ "$ARGS" != "" ]]
     then
         die "No arguments are needed. Run: $CMD --help"
     fi
@@ -207,37 +207,37 @@ function execute_operation(){
 
     local final_res=0
     if $COMMAND_INSTALL; then
-        [ -z "$COMMAND_ARGS" ] && die "No Pearl package specified."
+        [[ -z "$COMMAND_ARGS" ]] && die "No Pearl package specified."
 
         for pkg in ${COMMAND_ARGS[@]}
         do
             try pearl_package_install "$pkg"
             catch || {
                 local pkg_res=$?
-                [ $pkg_res -eq 0 ] || final_res=$pkg_res
+                [[ $pkg_res -eq 0 ]] || final_res=$pkg_res
             }
         done
     elif $COMMAND_UPDATE; then
-        [ -z "$COMMAND_ARGS" ] && pearl_update
+        [[ -z "$COMMAND_ARGS" ]] && pearl_update
 
         for pkg in ${COMMAND_ARGS[@]}
         do
             try pearl_package_update "$pkg"
             catch || {
                 local pkg_res=$?
-                [ $pkg_res -eq 0 ] || final_res=$pkg_res
+                [[ $pkg_res -eq 0 ]] || final_res=$pkg_res
             }
         done
     elif $COMMAND_REMOVE; then
         # Do not send a signal if $NAME has been removed
-        [ -z "$COMMAND_ARGS" ] && pearl_remove && return 0
+        [[ -z "$COMMAND_ARGS" ]] && pearl_remove && return 0
 
         for pkg in ${COMMAND_ARGS[@]}
         do
             try pearl_package_remove "$pkg"
             catch || {
                 local pkg_res=$?
-                [ $pkg_res -eq 0 ] || final_res=$pkg_res
+                [[ $pkg_res -eq 0 ]] || final_res=$pkg_res
             }
         done
     fi
@@ -263,7 +263,7 @@ function execute_operation(){
 #######################################
 function source_pearl(){
     # Send signal to parent in order to (re)source pearl
-    [ -z "$PEARL_ROOT" ] || $KILL_CMD -USR1 $PPID
+    [[ -z "$PEARL_ROOT" ]] || $KILL_CMD -USR1 $PPID
     return 0
 }
 

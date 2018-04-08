@@ -11,8 +11,8 @@ env:
   - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.0"
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./tests/integ-tests/install-linux-deps.sh; fi;
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./tests/integ-tests/install-osx-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./tests/test-utils/installs/install-linux-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./tests/test-utils/installs/install-osx-deps.sh; fi;
 
 install:
   - PATH=$PWD/bin:$PATH
