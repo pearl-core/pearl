@@ -221,10 +221,7 @@ function pearl_package_install(){
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
-        $GIT clone --quiet "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
-        cd "$PEARL_PKGDIR"
-        $GIT submodule --quiet update --init --recursive
-        $GIT --no-pager log -n 3 --no-merges --pretty="tformat:    - %s (%ar)"
+        install_git_repo "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" master
     fi
     cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
@@ -320,10 +317,7 @@ function pearl_package_update(){
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
-        local last_commit=$($GIT rev-parse HEAD)
-        $GIT pull --quiet
-        $GIT submodule --quiet update --init
-        $GIT --no-pager log --no-merges --pretty="tformat:    - %s (%ar)" $last_commit..HEAD
+        update_git_repo "$PEARL_PKGDIR" master
     fi
 
     _init_package $pkgfullname $pre_func $post_func

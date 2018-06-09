@@ -358,25 +358,37 @@ If you want to use a third-party project
 that is not available in the [Official Pearl Hub](https://github.com/pearl-hub),
 you can:
 
-* Point directly to the third-party project git repository
+* Create your own git repository and use the *PEARL_PKGVARDIR* directory (recommended)
 * Create your own git repository and use [git submodule](https://git-scm.com/docs/git-submodule)
+* Point directly to the third-party project git repository
 
-### Point directly to the third-party project git repository ###
-Let's suppose you want to install the [vim-rails](https://github.com/tpope/vim-rails) plugin.
-In your Pearl configuration (~/.config/pearl/pearl.conf), add your new Pearl package:
+To see examples of Pearl packages from third-party projects take a look at the
+[Official Pearl Hub](https://github.com/pearl-hub).
 
-    PEARL_PACKAGES["vim-rails"]="https://github.com/tpope/vim-rails.git"
-    PEARL_PACKAGES_DESCR["vim-rails"]="Ruby on Rails power tools"
+### Create your own git repository and use the *PEARL_PKGVARDIR* directory (recommended) ###
+You can use the *PEARL_PKGVARDIR* directory during the installation phase to install the third-party git repository.
+This is the best way to incorporate third-party project into Pearl ecosystem.
 
-Install the package:
+Here it is an example of *install.sh* file which install the ranger file manager into the directory *${PEARL_PKGVARDIR}/ranger*:
 
-    pearl install vim-rails
+    function post_install(){
+        install_or_update_git_repo https://github.com/ranger/ranger.git "${PEARL_PKGVARDIR}/ranger" master
+    }
 
-Voila', your new vim plugin is ready to be used!
+    function post_update(){
+        post_install
+    }
 
-This approach is particularly useful whenever you do not need to specify
-any pearl config to *"enrich"* the third-party project inside
-the Pearl environment.
+    function pre_remove(){
+        rm -rf ${PEARL_PKGVARDIR}/ranger
+    }
+
+The function `install_or_update_git_repo` comes from the [Buava](https://github.com/fsquillace/buava)
+library in [*utils.sh*](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
+which is natively available in Pearl during the installation.
+You can even use the functions `install_git_repo` or `update_git_repo` which respectively install or update the git repository.
+
+For a full example take a look at the [ranger](https://github.com/pearl-hub/ranger) Pearl Hub package.
 
 ### Create your own git repository and use git submodule ###
 Inside your git repository, you just need to add the third-party project as a
@@ -397,8 +409,23 @@ The filesystem structure of the package will become something like this:
 Then, you just need to modify the config scripts in order to integrate the third-party
 project inside Pearl environment.
 
-To see examples of Pearl packages from third-party projects take a look at the
-[Official Pearl Hub](https://github.com/pearl-hub).
+### Point directly to the third-party project git repository ###
+Let's suppose you want to install the [vim-rails](https://github.com/tpope/vim-rails) plugin.
+In your Pearl configuration (~/.config/pearl/pearl.conf), add your new Pearl package:
+
+    PEARL_PACKAGES["vim-rails"]="https://github.com/tpope/vim-rails.git"
+    PEARL_PACKAGES_DESCR["vim-rails"]="Ruby on Rails power tools"
+
+Install the package:
+
+    pearl install vim-rails
+
+Voila', your new vim plugin is ready to be used!
+
+This approach is particularly useful whenever you do not need to specify
+any pearl config to *"enrich"* the third-party project inside
+the Pearl environment.
+
 
 Create your own Pearl repository in seconds!
 ===============

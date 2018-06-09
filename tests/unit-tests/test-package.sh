@@ -7,6 +7,8 @@ source "$PEARL_LOCATION/buava/lib/utils.sh"
 source "$PEARL_LOCATION/buava/lib/trycatch.sh"
 source "$PEARL_LOCATION/lib/core/package.sh"
 
+INITIAL_PWD="$PWD"
+
 # Disable the exiterr
 set +e
 
@@ -16,6 +18,7 @@ function oneTimeSetUp(){
 
 function setUp(){
     pearlSetUp
+    cd "$INITIAL_PWD"
 }
 
 function tearDown(){
@@ -47,22 +50,27 @@ function git_clone_mock() {
 function git_pearl_basic_install_mock() {
     git_command_mock "submodule" $@ && return
     git_command_mock "--no-pager" $@ && return
-    if [ "$1" == "clone" ]
+    git_command_mock "checkout" $@ && return
+    if [[ "$1" == "clone" ]]
     then
         git_command_mock "clone" $@
         create_package $pkgname
         create_install "$pkgname" post_install
         return
     fi
+    echo "Error: Unknown Git command!"
     return 111
 }
 
 function git_pearl_basic_update_mock() {
     git_config_mock $1 "https://ls-colors" && return
     git_command_mock "--no-pager" $@ && return
+    git_command_mock "checkout" $@ && return
+    git_command_mock "reset" $@ && return
     git_command_mock "rev-parse" $@ && return
     git_command_mock "submodule" $@ && return
-    git_command_mock "pull" $@ && return
+    git_command_mock "fetch" $@ && return
+    echo "Error: Unknown Git command!"
     return 111
 }
 
@@ -246,7 +254,7 @@ function test_pearl_package_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\ngit checkout\npost_install")" "$actual_out"
 }
 
 function test_pearl_package_install_errors_on_hooks(){
@@ -255,13 +263,15 @@ function test_pearl_package_install_errors_on_hooks(){
     git_pearl_install_mock() {
         git_command_mock "submodule" $@ && return
         git_command_mock "--no-pager" $@ && return
-        if [ "$1" == "clone" ]
+        git_command_mock "checkout" $@ && return
+        if [[ "$1" == "clone" ]]
         then
             git_command_mock "clone" $@
             create_package $pkgname
             create_bad_install "$pkgname" post_install
             return
         fi
+        echo "Error: Unknown Git command!"
         return 111
     }
     GIT=git_pearl_install_mock
@@ -272,7 +282,7 @@ function test_pearl_package_install_errors_on_hooks(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\ngit checkout\npost_install")" "$actual_out"
 }
 
 function test_pearl_package_install_deinit(){
@@ -305,23 +315,26 @@ function test_pearl_package_install_no_install_file(){
     git_pearl_install_mock() {
         git_command_mock "submodule" $@ && return
         git_command_mock "--no-pager" $@ && return
-        if [ "$1" == "clone" ]
+        git_command_mock "checkout" $@ && return
+        if [[ "$1" == "clone" ]]
         then
             git_command_mock "clone" $@
             create_package $pkgname
             return
         fi
+        echo "Error: Unknown Git command!"
         return 111
     }
     GIT=git_pearl_install_mock
 
     assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
+    cat $STDERRF
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\ngit checkout")" "$actual_out"
 }
 
 function test_pearl_package_install_empty_install(){
@@ -330,13 +343,15 @@ function test_pearl_package_install_empty_install(){
     git_pearl_install_mock() {
         git_command_mock "submodule" $@ && return
         git_command_mock "--no-pager" $@ && return
-        if [ "$1" == "clone" ]
+        git_command_mock "checkout" $@ && return
+        if [[ "$1" == "clone" ]]
         then
             git_command_mock "clone" $@
             create_package $pkgname
             echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
             return
         fi
+        echo "Error: Unknown Git command!"
         return 111
     }
     GIT=git_pearl_install_mock
@@ -347,7 +362,7 @@ function test_pearl_package_install_empty_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager")" "$actual_out"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\ngit checkout")" "$actual_out"
 }
 
 function test_pearl_package_install_not_existing_package(){
@@ -493,7 +508,7 @@ function test_pearl_package_update(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
+    assertEquals "$(echo -e "pre_update\ngit fetch\ngit reset\ngit submodule\ngit --no-pager\ngit checkout\npost_update")" "$actual_out"
 }
 
 function test_pearl_package_update_url_changed(){
@@ -506,8 +521,9 @@ function test_pearl_package_update_url_changed(){
         git_config_mock $1 "https://ls-colors2" && return
         git_command_mock "submodule" $@ && return
         git_command_mock "--no-pager" $@ && return
-        git_command_mock "pull" $@ && return
+        git_command_mock "checkout" $@ && return
         git_clone_mock $@ && return
+        echo "Error: Unknown Git command!"
         return 111
     }
     GIT=git_pearl_update_mock
@@ -519,7 +535,7 @@ function test_pearl_package_update_url_changed(){
     assertEquals 0 $?
 
     local actual_out="$(cat $STDOUTF | grep -v "*" | grep -v "The Git URL")"
-    assertEquals "$(echo -e "pre_remove\npost_remove\ngit clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
+    assertEquals "$(echo -e "pre_remove\npost_remove\ngit clone\ngit submodule\ngit --no-pager\ngit checkout\npost_install")" "$actual_out"
 }
 
 function test_pearl_package_update_git_config_error(){
@@ -530,7 +546,10 @@ function test_pearl_package_update_git_config_error(){
         git_command_mock "submodule" $@ && return
         git_command_mock "--no-pager" $@ && return
         git_command_mock "rev-parse" $@ && return
-        git_command_mock "pull" $@ && return
+        git_command_mock "fetch" $@ && return
+        git_command_mock "reset" $@ && return
+        git_command_mock "checkout" $@ && return
+        echo "Error: Unknown Git command!"
         return 111
     }
     GIT=git_pearl_update_mock
@@ -541,7 +560,7 @@ function test_pearl_package_update_git_config_error(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
+    assertEquals "$(echo -e "pre_update\ngit fetch\ngit reset\ngit submodule\ngit --no-pager\ngit checkout\npost_update")" "$actual_out"
 }
 
 function test_pearl_package_update_errors_on_hooks(){
@@ -565,7 +584,7 @@ function test_pearl_package_update_errors_on_hooks(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git pull\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
+    assertEquals "$(echo -e "git fetch\ngit reset\ngit submodule\ngit --no-pager\ngit checkout\npost_update")" "$actual_out"
 }
 
 function test_pearl_package_update_deinit(){
@@ -607,7 +626,7 @@ function test_pearl_package_update_empty_install(){
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "git pull\ngit submodule\ngit --no-pager")" "$actual_out"
+    assertEquals "$(echo -e "git fetch\ngit reset\ngit submodule\ngit --no-pager\ngit checkout")" "$actual_out"
 }
 
 function test_pearl_package_update_post_func_changed(){
@@ -618,18 +637,21 @@ function test_pearl_package_update_post_func_changed(){
         git_command_mock "submodule" $@ && return
         git_command_mock "--no-pager" $@ && return
         git_command_mock "rev-parse" $@ && return
-        if [ "$1" == "pull" ]
+        if [ "$1" == "fetch" ]
         then
-            echo "git pull"
+            echo "git fetch"
             create_install_with_content "post_update" "new_post_update"
             return 0
         fi
+        git_command_mock "reset" $@ && return
+        git_command_mock "checkout" $@ && return
+        echo "Error: Unknown Git command!"
         return 111
     }
     GIT=git_pearl_update_mock
     assertCommandSuccess load_repo_first pearl_package_update $pkgname
     local actual_out="$(cat $STDOUTF | grep -v "*")"
-    assertEquals "$(echo -e "pre_update\ngit pull\ngit submodule\ngit --no-pager\nnew_post_update")" "$actual_out"
+    assertEquals "$(echo -e "pre_update\ngit fetch\ngit reset\ngit submodule\ngit --no-pager\ngit checkout\nnew_post_update")" "$actual_out"
 }
 
 function test_pearl_package_update_not_existing_package(){
