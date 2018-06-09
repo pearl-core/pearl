@@ -127,11 +127,8 @@ function pearl_remove(){
 #   Logging information.
 #######################################
 function pearl_update(){
-    cd $PEARL_ROOT
     bold_cyan; echo -n "* "; normal; echo "Updating Pearl script"
-    $GIT fetch --quiet --all
-    $GIT reset --quiet --hard origin/master
-    $GIT submodule update --init --recursive
+    update_git_repo "$PEARL_ROOT" "master"
 
     get_list_installed_packages
     for pkgname in "${RESULT[@]}"
