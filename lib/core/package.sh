@@ -91,7 +91,15 @@ function _load_repo() {
         echo "Initializing $repo repository"
         $GIT clone --quiet --depth 1 "$repo" "$PEARL_HOME/repos/$sum"
     fi
-    _load_internal_repo "$PEARL_HOME/repos/$sum/repo.conf"
+
+    # TODO The new repo file location is in pearl-config/pearl.conf and
+    # the old location will be deprecated in the future major version 2.0.0
+    if [[ -f "$PEARL_HOME/repos/$sum/pearl-config/pearl.conf" ]]
+    then
+        _load_internal_repo "$PEARL_HOME/repos/$sum/pearl-config/pearl.conf"
+    else
+        _load_internal_repo "$PEARL_HOME/repos/$sum/repo.conf"
+    fi
 }
 
 #######################################
@@ -221,7 +229,7 @@ function pearl_package_install(){
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
-        install_git_repo "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" master
+        install_git_repo "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}"
     fi
     cd "$PEARL_PKGDIR"
     _init_package "$pkgfullname" "" $post_func
@@ -317,7 +325,7 @@ function pearl_package_update(){
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
     else
-        update_git_repo "$PEARL_PKGDIR" master
+        update_git_repo "$PEARL_PKGDIR"
     fi
 
     _init_package $pkgfullname $pre_func $post_func

@@ -346,23 +346,16 @@ and [removed](#remove) via the Pearl system.
 The directory content can be structured in the exact way as described
 in the previous [section](#structure-of-a-pearl-package).
 
-## Create a Pearl package from a Vim plugin ##
-Packages containing Vim plugins are specials.
-They are automatically detected via [pathogen](https://github.com/tpope/vim-pathogen),
-so there is no need to use [hooks functions](#hook-functions) to link
-the Vim plugin with Pearl.
-This feature will be probably available for Emacs too in the future.
-
-## Use third-party project not available in Pearl Hub ##
-If you want to use a third-party project
+## Use third-party git repository not available in Pearl Hub ##
+If you want to use a third-party git repository
 that is not available in the [Official Pearl Hub](https://github.com/pearl-hub),
 you can:
 
 * Create your own git repository and use the *PEARL_PKGVARDIR* directory (recommended)
 * Create your own git repository and use [git submodule](https://git-scm.com/docs/git-submodule)
-* Point directly to the third-party project git repository
+* Point directly to the third-party git repository
 
-To see examples of Pearl packages from third-party projects take a look at the
+To see examples of Pearl packages from third-party git repos take a look at the
 [Official Pearl Hub](https://github.com/pearl-hub).
 
 ### Create your own git repository and use the *PEARL_PKGVARDIR* directory (recommended) ###
@@ -391,7 +384,7 @@ You can even use the functions `install_git_repo` or `update_git_repo` which res
 For a full example take a look at the [ranger](https://github.com/pearl-hub/ranger) Pearl Hub package.
 
 ### Create your own git repository and use git submodule ###
-Inside your git repository, you just need to add the third-party project as a
+Inside your git repository, you just need to add the third-party git repo as a
 [git submodule](https://git-scm.com/docs/git-submodule).
 For instance, to add the [powerline](https://github.com/powerline/powerline) in your Pearl package,
 you can introduce a submodule in the *module* directory:
@@ -409,7 +402,7 @@ The filesystem structure of the package will become something like this:
 Then, you just need to modify the config scripts in order to integrate the third-party
 project inside Pearl environment.
 
-### Point directly to the third-party project git repository ###
+### Point directly to the third-party git repository ###
 Let's suppose you want to install the [vim-rails](https://github.com/tpope/vim-rails) plugin.
 In your Pearl configuration (~/.config/pearl/pearl.conf), add your new Pearl package:
 
@@ -429,7 +422,7 @@ the Pearl environment.
 
 Create your own Pearl repository in seconds!
 ===============
-A Pearl repository is just a git repository containing a file named *repo.conf*
+A Pearl repository is just a git repository containing a file located in *pearl-config/pearl.conf*
 with a list of packages. For instance, the *OPH* repository is available
 [here](https://github.com/pearl-hub/repo).
 
