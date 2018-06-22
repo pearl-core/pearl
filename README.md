@@ -422,7 +422,7 @@ the Pearl environment.
 
 Create your own Pearl repository in seconds!
 ===============
-A Pearl repository is just a git repository containing a file named *repo.conf*
+A Pearl repository is just a git repository containing a file located in *pearl-config/pearl.conf*
 with a list of packages. For instance, the *OPH* repository is available
 [here](https://github.com/pearl-hub/repo).
 
