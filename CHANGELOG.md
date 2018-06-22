@@ -1,5 +1,10 @@
 # Change Log #
 
+## [1.6.3][v163] - 2018-06-22 ##
+
+* Location of the repo file is `pearl-config/pearl.conf`. Backward compatibility will be kept until 2.0.0
+* Make the branch name inferred from repo's HEAD rather than hardcode the branch with `master`
+
 ## [1.6.2][v162] - 2018-06-09 ##
 
 * Add variables `PEARL_PKGNAME` `PEARL_PKGREPONAME`
@@ -154,3 +159,4 @@
 [v160]: https://github.com/pearl-core/pearl/releases/tag/1.6.0
 [v161]: https://github.com/pearl-core/pearl/releases/tag/1.6.1
 [v162]: https://github.com/pearl-core/pearl/releases/tag/1.6.2
+[v163]: https://github.com/pearl-core/pearl/releases/tag/1.6.3
