@@ -242,29 +242,7 @@ function execute_operation(){
         done
     fi
 
-    source_pearl
     return $final_res
-}
-
-#######################################
-# Send a signal to parent process for sourcing
-# the Pearl boot script.
-#
-# Globals:
-#   PEARL_ROOT (RO,bool)   : Pearl location.
-#   KILL_CMD (RO,bool)     : The kill command.
-#   PPID (RO)              : The parent pid process.
-# Arguments:
-#   None
-# Returns:
-#   0
-# Output:
-#   None
-#######################################
-function source_pearl(){
-    # Send signal to parent in order to (re)source pearl
-    [[ -z "$PEARL_ROOT" ]] || $KILL_CMD -USR1 $PPID
-    return 0
 }
 
 parse_arguments "$@"

@@ -464,15 +464,21 @@ Troubleshooting
 
     $> rm -rf $PEARL_HOME/var/pearl/<packagename>
 
-## Overridden USR1 signal ##
+## Package shell variables/functions not visible in current shell after installation ##
 
-> **Q**: Why does Pearl override the USR1 signal every time I open a new shell?
+> **Q**: Why are not package's environment variables/functions visible in
+> my current shell after installing/updating the package?
 
-> **A**: Pearl needs to trap the `USR1` signal in order to communicate with
-> the shell for reloading the Pearl configuration after installing, updating and removing packages.
-> Pearl will continue operating normally as it will override any existing trap,
-> but you may want to check out if other applications require to trap `USR1` signal
-> and resolve the conflict eventually.
+> **A**: After package install/update, the variables or
+> functions related to the current shell and defined in `pearl-config/config.*`
+> may not be available because a reload of Pearl configuration file is required.
+> You can fix this by simply run the function `pearl-source` which reloads
+> the configuration. The use of such function is not always required but depends
+> whether the variables/functions involve the current shell where the
+> package install/update occurred (i.e. a new variable defined in `config.sh`
+> and the current shell is a bash or zsh). Alternatively, user can always
+> create a new shell and the package resources will be available as
+> expected.
 
 Contributing
 ============

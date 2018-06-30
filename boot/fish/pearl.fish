@@ -52,11 +52,6 @@ for reponame in (ls $PEARL_HOME/packages)
     end
 end
 
-# trap for OSX works differently due to the BSD getopt.
-# With function things works fine with both GNU and BSD version:
-# https://github.com/fish-shell/fish-shell/issues/607
-function source_pearl
+function pearl-source
     source $PEARL_ROOT/boot/fish/pearl.fish
 end
-
-trap source_pearl USR1

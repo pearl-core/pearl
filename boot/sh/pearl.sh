@@ -59,4 +59,6 @@ do
     done
 done
 
-trap "source ${PEARL_ROOT}/boot/sh/pearl.sh" USR1
+function pearl-source() {
+    source ${PEARL_ROOT}/boot/sh/pearl.sh
+}
