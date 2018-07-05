@@ -241,6 +241,34 @@ function test_pearl_module_list_not_matching(){
     assertEquals 1 $?
 }
 
+function test_pearl_package_emerge_with_install(){
+    local pkgname="pearl-utils"
+    scenario_generic_pkgs
+    GIT=git_pearl_basic_install_mock
+
+    assertCommandSuccess load_repo_first pearl_package_emerge "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
+}
+
+function test_pearl_package_emerge_with_update(){
+    local pkgname="ls-colors"
+    scenario_generic_pkgs
+    GIT=git_pearl_basic_update_mock
+
+    assertCommandSuccess load_repo_first pearl_package_emerge "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "$(echo -e "pre_update\ngit fetch\ngit reset\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
+}
+
 function test_pearl_package_install(){
     local pkgname="pearl-utils"
     scenario_generic_pkgs

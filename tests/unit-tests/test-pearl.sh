@@ -41,6 +41,10 @@ function pearl_init(){
     echo "pearl_init $@"
 }
 
+function pearl_emerge(){
+    echo "pearl_emerge $@"
+}
+
 function pearl_install(){
     echo "pearl_install $@"
 }
@@ -51,6 +55,10 @@ function pearl_update(){
 
 function pearl_remove(){
     echo "pearl_remove"
+}
+
+function pearl_package_emerge(){
+    echo "pearl_package_emerge $@"
 }
 
 function pearl_package_install(){
@@ -75,8 +83,8 @@ function pearl_wrap(){
     execute_operation
 }
 
-function outputWithKill(){
-    echo -e "pearl_load_repos\n$@\nkill -USR1 $PPID"
+function outputWithLoadRepos(){
+    echo -e "pearl_load_repos\n$@"
 }
 
 function test_help(){
@@ -113,6 +121,13 @@ function test_pearl_init(){
     assertEquals "$(echo -e "pearl_init \npearl_load_repos")" "$(cat $STDOUTF)"
 }
 
+function test_pearl_emerge(){
+    assertCommandSuccess pearl_wrap emerge
+    assertEquals "$(outputWithLoadRepos "pearl_update")" "$(cat $STDOUTF)"
+    assertCommandSuccess pearl_wrap e
+    assertEquals "$(outputWithLoadRepos "pearl_update")" "$(cat $STDOUTF)"
+}
+
 function test_pearl_install(){
     assertCommandFail pearl_wrap install
     assertEquals "pearl_load_repos" "$(cat $STDOUTF)"
@@ -122,9 +137,9 @@ function test_pearl_install(){
 
 function test_pearl_update(){
     assertCommandSuccess pearl_wrap update
-    assertEquals "$(outputWithKill "pearl_update")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_update")" "$(cat $STDOUTF)"
     assertCommandSuccess pearl_wrap u
-    assertEquals "$(outputWithKill "pearl_update")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_update")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_remove(){
@@ -134,11 +149,18 @@ function test_pearl_remove(){
     assertEquals "$(echo -e "pearl_load_repos\npearl_remove")" "$(cat $STDOUTF)"
 }
 
+function test_pearl_package_emerge(){
+    assertCommandSuccess pearl_wrap emerge vim/fugitive misc/ranger
+    assertEquals "$(outputWithLoadRepos "pearl_package_emerge vim/fugitive\npearl_package_emerge misc/ranger")" "$(cat $STDOUTF)"
+    assertCommandSuccess pearl_wrap e vim/fugitive misc/ranger
+    assertEquals "$(outputWithLoadRepos "pearl_package_emerge vim/fugitive\npearl_package_emerge misc/ranger")" "$(cat $STDOUTF)"
+}
+
 function test_pearl_package_install(){
     assertCommandSuccess pearl_wrap install vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_install vim/fugitive\npearl_package_install misc/ranger")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_install vim/fugitive\npearl_package_install misc/ranger")" "$(cat $STDOUTF)"
     assertCommandSuccess pearl_wrap i vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_install vim/fugitive\npearl_package_install misc/ranger")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_install vim/fugitive\npearl_package_install misc/ranger")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_install_already_installed(){
@@ -148,16 +170,16 @@ function test_pearl_package_install_already_installed(){
         return 0
     }
     assertCommandFailOnStatus 10 pearl_wrap install vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_install vim/fugitive")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_install vim/fugitive")" "$(cat $STDOUTF)"
     assertCommandFailOnStatus 10 pearl_wrap i vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_install vim/fugitive")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_install vim/fugitive")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_update(){
     assertCommandSuccess pearl_wrap update vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_update vim/fugitive\npearl_package_update misc/ranger")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_update vim/fugitive\npearl_package_update misc/ranger")" "$(cat $STDOUTF)"
     assertCommandSuccess pearl_wrap u vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_update vim/fugitive\npearl_package_update misc/ranger")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_update vim/fugitive\npearl_package_update misc/ranger")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_update_not_installed(){
@@ -167,16 +189,16 @@ function test_pearl_package_update_not_installed(){
         return 0
     }
     assertCommandFailOnStatus 10 pearl_wrap update vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_update vim/fugitive")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_update vim/fugitive")" "$(cat $STDOUTF)"
     assertCommandFailOnStatus 10 pearl_wrap u vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_update vim/fugitive")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_update vim/fugitive")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_remove(){
     assertCommandSuccess pearl_wrap remove vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_remove vim/fugitive\npearl_package_remove misc/ranger")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_remove vim/fugitive\npearl_package_remove misc/ranger")" "$(cat $STDOUTF)"
     assertCommandSuccess pearl_wrap r vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_remove vim/fugitive\npearl_package_remove misc/ranger")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_remove vim/fugitive\npearl_package_remove misc/ranger")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_remove_not_installed(){
@@ -186,9 +208,9 @@ function test_pearl_package_remove_not_installed(){
         return 0
     }
     assertCommandFailOnStatus 10 pearl_wrap remove vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_remove vim/fugitive")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_remove vim/fugitive")" "$(cat $STDOUTF)"
     assertCommandFailOnStatus 10 pearl_wrap r vim/fugitive misc/ranger
-    assertEquals "$(outputWithKill "pearl_package_remove vim/fugitive")" "$(cat $STDOUTF)"
+    assertEquals "$(outputWithLoadRepos "pearl_package_remove vim/fugitive")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_list(){
