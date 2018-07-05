@@ -62,6 +62,7 @@ usage() {
     echo -e "  init                           Init $PEARL_HOME config directory"
     echo -e "  l[ist]                         List all the available $NAME packages"
     echo -e "  s[earch]    <pattern>          Search the available $NAME packages that match pattern"
+    echo -e "  e[merge]    [repo/]pkg1...     Update $NAME or install/update the packages if specified"
     echo -e "  i[nstall]   [repo/]pkg1...     Install the packages"
     echo -e "  u[pdate]    [[repo/]pkg1...]   Update $NAME or the packages if specified"
     echo -e "  r[emove]    [[repo/]pkg1...]   Remove $NAME or the packages if specified"
@@ -77,6 +78,7 @@ usage() {
 #   COMMAND_INIT (RO,bool)    :  true if the command has been specified.
 #   COMMAND_SEARCH (RO,bool)  :  true if the command has been specified.
 #   COMMAND_LIST (RO,bool)    :  true if the command has been specified.
+#   COMMAND_EMERGE (RO,bool)  :  true if the command has been specified.
 #   COMMAND_INSTALL (RO,bool) :  true if the command has been specified.
 #   COMMAND_UPDATE (RO,bool)  :  true if the command has been specified.
 #   COMMAND_REMOVE (RO,bool)  :  true if the command has been specified.
@@ -93,12 +95,12 @@ usage() {
 #######################################
 check_cli(){
     $COMMAND_INIT || $COMMAND_SEARCH || $COMMAND_LIST || \
-    $COMMAND_INSTALL || $COMMAND_UPDATE || $COMMAND_REMOVE || \
+    $COMMAND_EMERGE || $COMMAND_INSTALL || $COMMAND_UPDATE || $COMMAND_REMOVE || \
     $OPT_HELP || die "No command has been specified. Run: $CMD --help"
     if $OPT_HELP
     then
         if $COMMAND_SEARCH || $COMMAND_LIST || \
-        $COMMAND_INSTALL || \
+        $COMMAND_EMERGE || $COMMAND_INSTALL || \
         $COMMAND_UPDATE || $COMMAND_REMOVE
         then
             die "The help option must be used exclusively"
@@ -120,6 +122,7 @@ check_cli(){
 #   COMMAND_INIT (WO,bool)    :  true if the command has been specified.
 #   COMMAND_SEARCH (WO,bool)  :  true if the command has been specified.
 #   COMMAND_LIST (WO,bool)    :  true if the command has been specified.
+#   COMMAND_EMERGE (WO,bool)  :  true if the command has been specified.
 #   COMMAND_INSTALL (WO,bool) :  true if the command has been specified.
 #   COMMAND_UPDATE (WO,bool)  :  true if the command has been specified.
 #   COMMAND_REMOVE (WO,bool)  :  true if the command has been specified.
@@ -138,6 +141,7 @@ function parse_arguments(){
     COMMAND_INIT=false
     COMMAND_LIST=false
     COMMAND_SEARCH=false
+    COMMAND_EMERGE=false
     COMMAND_INSTALL=false
     COMMAND_UPDATE=false
     COMMAND_REMOVE=false
@@ -153,6 +157,8 @@ function parse_arguments(){
         COMMAND_LIST=true; shift ;;
         search|s)
         COMMAND_SEARCH=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
+        emerge|e)
+        COMMAND_EMERGE=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
         install|i)
         COMMAND_INSTALL=true; shift ; COMMAND_ARGS=("$@") ; shift ${#} ;;
         update|u)
@@ -182,6 +188,7 @@ function parse_arguments(){
 #   COMMAND_INIT (RO,bool)    :  true if the command has been specified.
 #   COMMAND_SEARCH (RO,bool)  :  true if the command has been specified.
 #   COMMAND_LIST (RO,bool)    :  true if the command has been specified.
+#   COMMAND_EMERGE (RO,bool)  :  true if the command has been specified.
 #   COMMAND_INSTALL (RO,bool) :  true if the command has been specified.
 #   COMMAND_UPDATE (RO,bool)  :  true if the command has been specified.
 #   COMMAND_REMOVE (RO,bool)  :  true if the command has been specified.
@@ -206,7 +213,18 @@ function execute_operation(){
     $COMMAND_SEARCH && { pearl_package_list ${COMMAND_ARGS[@]}; return; }
 
     local final_res=0
-    if $COMMAND_INSTALL; then
+    if $COMMAND_EMERGE; then
+        [[ -z "$COMMAND_ARGS" ]] && pearl_update
+
+        for pkg in ${COMMAND_ARGS[@]}
+        do
+            try pearl_package_emerge "$pkg"
+            catch || {
+                local pkg_res=$?
+                [[ $pkg_res -eq 0 ]] || final_res=$pkg_res
+            }
+        done
+    elif $COMMAND_INSTALL; then
         [[ -z "$COMMAND_ARGS" ]] && die "No Pearl package specified."
 
         for pkg in ${COMMAND_ARGS[@]}

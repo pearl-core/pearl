@@ -194,6 +194,36 @@ function _check_and_copy(){
 }
 
 #######################################
+# Install or update the Pearl package.
+# This function is idempotent.
+#
+# Globals:
+#   PEARL_HOME (RO)                 : Used to access to the local directory.
+#   PEARL_INTERNAL_PACKAGES (RO)    : Used to get the package location.
+# Arguments:
+#   pkgname ($1)                    : The name of the package.
+# Returns:
+#   NOT_IN_REPOSITORY_EXCEPTION     : The package is not available in repo.
+#   LOCAL_COPY_EXCEPTION            : Error during the local copy.
+#   HOOK_EXCEPTION                  : Error during the hook function execution.
+# Output:
+#   Logging information.
+#######################################
+function pearl_package_emerge(){
+    local pkgname=$1
+
+    _package_full_name $pkgname
+    local pkgfullname=$RESULT
+    unset RESULT
+    if _is_installed $pkgfullname
+    then
+        pearl_package_update "$pkgname"
+    else
+        pearl_package_install "$pkgname"
+    fi
+}
+
+#######################################
 # Install the Pearl package.
 #
 # Globals:

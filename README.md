@@ -54,8 +54,8 @@ The main advantages on using Pearl are:
 
 Quickstart
 ==========
-The Pearl CLI script allows to: *list*, *search*, *install*, *update*,
-*remove* the Pearl packages defined according to the configuration located in *~/.config/pearl/pearl.conf*
+The Pearl CLI script allows to: `list`, `search`, `install`, `update`, `emerge`,
+`remove` the Pearl packages defined according to the configuration located in `~/.config/pearl/pearl.conf`
 
 ![quickstart](https://raw.githubusercontent.com/pearl-core/resources/master/pearl-opt3.gif)
 
@@ -139,6 +139,14 @@ $ pearl update
 * Updating pearl/caprica package
 ...
 ```
+
+Emerge
+------
+Emerge is an idempotent command for either installing or updating a package
+depending whether the package is already installed or not. This command turns
+to be particularly useful for establishing dependencies between packages.
+See the section [below](#define-dependencies-between-pearl-packages)
+for more details.
 
 Remove
 -------
@@ -232,17 +240,17 @@ Create your own Pearl package in seconds!
 ===============
 **Any git repository is already a Pearl package**. For instance, in order
 to see a dotfiles repository in Pearl, you just need to change
-the Pearl configuration file located in *$HOME/.config/pearl/pearl.conf*.
+the Pearl configuration file located in `$HOME/.config/pearl/pearl.conf`.
 
-Add the following line to *pearl.conf* file:
+Add the following line to `pearl.conf` file:
 
     PEARL_PACKAGES["joe-dotfiles"]="https://github.com/joe/mydotfiles.git"
 
 In other words, update the `PEARL_PACKAGES` array with a new entry containing the
-name of the package (i.e. *joe-dotfiles*) and the git url (i.e. *https://github.com/joe/mydotfiles.git*).
+name of the package (i.e. `joe-dotfiles`) and the git url (i.e. `https://github.com/joe/mydotfiles.git`).
 
 ***That's it!*** The package will be ready to be [installed](#install),
-[updated](#update) and [removed](#remove) via the Pearl system.
+[updated](#update), [emerged](#emerge) and [removed](#remove) via the Pearl system.
 
 Also, an optional description of the package can be defined via `PEARL_PACKAGES_DESCR` array:
 
@@ -250,7 +258,7 @@ Also, an optional description of the package can be defined via `PEARL_PACKAGES_
 
 ## Structure of a Pearl package ##
 Your own git repository can contain an **optional** directory
-named *pearl-config* used by Pearl to integrate the package with the Pearl environment.
+named `pearl-config` used by Pearl to integrate the package with the Pearl environment.
 
     / (package root)
     │
@@ -266,41 +274,41 @@ named *pearl-config* used by Pearl to integrate the package with the Pearl envir
     │
     └── (additional package content)
 
-The files inside *pearl-config* are also **optional** scripts:
+The files inside `pearl-config` are also **optional** scripts:
 
-- *install.sh* - contains the [hooks functions](#hook-functions) executed during the *install*, *update* and *remove* events.
-- *config.sh* - will be sourced whenever a new Bash/Zsh shell is starting up.
-- *config.bash* - will be sourced whenever a new Bash shell is starting up.
-- *config.zsh* - will be sourced whenever a new Zsh shell is starting up.
-- *config.fish* - will be sourced whenever a new Fish shell is starting up.
-- *config.vim* - will be executed whenever Vim editor is starting up.
-- *config.el* - will be sourced whenever Emacs editor is starting up.
+- `install.sh` - contains the [hooks functions](#hook-functions) executed during the `install`, `update` and `remove` events.
+- `config.sh` - will be sourced whenever a new Bash/Zsh shell is starting up.
+- `config.bash` - will be sourced whenever a new Bash shell is starting up.
+- `config.zsh` - will be sourced whenever a new Zsh shell is starting up.
+- `config.fish` - will be sourced whenever a new Fish shell is starting up.
+- `config.vim` - will be executed whenever Vim editor is starting up.
+- `config.el` - will be sourced whenever Emacs editor is starting up.
 
 The following variables can be used in any of the previous scripts:
 
-- *PEARL_HOME*          - Pearl location (default: *$HOME/.config/pearl*)
-- *PEARL_ROOT*          - Pearl script location
-- *PEARL_PKGDIR*        - Pearl package location
-- *PEARL_PKGVARDIR*     - Pearl package location containing data needed for package
-- *PEARL_PKGNAME*       - Pearl package name
-- *PEARL_PKGREPONAME*   - Pearl package repo name (useful to detect and interact with packages within the same repo)
+- `PEARL_HOME`          - Pearl location (default: `$HOME/.config/pearl`)
+- `PEARL_ROOT`          - Pearl script location
+- `PEARL_PKGDIR`        - Pearl package location
+- `PEARL_PKGVARDIR`     - Pearl package location containing data needed for package
+- `PEARL_PKGNAME`       - Pearl package name
+- `PEARL_PKGREPONAME`   - Pearl package repo name (useful to detect and interact with packages within the same repo)
 
-Additionally, the script *install.sh* can use the utility functions available in
+Additionally, the script `install.sh` can use the utility functions available in
 [Buava](https://github.com/fsquillace/buava) and Pearl [*utils*](lib/utils) directory that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
 [Official Pearl Hub](https://github.com/pearl-hub).
 
-**Note**: Legacy Pearl versions were using a different directory named *pearl-metadata*. This directory is meant to be deprecated in the upcoming Pearl version.
+**Note**: Legacy Pearl versions were using a different directory named `pearl-metadata`. This directory is meant to be deprecated in the upcoming Pearl version.
 
 ### The install.sh script ###
 #### Hook functions ####
-- *post_install*  - Called *after* an installation of the package occurs.
-- *pre_update*    - Called *before* an update of the package occurs.
-- *post_update*   - Called *after* an update of the package occurs.
-- *pre_remove*    - Called *before* a removal of the package occurs.
-- *post_remove*   - Called *after* a removal of the package occurs.
+- `post_install`  - Called *after* an installation of the package occurs.
+- `pre_update`    - Called *before* an update of the package occurs.
+- `post_update`   - Called *after* an update of the package occurs.
+- `pre_remove`    - Called *before* a removal of the package occurs.
+- `post_remove`   - Called *after* a removal of the package occurs.
 
 #### An install.sh script example ####
 
@@ -325,44 +333,65 @@ if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
 All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
-in [*utils.sh*](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and to
-the Pearl [*utils.sh*](lib/utils/utils.sh) script.
+in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and to
+the Pearl [`utils.sh`](lib/utils/utils.sh) script.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
 whenever a Pearl package needs to be tested before pushing to a git repository.
 
-For instance, the following lines in *pearl.conf* file will add a package located in
-*/home/joe/dotfiles*:
+For instance, the following lines in `pearl.conf` file will add a package located in
+`/home/joe/dotfiles`:
 
     PEARL_PACKAGES["joe-dotfiles"]="/home/joe/dotfiles"
     PEARL_PACKAGES_DESCR["joe-dotfiles"]="The Joe's dotfiles"
 
 The directory path must be an absolute path.
 
-The package will be ready to be [installed](#install), [updated](#update)
-and [removed](#remove) via the Pearl system.
+The package will be ready to be [installed](#install), [updated](#update),
+[emerged](#emerge) and [removed](#remove) via the Pearl system.
 
 The directory content can be structured in the exact way as described
 in the previous [section](#structure-of-a-pearl-package).
+
+## Define dependencies between Pearl packages ##
+Suppose you have a package `mypack` which depends on another package `mydep`,
+you can update the `mypack` `install.sh` file in this way:
+
+    post_install() {
+        # Install/update the dependency here:
+        pearl emerge ${PEARL_PKGREPONAME}/mydep
+    }
+    post_update() {
+        post_install
+    }
+    pre_remove() {
+        # Uncomment below to strictly remove the dependency
+        # during the removal of the current package:
+        #pearl remove ${PEARL_PKGREPONAME}/mydep
+    }
+
+The `PEARL_PKGREPONAME` variable will make sure to define dependencies only
+between packages of the same repository.
+To see a real example in Pearl Hub, take a look at the [Kyrat install.sh](https://github.com/pearl-hub/kyrat/blob/master/pearl-config/install.sh).
 
 ## Use third-party git repository not available in Pearl Hub ##
 If you want to use a third-party git repository
 that is not available in the [Official Pearl Hub](https://github.com/pearl-hub),
 you can:
 
-* Create your own git repository and use the *PEARL_PKGVARDIR* directory (recommended)
+* Create your own git repository and use the `PEARL_PKGVARDIR` directory (recommended)
 * Create your own git repository and use [git submodule](https://git-scm.com/docs/git-submodule)
 * Point directly to the third-party git repository
 
 To see examples of Pearl packages from third-party git repos take a look at the
 [Official Pearl Hub](https://github.com/pearl-hub).
 
-### Create your own git repository and use the *PEARL_PKGVARDIR* directory (recommended) ###
-You can use the *PEARL_PKGVARDIR* directory during the installation phase to install the third-party git repository.
+### Create your own git repository and use the `PEARL_PKGVARDIR` directory (recommended) ###
+You can use the `PEARL_PKGVARDIR` directory during the installation phase to install the third-party git repository.
 This is the best way to incorporate third-party project into Pearl ecosystem.
 
-Here it is an example of *install.sh* file which install the ranger file manager into the directory *${PEARL_PKGVARDIR}/ranger*:
+Here it is an example of `install.sh` file which install the ranger file manager into the directory `${PEARL_PKGVARDIR}/ranger`:
 
     function post_install(){
         install_or_update_git_repo https://github.com/ranger/ranger.git "${PEARL_PKGVARDIR}/ranger" master
@@ -377,7 +406,7 @@ Here it is an example of *install.sh* file which install the ranger file manager
     }
 
 The function `install_or_update_git_repo` comes from the [Buava](https://github.com/fsquillace/buava)
-library in [*utils.sh*](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
+library in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
 which is natively available in Pearl during the installation.
 You can even use the functions `install_git_repo` or `update_git_repo` which respectively install or update the git repository.
 
@@ -387,7 +416,7 @@ For a full example take a look at the [ranger](https://github.com/pearl-hub/rang
 Inside your git repository, you just need to add the third-party git repo as a
 [git submodule](https://git-scm.com/docs/git-submodule).
 For instance, to add the [powerline](https://github.com/powerline/powerline) in your Pearl package,
-you can introduce a submodule in the *module* directory:
+you can introduce a submodule in the `module` directory:
 
     git submodule add https://github.com/powerline/powerline.git module
 
@@ -422,12 +451,12 @@ the Pearl environment.
 
 Create your own Pearl repository in seconds!
 ===============
-A Pearl repository is just a git repository containing a file located in *pearl-config/pearl.conf*
+A Pearl repository is just a git repository containing a file located in `pearl-config/pearl.conf`
 with a list of packages. For instance, the *OPH* repository is available
 [here](https://github.com/pearl-hub/repo).
 
 In order to use the new repository (i.e. "https://github.com/myrepo/pearl-repo.git"),
-update the *pearl.conf* file by adding the following line:
+update the `pearl.conf` file by adding the following line:
 
     PEARL_REPOS+=("https://github.com/myrepo/pearl-repo.git")
 

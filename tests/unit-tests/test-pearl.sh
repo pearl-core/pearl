@@ -41,6 +41,10 @@ function pearl_init(){
     echo "pearl_init $@"
 }
 
+function pearl_emerge(){
+    echo "pearl_emerge $@"
+}
+
 function pearl_install(){
     echo "pearl_install $@"
 }
@@ -51,6 +55,10 @@ function pearl_update(){
 
 function pearl_remove(){
     echo "pearl_remove"
+}
+
+function pearl_package_emerge(){
+    echo "pearl_package_emerge $@"
 }
 
 function pearl_package_install(){
@@ -113,6 +121,13 @@ function test_pearl_init(){
     assertEquals "$(echo -e "pearl_init \npearl_load_repos")" "$(cat $STDOUTF)"
 }
 
+function test_pearl_emerge(){
+    assertCommandSuccess pearl_wrap emerge
+    assertEquals "$(outputWithLoadRepos "pearl_update")" "$(cat $STDOUTF)"
+    assertCommandSuccess pearl_wrap e
+    assertEquals "$(outputWithLoadRepos "pearl_update")" "$(cat $STDOUTF)"
+}
+
 function test_pearl_install(){
     assertCommandFail pearl_wrap install
     assertEquals "pearl_load_repos" "$(cat $STDOUTF)"
@@ -132,6 +147,13 @@ function test_pearl_remove(){
     assertEquals "$(echo -e "pearl_load_repos\npearl_remove")" "$(cat $STDOUTF)"
     assertCommandSuccess pearl_wrap r
     assertEquals "$(echo -e "pearl_load_repos\npearl_remove")" "$(cat $STDOUTF)"
+}
+
+function test_pearl_package_emerge(){
+    assertCommandSuccess pearl_wrap emerge vim/fugitive misc/ranger
+    assertEquals "$(outputWithLoadRepos "pearl_package_emerge vim/fugitive\npearl_package_emerge misc/ranger")" "$(cat $STDOUTF)"
+    assertCommandSuccess pearl_wrap e vim/fugitive misc/ranger
+    assertEquals "$(outputWithLoadRepos "pearl_package_emerge vim/fugitive\npearl_package_emerge misc/ranger")" "$(cat $STDOUTF)"
 }
 
 function test_pearl_package_install(){
