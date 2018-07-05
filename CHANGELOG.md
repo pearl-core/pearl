@@ -1,5 +1,10 @@
 # Change Log #
 
+## [1.7.0][v170] - 2018-07-05 ##
+
+* Add the idempotent `emerge` command which update/install packages.
+* No longer support the use of USR1 signal to source the Pearl config to the parent process. To explictly do that run `pearl-source` command instead.
+
 ## [1.6.3][v163] - 2018-06-22 ##
 
 * Location of the repo file is `pearl-config/pearl.conf`. Backward compatibility will be kept until 2.0.0
@@ -160,3 +165,4 @@
 [v161]: https://github.com/pearl-core/pearl/releases/tag/1.6.1
 [v162]: https://github.com/pearl-core/pearl/releases/tag/1.6.2
 [v163]: https://github.com/pearl-core/pearl/releases/tag/1.6.3
+[v170]: https://github.com/pearl-core/pearl/releases/tag/1.7.0
