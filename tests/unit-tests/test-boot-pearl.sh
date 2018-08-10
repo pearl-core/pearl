@@ -21,7 +21,7 @@ function tearDown(){
 }
 
 function ls_colors_scenario() {
-    mkdir -p ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata
+    mkdir -p ${PEARL_HOME}/packages/pearl/ls-colors/pearl-config
     create_config_file config.sh
     create_config_file config.bash
     create_config_file config.zsh
@@ -38,7 +38,7 @@ function create_config_file() {
     echo \$PEARL_PKGREPONAME
 EOF
 )
-    echo "$content" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/$configfile
+    echo "$content" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-config/$configfile
 }
 
 function fish_wrapper(){
@@ -76,6 +76,8 @@ function test_pearl(){
     env | grep -q PEARL_TEMPORARY
     echo \$PATH | grep -q \$PEARL_HOME/bin
     echo \$MANPATH | grep -q \$PEARL_ROOT/man
+    # Make sure that temporary variables are no longer set
+    echo -n "\${PEARL_PKGDIR}\${PEARL_PKGVARDIR}\${PEARL_PKGNAME}\${PEARL_PKGREPONAME}\${repopath}\${reponame}\${pkgpath}\${pkgname}"
 EOF
 )
     echo -e "$test_content" > ${OUTPUT_DIR}/sourced_file
@@ -130,7 +132,7 @@ EOF
 
 function test_pearl_config_error(){
     ls_colors_scenario
-    echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/config.sh
+    echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-config/config.sh
     assertCommandFailOnStatus 123 source $(dirname $0)/../../boot/sh/pearl.sh
 }
 
@@ -139,7 +141,7 @@ function test_pearl_fish_config_error(){
     # Unfortunately there is not an equivalent to the bash 'set -e'
     # Fish will return 0 in this case
     # (more info: https://github.com/fish-shell/fish-shell/issues/805)
-    echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-metadata/config.fish
+    echo "return 123" > ${PEARL_HOME}/packages/pearl/ls-colors/pearl-config/config.fish
     assertCommandSuccess fish_wrapper "source $(dirname $0)/../../boot/fish/pearl.fish"
 }
 

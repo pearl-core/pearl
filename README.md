@@ -33,8 +33,10 @@ bash install.sh
 
 Description
 ===========
-**Pearl** is a package manager for dotfiles, plugins, programs
-and any form of code accessible via git for Linux and OSX.
+**Pearl** is a lightweight package manager for automating reproducible environments
+between different systems (Linux and OSX).
+It can be used for dotfiles, plugins, programs and any form of code
+accessible via git.
 
 As soon as a package gets installed, its content can be activated out of the box
 according to certain events, like, for instance, a shell startup (Bash, Zsh or Fish) or
@@ -51,6 +53,21 @@ The main advantages on using Pearl are:
 - Allows to create your own package repository that can be shared with your friends!
 - Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl) for Linux and OSX.
 - Small number of [dependencies](#dependencies) needed in order to ensure compatibility with most of the systems.
+
+Comparison with similar solution: Ansible
+-----------------------------------------
+You could achieve something similar from what Pearl provide by using
+[Ansible](https://www.ansible.com/). Ansible is a powerful software for IT
+automation which can be widely used for many use cases.
+Despite of this, Ansible has few drawbacks when using it for lightweight forms of automations:
+
+- Pearl uses bash for writing simple scripts for automation:
+  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard to achieve this in Ansible);
+  - it is a powerful and well-known language;
+- Ansible requires way more dependencies than Pearl;
+- Ansible requires knowledge about how Ansible Playbooks works;
+- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and variables which heavily simplify construction of scripts for automation;
+- Pearl makes easier to remove packages and restore the system to an initial state;
 
 Quickstart
 ==========

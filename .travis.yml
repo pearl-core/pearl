@@ -22,7 +22,7 @@ script:
   - bash --version
   - zsh --version
   - fish --version
-  - ./tests/bunit/bin/checkstyle.sh ./bin/ ./lib/
+  - ./tests/bunit/bin/checkstyle.sh ./bin/ ./lib/ ./boot/
   - ./tests/bunit/bin/unit-tests.sh ./tests/unit-tests
   - bash ./tests/integ-tests/integ-tests.sh $PWD
   - zsh ./tests/integ-tests/integ-tests.sh $PWD
