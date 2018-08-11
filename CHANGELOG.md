@@ -1,5 +1,14 @@
 # Change Log #
 
+## [1.7.1][v171] - 2018-08-11 ##
+
+* Deprecate pathogen
+* Ensure to `cd` when updating package pointing to local directory
+* Fix when package specified with full name does not exist
+* More log info when Git URL package change
+* Proceed even if `install.sh` is syntatically incorrect (prevent block for fixing the broken package)
+* Improve doc and add section about comparison with Ansible
+
 ## [1.7.0][v170] - 2018-07-05 ##
 
 * Add the idempotent `emerge` command which update/install packages.
@@ -166,3 +175,4 @@
 [v162]: https://github.com/pearl-core/pearl/releases/tag/1.6.2
 [v163]: https://github.com/pearl-core/pearl/releases/tag/1.6.3
 [v170]: https://github.com/pearl-core/pearl/releases/tag/1.7.0
+[v171]: https://github.com/pearl-core/pearl/releases/tag/1.7.1
