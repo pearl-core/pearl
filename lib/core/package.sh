@@ -107,6 +107,7 @@ function _load_repo() {
 #
 # Globals:
 #   RESULT (WO)  : Contains the full name: repo and package name.
+#                  Empty if the repo or package name does not exist.
 # Arguments:
 #   pkgname ($1) : The name of the package.
 # Returns:
@@ -121,15 +122,19 @@ function _package_full_name() {
     RESULT=""
     if [[ $pkgname == *[/]* ]]
     then
-        RESULT="$pkgname"
-        return
+        local reponame="${pkgname/\/*/}"
+        local pkgshortname="${pkgname/*\//}"
+        [[ ${PEARL_INTERNAL_PACKAGES[$reponame/$pkgshortname]+abc} ]] && {
+            RESULT="$reponame/$pkgshortname"
+        }
+        return 0
     fi
 
     for reponame in "${PEARL_INTERNAL_REPOS_NAME[@]}"
     do
         [[ ${PEARL_INTERNAL_PACKAGES[$reponame/$pkgname]+abc} ]] && {
             RESULT="$reponame/$pkgname"
-            return
+            return 0
         }
     done
     return 0
@@ -280,9 +285,15 @@ function pearl_package_install(){
     _deinit_package $pkgfullname $pre_func $post_func
 }
 
+function _get_git_url(){
+    RESULT="$($GIT config remote.origin.url)"
+}
+
 function _is_url_changed(){
     local pkgfullname=$1
-    local existingurl=$($GIT config remote.origin.url)
+    _get_git_url
+    local existingurl=$RESULT
+    unset RESULT
     # Compare the Git URL only if git config produce an non empty string
     [[ -z "$existingurl" ]] && return 1
     [[ "$existingurl" != "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" ]]
@@ -332,7 +343,10 @@ function pearl_package_update(){
     if ! _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" && \
         _is_url_changed $pkgfullname
     then
-        echo "The Git URL for $pkgfullname has changed to ${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
+        _get_git_url
+        local existingurl=$RESULT
+        unset RESULT
+        echo "The Git URL for $pkgfullname has changed from ${existingurl} to ${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
         if ask "Do you want to replace the package with the new repository?" "N"
         then
             pearl_package_remove $pkgfullname
@@ -354,6 +368,9 @@ function pearl_package_update(){
     if _is_local_package "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}"
     then
         _check_and_copy "${PEARL_INTERNAL_PACKAGES[$pkgfullname]}" "${PEARL_PKGDIR}" || { _deinit_package $pkgfullname $pre_func $post_func; throw $LOCAL_COPY_EXCEPTION; }
+        # At this point the PEARL_PKGDIR directory changed. Make sure to cd to
+        # the new directory
+        cd $PEARL_PKGDIR
     else
         update_git_repo "$PEARL_PKGDIR"
     fi
@@ -442,9 +459,27 @@ function _init_package(){
     unset ${pre_func} ${post_func}
     # TODO pearl-metadata directory is meant to be deprecated in the future versions
     local hook_file=${PEARL_HOME}/packages/$pkgfullname/pearl-metadata/install.sh
-    [[ -f "$hook_file" ]] && source "$hook_file"
+    if [[ -f "$hook_file" ]];
+    then
+        source "$hook_file" || { \
+            # Continue even if install.sh is broken otherwise the package
+            # will never get updated for being fixed.
+            warn "Error on parsing the install.sh file. Proceeding anyway...";
+            _deinit_package $pkgfullname $pre_func $post_func;
+        }
+    fi
+
     local hook_file=${PEARL_HOME}/packages/$pkgfullname/pearl-config/install.sh
-    [[ -f "$hook_file" ]] && source "$hook_file"
+    if [[ -f "$hook_file" ]];
+    then
+        source "$hook_file" || { \
+            # Continue even if install.sh is broken otherwise the package
+            # will never get updated for being fixed.
+            warn "Error on parsing the install.sh file. Proceeding anyway...";
+            _deinit_package $pkgfullname $pre_func $post_func;
+        }
+    fi
+
     return 0
 }
 

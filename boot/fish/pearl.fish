@@ -5,7 +5,7 @@
 ####################### VARIABLES & IMPORTS ############################
 if [ -z "$PEARL_ROOT" ]
     echo "Error: PEARL_ROOT environment variable does not exist." 1>&2
-	exit 1
+    exit 1
 end
 
 if [ ! -d "$PEARL_ROOT" ]
@@ -30,8 +30,10 @@ if not contains $PEARL_ROOT/man $MANPATH
 end
 
 ################################# MAIN ##############################
-for reponame in (ls $PEARL_HOME/packages)
-    for pkgname in (ls $PEARL_HOME/packages/$reponame)
+for reponame in $PEARL_HOME/packages/*
+    set reponame (basename $reponame)
+    for pkgname in $PEARL_HOME/packages/$reponame/*
+        set pkgname (basename $pkgname)
         set PEARL_PKGDIR "$PEARL_HOME/packages/$reponame/$pkgname"
         set PEARL_PKGVARDIR "$PEARL_HOME/var/$reponame/$pkgname"
         set PEARL_PKGREPONAME "$reponame"
@@ -47,8 +49,8 @@ for reponame in (ls $PEARL_HOME/packages)
         end
         set -e PEARL_PKGDIR
         set -e PEARL_PKGVARDIR
-		set -e PEARL_PKGNAME
-		set -e PEARL_PKGREPONAME
+        set -e PEARL_PKGNAME
+        set -e PEARL_PKGREPONAME
     end
 end
 

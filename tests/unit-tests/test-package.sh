@@ -99,7 +99,7 @@ function create_package(){
 function create_package_from_fullname(){
     local pkgfullname=$1
     mkdir -p $PEARL_HOME/packages/$pkgfullname/.git
-    mkdir -p $PEARL_HOME/packages/$pkgfullname/pearl-metadata
+    mkdir -p $PEARL_HOME/packages/$pkgfullname/pearl-config
     mkdir -p $PEARL_HOME/var/$pkgfullname
 }
 
@@ -107,16 +107,16 @@ function scenario_local_pkgs(){
     create_package vim-django
     touch $PEARL_HOME/packages/default/vim-django/file_django
     mkdir -p $HOME/my-vim-django/.git
-    mkdir -p $HOME/my-vim-django/pearl-metadata
+    mkdir -p $HOME/my-vim-django/pearl-config
     mkdir -p $HOME/my-vim-rails/.git
-    mkdir -p $HOME/my-vim-rails/pearl-metadata
+    mkdir -p $HOME/my-vim-rails/pearl-config
     create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
                       "vim-django" "$HOME/my-vim-django"
     local install_content="$(_create_install post_install \
                                pre_update post_update \
                                pre_remove post_remove)"
-    echo "$install_content" > $HOME/my-vim-rails/pearl-metadata/install.sh
-    echo "$install_content" > $HOME/my-vim-django/pearl-metadata/install.sh
+    echo "$install_content" > $HOME/my-vim-rails/pearl-config/install.sh
+    echo "$install_content" > $HOME/my-vim-django/pearl-config/install.sh
     git_mock(){
         :
     }
@@ -174,7 +174,7 @@ function create_install_from_fullname(){
     local pkgfullname=$1
     shift
     local install_content="$(_create_install $@)"
-    echo "$install_content" > $PEARL_HOME/packages/${pkgfullname}/pearl-metadata/install.sh
+    echo "$install_content" > $PEARL_HOME/packages/${pkgfullname}/pearl-config/install.sh
 }
 
 function create_install_with_content() {
@@ -186,7 +186,7 @@ function $hookfunc(){
 }
 EOF
     )
-    echo "$content_file" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
+    echo "$content_file" > $PEARL_HOME/packages/default/$pkgname/pearl-config/install.sh
 }
 
 function create_bad_install(){
@@ -200,7 +200,18 @@ function $hookfunc(){
 }
 EOF
 )
-    echo "$install_content" > $PEARL_HOME/packages/default/${pkgname}/pearl-metadata/install.sh
+    echo "$install_content" > $PEARL_HOME/packages/default/${pkgname}/pearl-config/install.sh
+}
+
+function create_bad_syntax_install(){
+    local pkgname=$1
+    local hookfunc=$2
+    local install_content=$(cat <<EOF
+function $hookfunc(){
+}
+EOF
+)
+    echo "$install_content" > $PEARL_HOME/packages/default/${pkgname}/pearl-config/install.sh
 }
 
 function load_repo_first() {
@@ -239,6 +250,14 @@ function test_pearl_module_list_not_matching(){
     assertEquals 1 $?
     cat $STDOUTF | grep -qE "ls-colors .*[installed]"
     assertEquals 1 $?
+}
+
+function test_pearl_package_emerge_wrong_package(){
+    local pkgname="asdf/asdf"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_emerge "$pkgname"
+
+    local pkgname="asdf"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_emerge "$pkgname"
 }
 
 function test_pearl_package_emerge_with_install(){
@@ -283,6 +302,14 @@ function test_pearl_package_install(){
     assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
 }
 
+function test_pearl_package_install_wrong_package(){
+    local pkgname="asdf/asdf"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_install "$pkgname"
+
+    local pkgname="asdf"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_install "$pkgname"
+}
+
 function test_pearl_package_install_errors_on_hooks(){
     local pkgname="pearl-utils"
     scenario_generic_pkgs
@@ -308,6 +335,33 @@ function test_pearl_package_install_errors_on_hooks(){
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
     assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager\npost_install")" "$actual_out"
+}
+
+function test_pearl_package_install_syntax_errors_in_install_file(){
+    local pkgname="pearl-utils"
+    scenario_generic_pkgs
+    git_pearl_install_mock() {
+        git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
+        if [[ "$1" == "clone" ]]
+        then
+            git_command_mock "clone" $@
+            create_package $pkgname
+            create_bad_syntax_install "$pkgname" post_install
+            return
+        fi
+        echo "Error: Unknown Git command!"
+        return 111
+    }
+    GIT=git_pearl_install_mock
+
+    assertCommandSuccess load_repo_first pearl_package_install "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "$(echo -e "git clone\ngit submodule\ngit --no-pager")" "$actual_out"
 }
 
 function test_pearl_package_install_deinit(){
@@ -371,7 +425,7 @@ function test_pearl_package_install_empty_install(){
         then
             git_command_mock "clone" $@
             create_package $pkgname
-            echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
+            echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-config/install.sh
             return
         fi
         echo "Error: Unknown Git command!"
@@ -471,6 +525,20 @@ function test_pearl_package_remove_errors_on_hooks(){
     assertEquals "$(echo -e "post_remove")" "$actual_out"
 }
 
+function test_pearl_package_remove_syntax_errors_in_install_file(){
+    local pkgname="ls-colors"
+    scenario_generic_pkgs
+    create_bad_syntax_install "$pkgname" pre_remove
+
+    assertCommandSuccess load_repo_first pearl_package_remove "$pkgname"
+    [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "" "$actual_out"
+}
+
 function test_pearl_package_remove_deinit(){
     local pkgname="ls-colors"
     scenario_generic_pkgs
@@ -499,7 +567,7 @@ function test_pearl_package_remove_not_installed(){
 function test_pearl_package_remove_empty_install(){
     local pkgname="ls-colors"
     scenario_generic_pkgs
-    echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
+    echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-config/install.sh
     assertCommandSuccess load_repo_first pearl_package_remove $pkgname
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
@@ -532,6 +600,14 @@ function test_pearl_package_update(){
     assertEquals 0 $?
     local actual_out="$(cat $STDOUTF | grep -v "*")"
     assertEquals "$(echo -e "pre_update\ngit fetch\ngit reset\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
+}
+
+function test_pearl_package_update_wrong_package(){
+    local pkgname="asdf/asdf"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_update "$pkgname"
+
+    local pkgname="asdf"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_update "$pkgname"
 }
 
 function test_pearl_package_update_url_changed(){
@@ -608,6 +684,35 @@ function test_pearl_package_update_errors_on_hooks(){
     assertEquals "$(echo -e "git fetch\ngit reset\ngit submodule\ngit --no-pager\npost_update")" "$actual_out"
 }
 
+function test_pearl_package_update_syntax_errors_in_install_file(){
+    local pkgname="ls-colors"
+    scenario_generic_pkgs
+    git_pearl_update_mock() {
+        git_config_mock $1 "" && return
+        git_command_mock "submodule" $@ && return
+        git_command_mock "--no-pager" $@ && return
+        git_command_mock "rev-parse" $@ && return
+        git_command_mock "fetch" $@ && return
+        if [[ "$1" == "reset" ]]
+        then
+            git_command_mock "reset" $@
+            create_bad_syntax_install "$pkgname" post_update
+            return
+        fi
+        echo "Error: Unknown Git command!"
+        return 111
+    }
+    GIT=git_pearl_update_mock
+
+    assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
+    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "$(echo -e "pre_update\ngit fetch\ngit reset\ngit submodule\ngit --no-pager")" "$actual_out"
+}
+
 function test_pearl_package_update_deinit(){
     local pkgname="ls-colors"
     scenario_generic_pkgs
@@ -638,7 +743,7 @@ function test_pearl_package_update_empty_install(){
     local pkgname="ls-colors"
     scenario_generic_pkgs
     GIT=git_pearl_basic_update_mock
-    echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh
+    echo "" > $PEARL_HOME/packages/default/$pkgname/pearl-config/install.sh
 
     assertCommandSuccess load_repo_first pearl_package_update $pkgname
 
@@ -687,7 +792,7 @@ function test_pearl_local_package_update(){
     assertCommandSuccess load_repo_first pearl_package_update "$pkgname"
     [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
-    [ -f $PEARL_HOME/packages/default/$pkgname/pearl-metadata/install.sh ]
+    [ -f $PEARL_HOME/packages/default/$pkgname/pearl-config/install.sh ]
     assertEquals 0 $?
     [ ! -e $PEARL_HOME/packages/default/$pkgname/file_django ]
     assertEquals 0 $?

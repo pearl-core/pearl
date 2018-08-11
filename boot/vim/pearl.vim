@@ -1,20 +1,5 @@
 
 if isdirectory($PEARL_ROOT) && isdirectory($PEARL_HOME)
-    " TODO Pathogen will be deprecated in the future major version 2.0.0
-    " It will be the Pearl package to decide how to install the
-    " plugin as it is a more flexible approach (the preferred will be the
-    " native vim package management).
-    """"""""""""""""""""""""""""""""""""""""""""""""""""
-    " Pathogen (https://github.com/tpope/vim-pathogen)
-    """"""""""""""""""""""""""""""""""""""""""""""""""""
-    source $PEARL_ROOT/boot/vim/vim.d/plugins/pathogen/autoload/pathogen.vim
-    filetype off
-    call pathogen#infect($PEARL_HOME.'/packages/*/*/{}')
-    call pathogen#helptags()
-    filetype plugin indent on
-    syntax on
-
-
     """"""""""""""""""
     " Package loader
     """"""""""""""""""

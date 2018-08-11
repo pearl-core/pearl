@@ -13,9 +13,6 @@ then
     exit 33
 fi
 
-[ -n "$ZSH_NAME" ] && source ${HOME}/.zshrc
-[ -n "$BASH" ] && source ${HOME}/.bashrc
-
 export PEARL_ROOT="$1"
 export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
 export PEARL_HOME="${HOME}/.config/pearl"
@@ -37,6 +34,9 @@ pearl init
 [ -d $PEARL_HOME/packages ] || { echo "$PEARL_HOME/packages does not exist after install"; exit 1; }
 [ -d $PEARL_HOME/repos ] || { echo "$PEARL_HOME/repos does not exist after install"; exit 2; }
 
+[ -n "$ZSH_NAME" ] && source ${HOME}/.zshrc
+[ -n "$BASH" ] && source ${HOME}/.bashrc
+
 source $PEARL_ROOT/boot/sh/pearl.sh
 [ -d "$PEARL_ROOT" ] || { echo "$PEARL_ROOT does not exist"; exit 3; }
 [ -d "$PEARL_HOME" ] || { echo "$PEARL_HOME does not exist"; exit 4; }
@@ -47,7 +47,7 @@ pearl list
 info Install ALL pearl packages
 for package in $(bash -c 'declare -A PEARL_PACKAGES; source $PEARL_HOME/repos/*/repo.conf; echo ${!PEARL_PACKAGES[@]};')
 do
-    yes "" | pearl install $package
+    yes "" | pearl emerge $package
     [ -d "$PEARL_HOME/packages/pearl/$package" ] || { echo "$PEARL_HOME/packages/pearl/$package does not exist"; exit 6; }
     [ -d "$PEARL_HOME/packages/pearl/$package/module" ] && [ ! "$(ls -A $PEARL_HOME/packages/pearl/$package/module)" ] && { echo "$PEARL_HOME/packages/pearl/$package/module exists but it is empty"; exit 7; }
 done
