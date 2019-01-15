@@ -2,8 +2,8 @@
 
 (defun source-config-file (config-file)
   (setq pkg-name (replace-regexp-in-string "^.*\/packages\/" "" (replace-regexp-in-string "\/pearl-metadata\/.*$" "" (replace-regexp-in-string "\/pearl-config\/.*$" "" config-file))))
-  (setq pkg-short-name (replace-regexp-in-string "\/.*$" "" pkg-name))
-  (setq repo-name (replace-regexp-in-string "^.*\/" "" pkg-name))
+  (setq pkg-short-name (replace-regexp-in-string "^.*\/" "" pkg-name))
+  (setq repo-name (replace-regexp-in-string "\/.*$" "" pkg-name))
 
   ; To verify that this variable are visible use (getenv "VARNAME") from scratch buffer
   (setenv "PEARL_PKGDIR" (concat pearl-home "packages/" pkg-name))
