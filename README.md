@@ -66,7 +66,7 @@ Despite of this, Ansible has few drawbacks when using it for lightweight forms o
   - it is a powerful and well-known language;
 - Ansible requires way more dependencies than Pearl;
 - Ansible requires knowledge about how Ansible Playbooks works;
-- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and variables which heavily simplify construction of scripts for automation;
+- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and variables which heavily simplify construction of scripts for automation;
 - Pearl makes easier to remove packages and restore the system to an initial state;
 
 Quickstart
@@ -196,7 +196,7 @@ Recommended Pearl Hub packages to install:
 - [kyrat](https://github.com/pearl-hub/kyrat)
 - [ranger](https://github.com/pearl-hub/ranger)
 - [sesaila](https://github.com/pearl-hub/sesaila)
-- [trash](https://github.com/pearl-hub/trash)
+- [trash-cli](https://github.com/pearl-hub/trash-cli)
 - [txum](https://github.com/pearl-hub/txum)
 
 For dotfiles packages take a look [here](https://github.com/pearl-hub?q=dot).
