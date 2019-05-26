@@ -66,7 +66,7 @@ Despite of this, Ansible has few drawbacks when using it for lightweight forms o
   - it is a powerful and well-known language;
 - Ansible requires way more dependencies than Pearl;
 - Ansible requires knowledge about how Ansible Playbooks works;
-- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and variables which heavily simplify construction of scripts for automation;
+- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and [variables](#structure-of-a-pearl-package) which heavily simplify construction of scripts for automation;
 - Pearl makes easier to remove packages and restore the system to an initial state;
 
 Quickstart
@@ -215,10 +215,10 @@ The Pearl dependencies are the following:
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8)](https://git-scm.com/)
 - [GNU coreutils](https://www.gnu.org/software/coreutils/)
-- [grep](https://www.gnu.org/software/grep/)
+- [grep](https://www.gnu.org/software/grep/) optional
+- [sed](https://www.gnu.org/software/sed/) optional
 
-The following are ***optional*** dependencies in case you are using a different shell from
-`bash`:
+Pearl supports also the following shells:
 
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
@@ -241,7 +241,7 @@ In order to install all Pearl dependencies, you first need to install [Homebrew]
 To install all the needed dependencies via Homebrew:
 ```sh
 brew update
-brew install bash git coreutils
+brew install bash git coreutils grep gnu-sed
 ```
 
 Once all Pearl dependencies are properly installed in the system, to install Pearl
@@ -352,6 +352,9 @@ to link/unlink a config file in order to be loaded at startup by a certain progr
 All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
 in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and to
 the Pearl [`utils.sh`](lib/utils/utils.sh) script.
+
+Note: For OSX system, the GNU version `sed` and `grep` are automatically
+imported in `install.sh` and can be directly used if needed.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful

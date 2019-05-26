@@ -63,7 +63,7 @@ pearl list
 
 info Remove ALL pearl packages
 for package in (get_all_packages)
-    pearl remove $package; or die "Error on pearl remove $package"
+    yes "" | pearl remove $package; or die "Error on pearl remove $package"
     [ -d "$PEARL_HOME/packages/pearl/$package" ]; and die "$PEARL_HOME/packages/pearl/$package still exists"
 end
 
