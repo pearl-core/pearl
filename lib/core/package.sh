@@ -276,7 +276,8 @@ function pearl_package_install(){
     then
         try $post_func
         catch || {
-            error "Error on executing '$post_func' hook.";
+            error "Error on executing '$post_func' hook. Rolling back...";
+            pearl_package_remove "$pkgfullname" true
             _deinit_package $pkgfullname $pre_func $post_func;
             throw $HOOK_EXCEPTION;
         }
@@ -396,6 +397,7 @@ function pearl_package_update(){
 #   PEARL_HOME (RO)                 : Used to access to the local directory.
 # Arguments:
 #   pkgname ($1)                    : The name of the package.
+#   force ($2)                      : Do not fail if pre/post functions fail.
 # Returns:
 #   NOT_INSTALLED_EXCEPTION         : The package has not been installed.
 #   HOOK_EXCEPTION                  : Error during the hook function execution.
@@ -404,6 +406,7 @@ function pearl_package_update(){
 #######################################
 function pearl_package_remove(){
     local pkgname=$1
+    local force=${2:-false}
     local pre_func=pre_remove
     local post_func=post_remove
 
@@ -427,8 +430,11 @@ function pearl_package_remove(){
         try $pre_func
         catch || {
             error "Error on executing '$pre_func' hook.";
-            _deinit_package $pkgfullname $pre_func $post_func;
-            throw $HOOK_EXCEPTION;
+            if ! $force
+            then
+                _deinit_package $pkgfullname $pre_func $post_func;
+                throw $HOOK_EXCEPTION;
+            fi
         }
     fi
     cd $PEARL_HOME
@@ -438,8 +444,11 @@ function pearl_package_remove(){
         try $post_func
         catch || {
             error "Error on executing '$post_func' hook.";
-            _deinit_package $pkgfullname $pre_func $post_func;
-            throw $HOOK_EXCEPTION;
+            if ! $force
+            then
+                _deinit_package $pkgfullname $pre_func $post_func;
+                throw $HOOK_EXCEPTION;
+            fi
         }
     fi
 

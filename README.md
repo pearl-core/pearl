@@ -317,7 +317,7 @@ make easier the integration with Pearl ecosystem.
 Useful examples of Pearl packages can be checked in the
 [Official Pearl Hub](https://github.com/pearl-hub).
 
-**Note**: Legacy Pearl versions were using a different directory named `pearl-metadata`. This directory is meant to be deprecated in the upcoming Pearl version.
+**Note**: Legacy Pearl versions were using a different directory named `pearl-metadata`. This directory is meant to be deprecated in the upcoming Pearl major version.
 
 ### The install.sh script ###
 #### Hook functions ####
@@ -330,16 +330,26 @@ Useful examples of Pearl packages can be checked in the
 #### An install.sh script example ####
 
     post_install() {
-        info "Awesome - new package installed!"
-        warn "Remember to setup your config located in: ~/.dotfiles"
+        warn "Remember to setup your config located in: ~/.dotfile"
+        # Do a smart backup before modifying the file
+        backup ${HOME}/.dotfile
+        "# New dotfile" > ${HOME}/.dotfile
         link tmux "$PEARL_PKGDIR/mytmux.conf"
+
+        info "Awesome - new package installed!"
+        return 0
     }
     post_update() {
         post_install
+        return 0
     }
     pre_remove() {
         info "dotfiles package removed"
         unlink tmux "$PEARL_PKGDIR/mytmux.conf"
+
+        # Do an idempotent delete
+        delete ${HOME}/.dotfile
+        return 0
     }
 
 The `info` and `warn` are functions that print a message
@@ -349,11 +359,24 @@ The `link` `unlink` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
-All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
-in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and to
-the Pearl [`utils.sh`](lib/utils/utils.sh) script.
+The `backup` keep the last three backups of the file and do not perform backup
+if the file has not modified since the latest backup. The `delete` is a
+function for idempotent remove (it will not raise an error if the file
+no longer exist.)
 
-Note: For OSX system, the GNU version `sed` and `grep` are automatically
+All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
+in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
+and to the Pearl [`utils.sh`](lib/utils/utils.sh) script. You can use them
+inside the `install.sh` to any hook function.
+
+**Very important note**: All the hook function **must** be
+[**idempotent**](https://en.wikipedia.org/wiki/Idempotence)
+(the commands of each hook function must produce the same result even if
+the command gets executed multiple times).
+All buava commands are idempotent and this will help to write hook functions
+very quickly.
+
+**Note**: For OSX system, the GNU version `sed` and `grep` are automatically
 imported in `install.sh` and can be directly used if needed.
 
 ## Create a Pearl package from a local directory ##
@@ -372,7 +395,7 @@ The package will be ready to be [installed](#install), [updated](#update),
 [emerged](#emerge) and [removed](#remove) via the Pearl system.
 
 The directory content can be structured in the exact way as described
-in the previous [section](#structure-of-a-pearl-package).
+in the [section](#structure-of-a-pearl-package) above.
 
 ## Define dependencies between Pearl packages ##
 Suppose you have a package `mypack` which depends on another package `mydep`,
@@ -528,6 +551,15 @@ Troubleshooting
 > and the current shell is a bash or zsh). Alternatively, user can always
 > create a new shell and the package resources will be available as
 > expected.
+
+> Q: Why Do I get the following error:
+
+    Error on executing 'post_install' hook. Rolling back...
+
+> A: This occurs when the `post_install` hook function fails.
+> Pearl will attempt to roll back a force a removal of the package. In this way
+> you can attempt to install the package again once the hook function gets
+> fixed.
 
 Contributing
 ============
