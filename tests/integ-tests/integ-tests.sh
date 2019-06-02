@@ -18,6 +18,8 @@ export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
 export PEARL_HOME="${HOME}/.config/pearl"
 export PATH=$PEARL_ROOT/bin:$PATH
 
+# In later versions of Travis the signals are not recognized in zsh: QUIT TERM KILL ABRT
+# https://travis-ci.org/pearl-core/pearl/jobs/540316660
 trap "rm -rf ${HOME}/" EXIT
 
 function get_all_packages(){

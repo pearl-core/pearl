@@ -62,8 +62,8 @@ automation which can be widely used for many use cases.
 Despite of this, Ansible has few drawbacks when using it for lightweight forms of automations:
 
 - Pearl uses bash for writing simple scripts for automation:
-  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard to achieve this in Ansible);
-  - it is a powerful and well-known language;
+  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard and tedious to achieve this in Ansible);
+  - bash is a powerful, accessible and well-known language;
 - Ansible requires way more dependencies than Pearl;
 - Ansible requires knowledge about how Ansible Playbooks works;
 - Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and [variables](#structure-of-a-pearl-package) which heavily simplify construction of scripts for automation;
@@ -89,8 +89,8 @@ pearl/sesaila [installed]
     Awesome aliases for Bash, Zsh and Fish shells (https://github.com/pearl-hub/sesaila)
 pearl/airline [installed]
     Status/tabline for vim (https://github.com/vim-airline/vim-airline)
-pearl/trash [installed]
-    Smart command to recover files you regretted to delete (https://github.com/pearl-hub/trash)
+pearl/trash-cli [installed]
+    Command line interface to the freedesktop.org trashcan (https://github.com/pearl-hub/trash-cli)
 ...
 ```
 
@@ -115,22 +115,18 @@ $ pearl install dot-vim
 * Installing pearl/dot-vim package
 ```
 
-- Install `pearl/trash` package:
+- Install `pearl/trash-cli` package:
 
 ```sh
-$ pearl install trash
+$ pearl install trash-cli
 * Updating https://github.com/pearl-hub/repo.git repository
-* Installing pearl/trash package
+* Installing pearl/trash-cli package
 $ trash -h
-Usage: trash file1 file2 ....
-Moves to trash the files
-Options:
-        -s, --show                  Shows the trash
-        -e, --empty                 Empties the trash
-        -r, --recovery <file ...>   Recovers trashed files
-        -c, --count                 Count the trashed files
-        -h, --help                  Show this help message
+Usage: trash [OPTION]... FILE...
 
+Put files in trash
+...
+...
 ```
 
 Update
@@ -152,7 +148,7 @@ $ pearl update
 * Updating Pearl script
 * Updating pearl/dot-vim package
 * Updating pearl/airline package
-* Updating pearl/trash package
+* Updating pearl/trash-cli package
 * Updating pearl/caprica package
 ...
 ```
@@ -184,7 +180,7 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 * Updating https://github.com/pearl-hub/repo.git repository
 * Removing pearl/dot-vim package
 * Removing pearl/airline package
-* Removing pearl/trash package
+* Removing pearl/trash-cli package
 * Removing pearl/caprica package
 ...
 ```
@@ -225,12 +221,13 @@ Pearl supports also the following shells:
 
 Linux
 -----
-Assuming all Pearl dependencies are properly installed in the system, to install Pearl
-run the following:
+Assuming all Pearl [dependencies](#dependencies) are properly installed
+in the system, to install Pearl run the following:
 ```sh
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 # or
 curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+
 bash install.sh
 ```
 
@@ -250,6 +247,7 @@ run the following:
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 # or
 curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+
 bash install.sh
 ```
 
@@ -359,17 +357,17 @@ The `link` `unlink` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
-The `backup` keep the last three backups of the file and do not perform backup
+The `backup` keeps the last three backups of the file and do not perform backup
 if the file has not modified since the latest backup. The `delete` is a
 function for idempotent remove (it will not raise an error if the file
-no longer exist.)
+no longer exist).
 
 All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
 in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
 and to the Pearl [`utils.sh`](lib/utils/utils.sh) script. You can use them
 inside the `install.sh` to any hook function.
 
-**Very important note**: All the hook function **must** be
+**Very important note**: All the hook functions **must** be
 [**idempotent**](https://en.wikipedia.org/wiki/Idempotence)
 (the commands of each hook function must produce the same result even if
 the command gets executed multiple times).
@@ -547,17 +545,19 @@ Troubleshooting
 > You can fix this by simply run the function `pearl-source` which reloads
 > the configuration. The use of such function is not always required but depends
 > whether the variables/functions involve the current shell where the
-> package install/update occurred (i.e. a new variable defined in `config.sh`
+> package `install`/`update` occurred (i.e. a new variable defined in `config.sh`
 > and the current shell is a bash or zsh). Alternatively, user can always
 > create a new shell and the package resources will be available as
 > expected.
+
+## Error during package install
 
 > Q: Why Do I get the following error:
 
     Error on executing 'post_install' hook. Rolling back...
 
 > A: This occurs when the `post_install` hook function fails.
-> Pearl will attempt to roll back a force a removal of the package. In this way
+> Pearl will attempt to roll back and force a removal of the package. In this way
 > you can attempt to install the package again once the hook function gets
 > fixed.
 
