@@ -1,5 +1,16 @@
 # Change Log #
 
+## [1.8.0][v180] - 2019-06-03 ##
+
+* Add roll back mechanism during install package
+* Add `grep` and `sed` as optional dependencies since they may be used in hook functions
+* Add newer `buava`:
+  * `backup` function
+  * `delete` function
+  * `ideavim` and `gvim` dotfiles for (`un`)`link` functions
+  * `install_or_update_vim_plugin_git_repo` function
+  *  Add GNU `sed` and `grep` for OSX compat functions
+
 ## [1.7.2][v172] - 2019-01-15 ##
 
 * Fix variables `PEARL_PKGNAME` `PEARL_PKGREPONAME` for vim and emacs boot
@@ -181,3 +192,4 @@
 [v170]: https://github.com/pearl-core/pearl/releases/tag/1.7.0
 [v171]: https://github.com/pearl-core/pearl/releases/tag/1.7.1
 [v172]: https://github.com/pearl-core/pearl/releases/tag/1.7.2
+[v180]: https://github.com/pearl-core/pearl/releases/tag/1.8.0
