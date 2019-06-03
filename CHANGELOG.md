@@ -1,5 +1,9 @@
 # Change Log #
 
+## [1.7.2][v172] - 2019-01-15 ##
+
+* Fix variables `PEARL_PKGNAME` `PEARL_PKGREPONAME` for vim and emacs boot
+
 ## [1.7.1][v171] - 2018-08-11 ##
 
 * Deprecate pathogen
@@ -176,3 +180,4 @@
 [v163]: https://github.com/pearl-core/pearl/releases/tag/1.6.3
 [v170]: https://github.com/pearl-core/pearl/releases/tag/1.7.0
 [v171]: https://github.com/pearl-core/pearl/releases/tag/1.7.1
+[v172]: https://github.com/pearl-core/pearl/releases/tag/1.7.2

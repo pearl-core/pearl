@@ -62,11 +62,11 @@ automation which can be widely used for many use cases.
 Despite of this, Ansible has few drawbacks when using it for lightweight forms of automations:
 
 - Pearl uses bash for writing simple scripts for automation:
-  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard to achieve this in Ansible);
-  - it is a powerful and well-known language;
+  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard and tedious to achieve this in Ansible);
+  - bash is a powerful, accessible and well-known language;
 - Ansible requires way more dependencies than Pearl;
 - Ansible requires knowledge about how Ansible Playbooks works;
-- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and variables which heavily simplify construction of scripts for automation;
+- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and [variables](#structure-of-a-pearl-package) which heavily simplify construction of scripts for automation;
 - Pearl makes easier to remove packages and restore the system to an initial state;
 
 Quickstart
@@ -89,8 +89,8 @@ pearl/sesaila [installed]
     Awesome aliases for Bash, Zsh and Fish shells (https://github.com/pearl-hub/sesaila)
 pearl/airline [installed]
     Status/tabline for vim (https://github.com/vim-airline/vim-airline)
-pearl/trash [installed]
-    Smart command to recover files you regretted to delete (https://github.com/pearl-hub/trash)
+pearl/trash-cli [installed]
+    Command line interface to the freedesktop.org trashcan (https://github.com/pearl-hub/trash-cli)
 ...
 ```
 
@@ -115,22 +115,18 @@ $ pearl install dot-vim
 * Installing pearl/dot-vim package
 ```
 
-- Install `pearl/trash` package:
+- Install `pearl/trash-cli` package:
 
 ```sh
-$ pearl install trash
+$ pearl install trash-cli
 * Updating https://github.com/pearl-hub/repo.git repository
-* Installing pearl/trash package
+* Installing pearl/trash-cli package
 $ trash -h
-Usage: trash file1 file2 ....
-Moves to trash the files
-Options:
-        -s, --show                  Shows the trash
-        -e, --empty                 Empties the trash
-        -r, --recovery <file ...>   Recovers trashed files
-        -c, --count                 Count the trashed files
-        -h, --help                  Show this help message
+Usage: trash [OPTION]... FILE...
 
+Put files in trash
+...
+...
 ```
 
 Update
@@ -152,7 +148,7 @@ $ pearl update
 * Updating Pearl script
 * Updating pearl/dot-vim package
 * Updating pearl/airline package
-* Updating pearl/trash package
+* Updating pearl/trash-cli package
 * Updating pearl/caprica package
 ...
 ```
@@ -184,7 +180,7 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 * Updating https://github.com/pearl-hub/repo.git repository
 * Removing pearl/dot-vim package
 * Removing pearl/airline package
-* Removing pearl/trash package
+* Removing pearl/trash-cli package
 * Removing pearl/caprica package
 ...
 ```
@@ -196,7 +192,7 @@ Recommended Pearl Hub packages to install:
 - [kyrat](https://github.com/pearl-hub/kyrat)
 - [ranger](https://github.com/pearl-hub/ranger)
 - [sesaila](https://github.com/pearl-hub/sesaila)
-- [trash](https://github.com/pearl-hub/trash)
+- [trash-cli](https://github.com/pearl-hub/trash-cli)
 - [txum](https://github.com/pearl-hub/txum)
 
 For dotfiles packages take a look [here](https://github.com/pearl-hub?q=dot).
@@ -215,22 +211,23 @@ The Pearl dependencies are the following:
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8)](https://git-scm.com/)
 - [GNU coreutils](https://www.gnu.org/software/coreutils/)
-- [grep](https://www.gnu.org/software/grep/)
+- [grep](https://www.gnu.org/software/grep/) optional
+- [sed](https://www.gnu.org/software/sed/) optional
 
-The following are ***optional*** dependencies in case you are using a different shell from
-`bash`:
+Pearl supports also the following shells:
 
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
 
 Linux
 -----
-Assuming all Pearl dependencies are properly installed in the system, to install Pearl
-run the following:
+Assuming all Pearl [dependencies](#dependencies) are properly installed
+in the system, to install Pearl run the following:
 ```sh
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 # or
 curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+
 bash install.sh
 ```
 
@@ -241,7 +238,7 @@ In order to install all Pearl dependencies, you first need to install [Homebrew]
 To install all the needed dependencies via Homebrew:
 ```sh
 brew update
-brew install bash git coreutils
+brew install bash git coreutils grep gnu-sed
 ```
 
 Once all Pearl dependencies are properly installed in the system, to install Pearl
@@ -250,6 +247,7 @@ run the following:
 wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
 # or
 curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+
 bash install.sh
 ```
 
@@ -317,7 +315,7 @@ make easier the integration with Pearl ecosystem.
 Useful examples of Pearl packages can be checked in the
 [Official Pearl Hub](https://github.com/pearl-hub).
 
-**Note**: Legacy Pearl versions were using a different directory named `pearl-metadata`. This directory is meant to be deprecated in the upcoming Pearl version.
+**Note**: Legacy Pearl versions were using a different directory named `pearl-metadata`. This directory is meant to be deprecated in the upcoming Pearl major version.
 
 ### The install.sh script ###
 #### Hook functions ####
@@ -330,16 +328,26 @@ Useful examples of Pearl packages can be checked in the
 #### An install.sh script example ####
 
     post_install() {
-        info "Awesome - new package installed!"
-        warn "Remember to setup your config located in: ~/.dotfiles"
+        warn "Remember to setup your config located in: ~/.dotfile"
+        # Do a smart backup before modifying the file
+        backup ${HOME}/.dotfile
+        "# New dotfile" > ${HOME}/.dotfile
         link tmux "$PEARL_PKGDIR/mytmux.conf"
+
+        info "Awesome - new package installed!"
+        return 0
     }
     post_update() {
         post_install
+        return 0
     }
     pre_remove() {
         info "dotfiles package removed"
         unlink tmux "$PEARL_PKGDIR/mytmux.conf"
+
+        # Do an idempotent delete
+        delete ${HOME}/.dotfile
+        return 0
     }
 
 The `info` and `warn` are functions that print a message
@@ -349,9 +357,25 @@ The `link` `unlink` are idempotent functions (the result will not change
 if the function will be called multiple times) that are able
 to link/unlink a config file in order to be loaded at startup by a certain program.
 
+The `backup` keeps the last three backups of the file and do not perform backup
+if the file has not modified since the latest backup. The `delete` is a
+function for idempotent remove (it will not raise an error if the file
+no longer exist).
+
 All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
-in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh) and to
-the Pearl [`utils.sh`](lib/utils/utils.sh) script.
+in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
+and to the Pearl [`utils.sh`](lib/utils/utils.sh) script. You can use them
+inside the `install.sh` to any hook function.
+
+**Very important note**: All the hook functions **must** be
+[**idempotent**](https://en.wikipedia.org/wiki/Idempotence)
+(the commands of each hook function must produce the same result even if
+the command gets executed multiple times).
+All buava commands are idempotent and this will help to write hook functions
+very quickly.
+
+**Note**: For OSX system, the GNU version `sed` and `grep` are automatically
+imported in `install.sh` and can be directly used if needed.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
@@ -369,7 +393,7 @@ The package will be ready to be [installed](#install), [updated](#update),
 [emerged](#emerge) and [removed](#remove) via the Pearl system.
 
 The directory content can be structured in the exact way as described
-in the previous [section](#structure-of-a-pearl-package).
+in the [section](#structure-of-a-pearl-package) above.
 
 ## Define dependencies between Pearl packages ##
 Suppose you have a package `mypack` which depends on another package `mydep`,
@@ -521,10 +545,21 @@ Troubleshooting
 > You can fix this by simply run the function `pearl-source` which reloads
 > the configuration. The use of such function is not always required but depends
 > whether the variables/functions involve the current shell where the
-> package install/update occurred (i.e. a new variable defined in `config.sh`
+> package `install`/`update` occurred (i.e. a new variable defined in `config.sh`
 > and the current shell is a bash or zsh). Alternatively, user can always
 > create a new shell and the package resources will be available as
 > expected.
+
+## Error during package install
+
+> Q: Why Do I get the following error:
+
+    Error on executing 'post_install' hook. Rolling back...
+
+> A: This occurs when the `post_install` hook function fails.
+> Pearl will attempt to roll back and force a removal of the package. In this way
+> you can attempt to install the package again once the hook function gets
+> fixed.
 
 Contributing
 ============

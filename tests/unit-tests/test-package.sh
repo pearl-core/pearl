@@ -329,7 +329,7 @@ function test_pearl_package_install_errors_on_hooks(){
     GIT=git_pearl_install_mock
 
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_install "$pkgname"
-    [ -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -d $PEARL_HOME/var/default/$pkgname/ ]
     assertEquals 0 $?
@@ -517,6 +517,32 @@ function test_pearl_package_remove_errors_on_hooks(){
 
     create_bad_install $pkgname post_remove
     assertCommandFailOnStatus $HOOK_EXCEPTION load_repo_first pearl_package_remove "$pkgname"
+    [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "$(echo -e "post_remove")" "$actual_out"
+}
+
+function test_pearl_package_remove_force_errors_on_pre_remove_hook(){
+    local pkgname="ls-colors"
+    scenario_generic_pkgs
+    create_bad_install $pkgname pre_remove
+    assertCommandSuccess load_repo_first pearl_package_remove "$pkgname" true
+    [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
+    assertEquals 0 $?
+    [ -d $PEARL_HOME/var/default/$pkgname/ ]
+    assertEquals 0 $?
+    local actual_out="$(cat $STDOUTF | grep -v "*")"
+    assertEquals "$(echo -e "pre_remove")" "$actual_out"
+}
+
+function test_pearl_package_remove_force_errors_on_post_remove_hook(){
+    local pkgname="ls-colors"
+    scenario_generic_pkgs
+    create_bad_install $pkgname post_remove
+    assertCommandSuccess load_repo_first pearl_package_remove "$pkgname" true
     [ ! -d $PEARL_HOME/packages/default/$pkgname/.git ]
     assertEquals 0 $?
     [ -d $PEARL_HOME/var/default/$pkgname/ ]

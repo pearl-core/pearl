@@ -18,7 +18,9 @@ export HOME=$(TMPDIR=/tmp mktemp -d -t pearl-user-home.XXXXXXX)
 export PEARL_HOME="${HOME}/.config/pearl"
 export PATH=$PEARL_ROOT/bin:$PATH
 
-trap "rm -rf ${HOME}/" EXIT QUIT TERM KILL ABRT
+# In later versions of Travis the signals are not recognized in zsh: QUIT TERM KILL ABRT
+# https://travis-ci.org/pearl-core/pearl/jobs/540316660
+trap "rm -rf ${HOME}/" EXIT
 
 function get_all_packages(){
     ls $PEARL_HOME/packages/pearl
@@ -63,7 +65,7 @@ pearl list
 info Remove ALL pearl packages
 for package in $(get_all_packages)
 do
-    pearl remove $package
+    yes "" | pearl remove $package
     [ -d "$PEARL_HOME/packages/pearl/$package" ] && { echo "$PEARL_HOME/packages/pearl/$package still exists"; exit 8; }
 done
 
