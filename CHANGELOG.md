@@ -1,5 +1,10 @@
 # Change Log #
 
+## [1.8.1][v181] - 2019-07-13 ##
+
+* Update `buava`:
+  * New view action for `setup_configuration` helper function
+
 ## [1.8.0][v180] - 2019-06-03 ##
 
 * Add roll back mechanism during install package
@@ -193,3 +198,4 @@
 [v171]: https://github.com/pearl-core/pearl/releases/tag/1.7.1
 [v172]: https://github.com/pearl-core/pearl/releases/tag/1.7.2
 [v180]: https://github.com/pearl-core/pearl/releases/tag/1.8.0
+[v181]: https://github.com/pearl-core/pearl/releases/tag/1.8.1
