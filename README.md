@@ -156,10 +156,7 @@ $ pearl update
 Emerge
 ------
 Emerge is an idempotent command for either installing or updating a package
-depending whether the package is already installed or not. This command turns
-to be particularly useful for establishing dependencies between packages.
-See the section [below](#define-dependencies-between-pearl-packages)
-for more details.
+depending whether the package is already installed or not.
 
 Remove
 -------
@@ -399,9 +396,11 @@ in the [section](#structure-of-a-pearl-package) above.
 Suppose you have a package `mypack` which depends on another package `mydep`,
 you can update the `mypack` `install.sh` file in this way:
 
+    DEPENDS=("${PEARL_PKGREPONAME}/mydep")
     post_install() {
-        # Install/update the dependency here:
-        pearl emerge ${PEARL_PKGREPONAME}/mydep
+        ...
+        ...
+        return 0
     }
     post_update() {
         post_install
@@ -409,12 +408,22 @@ you can update the `mypack` `install.sh` file in this way:
     pre_remove() {
         # Uncomment below to strictly remove the dependency
         # during the removal of the current package:
-        #pearl remove ${PEARL_PKGREPONAME}/mydep
+        #for dep in ${DEPENDS[@]}
+        #do
+        #    pearl remove $dep
+        #done
     }
 
 The `PEARL_PKGREPONAME` variable will make sure to define dependencies only
 between packages of the same repository.
 To see a real example in Pearl Hub, take a look at the [Kyrat install.sh](https://github.com/pearl-hub/kyrat/blob/master/pearl-config/install.sh).
+
+**Note**: `DEPENDS` variable is currently not used during `remove` action.
+This means you would need either to manually detect the package
+dependencies and remove them accordingly or write a logic in
+`pre_remove` function like showed above.
+Another alternative is to use `ask` function to make the
+package removal more interactive.
 
 ## Use third-party git repository not available in Pearl Hub ##
 If you want to use a third-party git repository

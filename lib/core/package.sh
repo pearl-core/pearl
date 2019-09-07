@@ -103,6 +103,86 @@ function _load_repo() {
 }
 
 #######################################
+# Provide the list of all the given package names including their dependencies.
+# The packages dependencies are the ones specified inside the `DEPENDS` variable
+# in `install.sh` file.
+#
+# Globals:
+#   LIST_PACKAGES_DEPS (WO)  : Contains the full list of packages.
+# Arguments:
+#   pkgnames ($@?)           : The package names.
+#                              If not specified pkgnames will be the list
+#                              of all already installed packages.
+# Returns:
+#   NOT_IN_REPOSITORY_EXCEPTION     : The package is not available in repo.
+# Output:
+#   None
+#######################################
+function list_package_dependencies() {
+
+    if [[ -z $1 ]]
+    then
+        get_list_installed_packages
+        local queue=(${RESULT[@]})
+        unset RESULT
+    else
+        local queue=()
+        for pkgname in $@
+        do
+            _package_full_name $pkgname
+            local pkgfullname=$RESULT
+            unset RESULT
+
+            [[ -z "$pkgfullname" ]] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
+
+            queue+=("$pkgfullname")
+        done
+    fi
+
+    LIST_PACKAGES_DEPS=(${queue[@]})
+
+    while [[ ${#queue[@]} > 0 ]]
+    do
+        # pop the first element
+        local pkgname=${queue[0]}
+        local queue=( "${queue[@]:1}" )
+
+        _package_full_name $pkgname
+        local pkgfullname=$RESULT
+        local reponame="${RESULT/\/*/}"
+        local pkgshortname="${RESULT/*\//}"
+        unset RESULT
+        PEARL_PKGDIR=$PEARL_HOME/packages/$pkgfullname
+        _init_package "$pkgfullname" "" $post_func
+        PEARL_PKGVARDIR=$PEARL_HOME/var/$pkgfullname
+        PEARL_PKGNAME=$pkgshortname
+        PEARL_PKGREPONAME=$reponame
+
+        local install_file=$PEARL_HOME/packages/$pkgfullname/pearl-config/install.sh
+
+        DEPENDS=()
+        [[ -e $install_file ]] && source $install_file
+        for dep in ${DEPENDS[@]}
+        do
+            _package_full_name $dep
+            local deppkgfullname=$RESULT
+            unset RESULT
+
+            [[ -z "$deppkgfullname" ]] && { warn "Skipping $pkgname is not in the repositories."; throw $NOT_IN_REPOSITORY_EXCEPTION; }
+
+            if ! contains_element ${deppkgfullname} ${LIST_PACKAGES_DEPS[@]}
+            then
+                local queue+=("${deppkgfullname}")
+                LIST_PACKAGES_DEPS+=("${deppkgfullname}")
+            fi
+        done
+
+        unset DEPENDS
+    done
+    return 0
+}
+
+#######################################
 # Provide the full name of a package by reading the repository.
 #
 # Globals:
@@ -541,7 +621,7 @@ function pearl_package_list(){
 #   PEARL_HOME (RO)     : Used to access to the local directory.
 #   RESULT (WO)         : Array containing the list of installed packages.
 # Arguments:
-#   pattern ($1)        : The name of the package.
+#   pattern ($1?)        : The name of the package.
 # Returns:
 #   None
 # Output:
@@ -567,7 +647,7 @@ function get_list_installed_packages() {
 #   PEARL_HOME (RO)   : Used to access to the local directory.
 #   RESULT (WO)       : Array containing the list of uninstalled packages.
 # Arguments:
-#   pattern ($1)      : The name of the package.
+#   pattern ($1?)      : The name of the package.
 # Returns:
 #   None
 # Output:

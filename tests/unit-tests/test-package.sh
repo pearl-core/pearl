@@ -177,6 +177,18 @@ function create_install_from_fullname(){
     echo "$install_content" > $PEARL_HOME/packages/${pkgfullname}/pearl-config/install.sh
 }
 
+function add_depends_in_install(){
+    local pkgname=$1
+    shift
+    add_depends_in_install_from_fullname "default/$pkgname" $@
+}
+
+function add_depends_in_install_from_fullname(){
+    local pkgfullname=$1
+    shift
+    echo "DEPENDS=("$@")" >> $PEARL_HOME/packages/${pkgfullname}/pearl-config/install.sh
+}
+
 function create_install_with_content() {
     local hookfunc=$1
     local content=$2
@@ -215,8 +227,69 @@ EOF
 }
 
 function load_repo_first() {
+    unset PEARL_INTERNAL_REPOS_NAME
+    unset PEARL_INTERNAL_PACKAGES
+    unset PEARL_INTERNAL_PACKAGES_DESCR
+
+    declare -a PEARL_INTERNAL_REPOS_NAME
+    declare -A PEARL_INTERNAL_PACKAGES
+    declare -A PEARL_INTERNAL_PACKAGES_DESCR
+
     pearl_load_repos
     $@
+}
+
+function test_list_package_dependencies() {
+    scenario_generic_pkgs
+    create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
+                      "ls-colors" "$HOME/my-ls-colors" \
+                      "pearl-ssh" "$HOME/my-pearl-ssh"
+
+    load_repo_first list_package_dependencies "ls-colors"
+    assertEquals "default/ls-colors" ${LIST_PACKAGES_DEPS[@]}
+}
+
+function test_list_package_dependencies_with_depends() {
+    scenario_generic_pkgs
+    create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
+                      "ls-colors" "$HOME/my-ls-colors" \
+                      "pearl-ssh" "$HOME/my-pearl-ssh"
+    add_depends_in_install ls-colors pearl-ssh
+
+    load_repo_first list_package_dependencies "ls-colors"
+    assertEquals "default/ls-colors default/pearl-ssh" "$(echo "${LIST_PACKAGES_DEPS[@]}")"
+}
+
+function test_list_package_dependencies_no_arguments() {
+    scenario_generic_pkgs
+    create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
+                      "ls-colors" "$HOME/my-ls-colors" \
+                      "pearl-ssh" "$HOME/my-pearl-ssh"
+
+    load_repo_first list_package_dependencies
+    assertEquals "default/ls-colors default/pearl-ssh default/vim-rails" "$(echo "${LIST_PACKAGES_DEPS[@]}")"
+}
+
+function test_list_package_dependencies_not_pkg_name() {
+    scenario_generic_pkgs
+    create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
+                      "ls-colors" "$HOME/my-ls-colors" \
+                      "pearl-ssh" "$HOME/my-pearl-ssh"
+    add_depends_in_install ls-colors "pearl-ssh2"
+
+    assertCommandFailOnStatus 104 load_repo_first list_package_dependencies "ls-colors"
+}
+
+function test_list_package_dependencies_duplicate_deps() {
+    scenario_generic_pkgs
+    create_pearl_conf "vim-rails" "$HOME/my-vim-rails" \
+                      "ls-colors" "$HOME/my-ls-colors" \
+                      "pearl-ssh" "$HOME/my-pearl-ssh"
+    add_depends_in_install ls-colors "pearl-ssh"
+    add_depends_in_install vim-rails "pearl-ssh"
+
+    load_repo_first list_package_dependencies "ls-colors" "vim-rails"
+    assertEquals "default/ls-colors default/vim-rails default/pearl-ssh" "$(echo "${LIST_PACKAGES_DEPS[@]}")"
 }
 
 function test_pearl_package_list_empty_pattern(){
@@ -254,10 +327,10 @@ function test_pearl_module_list_not_matching(){
 
 function test_pearl_package_emerge_wrong_package(){
     local pkgname="asdf/asdf"
-    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_emerge "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_emerge "$pkgname"
 
     local pkgname="asdf"
-    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_emerge "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_emerge "$pkgname"
 }
 
 function test_pearl_package_emerge_with_install(){
@@ -304,10 +377,10 @@ function test_pearl_package_install(){
 
 function test_pearl_package_install_wrong_package(){
     local pkgname="asdf/asdf"
-    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
 
     local pkgname="asdf"
-    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_install "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_install "$pkgname"
 }
 
 function test_pearl_package_install_errors_on_hooks(){
@@ -630,10 +703,10 @@ function test_pearl_package_update(){
 
 function test_pearl_package_update_wrong_package(){
     local pkgname="asdf/asdf"
-    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 
     local pkgname="asdf"
-    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION pearl_package_update "$pkgname"
+    assertCommandFailOnStatus $NOT_IN_REPOSITORY_EXCEPTION load_repo_first pearl_package_update "$pkgname"
 }
 
 function test_pearl_package_update_url_changed(){
@@ -911,12 +984,12 @@ function test_package_full_name_from_local_with_fullname() {
 
 function test_package_full_name_from_local_null_arg() {
     scenario_generic_pkgs
-    assertCommandFailOnStatus 11 _package_full_name_from_local ""
+    assertCommandFailOnStatus 11 load_repo_first _package_full_name_from_local ""
 }
 
 function test_package_full_name_from_local_no_pkg() {
     scenario_generic_pkgs
-    _package_full_name_from_local ls-colors2
+    load_repo_first _package_full_name_from_local ls-colors2
     assertEquals 0 $?
     assertEquals "" "$RESULT"
     unset RESULT
@@ -924,7 +997,7 @@ function test_package_full_name_from_local_no_pkg() {
 
 function test_package_full_name() {
     scenario_generic_pkgs
-    _package_full_name ls-colors
+    load_repo_first _package_full_name ls-colors
     assertEquals 0 $?
     assertEquals "default/ls-colors" "${RESULT}"
     unset RESULT
@@ -932,7 +1005,7 @@ function test_package_full_name() {
 
 function test_package_full_name_with_fullname() {
     scenario_generic_pkgs
-    _package_full_name default/ls-colors
+    load_repo_first _package_full_name default/ls-colors
     assertEquals 0 $?
     assertEquals "default/ls-colors" "${RESULT}"
     unset RESULT
@@ -994,7 +1067,7 @@ function test_get_list_installed_packages_empty() {
 
 function test_get_list_uninstalled_packages() {
     scenario_generic_pkgs
-    get_list_uninstalled_packages ".*"
+    load_repo_first get_list_uninstalled_packages ".*"
     assertEquals 0 $?
     assertEquals "default/pearl-utils" "${RESULT[@]}"
     unset RESULT
@@ -1002,7 +1075,7 @@ function test_get_list_uninstalled_packages() {
 
 function test_get_list_uninstalled_packages_with_pattern() {
     scenario_generic_pkgs
-    get_list_uninstalled_packages "pearl"
+    load_repo_first get_list_uninstalled_packages "pearl"
     assertEquals 0 $?
     assertEquals "default/pearl-utils" "${RESULT[@]}"
     unset RESULT
@@ -1010,7 +1083,7 @@ function test_get_list_uninstalled_packages_with_pattern() {
 
 function test_get_list_uninstalled_packages_no_pattern() {
     scenario_generic_pkgs
-    get_list_uninstalled_packages ""
+    load_repo_first get_list_uninstalled_packages ""
     assertEquals 0 $?
     assertEquals "default/pearl-utils" "${RESULT[@]}"
     unset RESULT
@@ -1018,7 +1091,7 @@ function test_get_list_uninstalled_packages_no_pattern() {
 
 function test_get_list_uninstalled_packages_no_match() {
     scenario_generic_pkgs
-    get_list_uninstalled_packages "no-match"
+    load_repo_first get_list_uninstalled_packages "no-match"
     assertEquals 0 $?
     assertEquals "x" "x${RESULT[@]}"
     unset RESULT

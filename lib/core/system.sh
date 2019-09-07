@@ -129,12 +129,6 @@ function pearl_remove(){
 function pearl_update(){
     bold_cyan; echo -n "* "; normal; echo "Updating Pearl script"
     update_git_repo "$PEARL_ROOT" "master"
-
-    get_list_installed_packages
-    for pkgname in "${RESULT[@]}"
-    do
-        pearl_package_update $pkgname
-    done
-    unset RESULT
+    return 0
 }
 

@@ -77,6 +77,10 @@ function pearl_package_list(){
     echo "pearl_package_list $@"
 }
 
+function list_package_dependencies(){
+    LIST_PACKAGES_DEPS=$@
+}
+
 function pearl_wrap(){
     parse_arguments "$@"
     check_cli
