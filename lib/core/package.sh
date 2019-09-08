@@ -172,7 +172,7 @@ function list_package_dependencies() {
 
             if ! contains_element ${deppkgfullname} ${LIST_PACKAGES_DEPS[@]}
             then
-                local queue+=("${deppkgfullname}")
+                queue+=("${deppkgfullname}")
                 LIST_PACKAGES_DEPS+=("${deppkgfullname}")
             fi
         done
