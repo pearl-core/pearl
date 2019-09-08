@@ -1,5 +1,11 @@
 # Change Log #
 
+## [1.9.0][v190] - 2019-09-08 ##
+
+* Add `DEPENDS` variable to better control dependency packages:
+  * It make sure that general updates will not update packages more than once.
+  * For now it can be used only for updating/installing packages
+
 ## [1.8.1][v181] - 2019-07-13 ##
 
 * Update `buava`:
@@ -199,3 +205,4 @@
 [v172]: https://github.com/pearl-core/pearl/releases/tag/1.7.2
 [v180]: https://github.com/pearl-core/pearl/releases/tag/1.8.0
 [v181]: https://github.com/pearl-core/pearl/releases/tag/1.8.1
+[v190]: https://github.com/pearl-core/pearl/releases/tag/1.9.0
