@@ -3,11 +3,6 @@ Pearl
 
 Because only in the best Shells you will find a Pearl...
 
-```sh
-wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
-bash install.sh
-```
-
 <h1 align="center">
     <a href="https://github.com/pearl-core/pearl"><img
         alt="Pearl"
@@ -250,6 +245,16 @@ curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.
 
 bash install.sh
 ```
+
+**IMPORTANT NOTE**: Pearl gets loaded through `~/.bashrc`. The problem is that in OSX,
+the terminal opens a login shell and only `~/.bash_profile` will get executed.
+Run the following only if `~/.bashrc` is not loaded within `~/.bash_profile` file:
+
+```sh
+echo "[[ -f ~/.bashrc ]] && source ~/.bashrc" >> ~/.bash_profile
+```
+
+This will make sure that `~/.bashrc` will run at shell startup.
 
 Create your own Pearl package in seconds!
 ===============
