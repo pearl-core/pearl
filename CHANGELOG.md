@@ -1,5 +1,9 @@
 # Change Log #
 
+## [1.8.2][v182] - 2019-10-13 ##
+
+* Update `README.md` file
+
 ## [1.8.1][v181] - 2019-07-13 ##
 
 * Update `buava`:
@@ -199,3 +203,4 @@
 [v172]: https://github.com/pearl-core/pearl/releases/tag/1.7.2
 [v180]: https://github.com/pearl-core/pearl/releases/tag/1.8.0
 [v181]: https://github.com/pearl-core/pearl/releases/tag/1.8.1
+[v182]: https://github.com/pearl-core/pearl/releases/tag/1.8.2
