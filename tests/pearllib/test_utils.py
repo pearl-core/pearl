@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy
+from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy, ask, apply, unapply, run
 
 _MODULE_UNDER_TEST = 'pearllib.utils'
 
@@ -104,3 +104,158 @@ def test_check_and_copy_not_a_dir(tmp_path):
     with pytest.raises(NotADirectoryError):
         check_and_copy(tmp_path / 'not-a-dir', tmp_path)
 
+
+@pytest.mark.parametrize(
+    'script, expected_stdout, expected_status',
+    [
+        pytest.param(
+            'echo ciao\nfalse',
+            'ciao\n',
+            1
+        ),
+        pytest.param(
+            'echo ciao',
+            'ciao\n',
+            0
+        ),
+        pytest.param(
+            'echo ciao\nasfpoji',
+            'ciao\n',
+            127
+        ),
+    ]
+)
+def test_run(script, expected_stdout, expected_status):
+    result = run(script, capture_stdout=True, check=False, capture_stderr=True)
+    assert result.stdout == expected_stdout
+    assert result.returncode == expected_status
+
+
+@pytest.mark.parametrize(
+    'answers, yes_as_default_answer, expected_result',
+    [
+       pytest.param(
+           ['Y'], False, True
+       ),
+        pytest.param(
+            ['N'], True, False
+        ),
+        pytest.param(
+            ['y'], False, True
+        ),
+        pytest.param(
+            ['n'], True, False
+        ),
+        pytest.param(
+            ['R', 'c', 'q', 'Y'], False, True
+        ),
+        pytest.param(
+            ['R', 'c', 'q', 'N'], False, False
+        ),
+        pytest.param(
+            ['R', ''], False, False
+        ),
+        pytest.param(
+            ['R', ''], True, True
+        ),
+    ]
+)
+def test_ask(answers, yes_as_default_answer, expected_result):
+    with mock.patch('builtins.input') as input_mock:
+        input_mock.side_effect = answers
+
+        assert ask('prompt', yes_as_default_answer) == expected_result
+
+
+@pytest.mark.parametrize(
+    'line, file_content, expected_result',
+    [
+        pytest.param(
+            'This should stay on top',
+            '',
+            'This should stay on top\n',
+        ),
+       pytest.param(
+           'This should stay on top',
+           'First line\nSecond line',
+           'This should stay on top\nFirst line\nSecond line',
+       ),
+        pytest.param(
+            'This should stay on top',
+            'This should stay on top\nFirst line\nSecond line',
+            'This should stay on top\nFirst line\nSecond line',
+        ),
+        pytest.param(
+            'This should stay on top',
+            'First line\nThis should stay on top\nSecond line',
+            'First line\nThis should stay on top\nSecond line',
+        ),
+    ]
+)
+def test_apply(line, file_content, expected_result, tmp_path):
+    (tmp_path / 'file').write_text(file_content)
+
+    apply(line, str(tmp_path / 'file'))
+
+    assert (tmp_path / 'file').read_text() == expected_result
+
+
+def test_apply_file_not_exist(tmp_path):
+    line = 'Add this line'
+    apply(line, str(tmp_path / 'file'))
+
+    assert (tmp_path / 'file').read_text() == line + '\n'
+
+
+def test_apply_dir_and_file_not_exist(tmp_path):
+    line = 'Add this line'
+    apply(line, str(tmp_path / 'mydir/file'))
+
+    assert (tmp_path / 'mydir/file').read_text() == line + '\n'
+
+
+@pytest.mark.parametrize(
+    'line, file_content, expected_result',
+    [
+        pytest.param(
+            'This should stay on top',
+            'First line\nSecond line',
+            'First line\nSecond line',
+        ),
+        pytest.param(
+            'This should stay on top',
+            'This should stay on top\nFirst line\nSecond line',
+            'First line\nSecond line',
+        ),
+        pytest.param(
+            'This should stay on top',
+            'First line\nSecond line\nThis should stay on top',
+            'First line\nSecond line\n',
+        ),
+        pytest.param(
+            'This should stay on top',
+            'First line\nThis should stay on top\nSecond line',
+            'First line\nSecond line',
+        ),
+    ]
+)
+def test_unapply(line, file_content, expected_result, tmp_path):
+    (tmp_path / 'file').write_text(file_content)
+
+    unapply(line, str(tmp_path / 'file'))
+
+    assert (tmp_path / 'file').read_text() == expected_result
+
+
+def test_unapply_file_not_exist(tmp_path):
+    line = 'Add this line'
+    unapply(line, str(tmp_path / 'file'))
+
+    assert not (tmp_path / 'file').exists()
+
+
+def test_unapply_dir_and_file_not_exist(tmp_path):
+    line = 'Add this line'
+    unapply(line, str(tmp_path / 'mydir/file'))
+
+    assert not (tmp_path / 'file').exists()

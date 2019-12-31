@@ -1,15 +1,15 @@
 import logging
+import re
 import shutil
-import subprocess
 from pathlib import Path
 from textwrap import dedent
 
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
     PackageNotInstalledError
 from pearllib.pearlenv import PearlEnvironment, Package
-from pearllib.utils import check_and_copy, run
+from pearllib.utils import check_and_copy, run, ask, Messenger, Color
 
-logger = logging.getLogger(__name__)
+messenger = Messenger()
 
 
 _HOOK_FUNCTIONS_TEMPLATE = dedent("""
@@ -98,18 +98,18 @@ def install_package(pearl_env: PearlEnvironment, package_name: str):
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
 
-    logger.info("Installing {} package".format(package))
-    package.dir.mkdir(parents=True)
+    messenger.info("Installing {} package".format(package))
+    package.dir.mkdir(parents=True, exist_ok=True)
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
         script = dedent("""
-            source /Users/filippos/pearl/trunk/pearl-python/src/buava/lib/utils.sh
+            source {pearlroot}/buava/lib/utils.sh
             install_git_repo {pkgurl} {pkgdir}
-        """).format(pkgdir=package.dir, pkgurl=package.url)
+        """).format(pearlroot=pearl_env.root, pkgdir=package.dir, pkgurl=package.url)
         run(script)
 
-    package.vardir.mkdir(parents=True)
+    package.vardir.mkdir(parents=True, exist_ok=True)
 
     _run('post_install', pearl_env, package)
 
@@ -119,11 +119,16 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
-    logger.info("Updating {} package".format(package))
-    # existing_package_url = run("")
-    # if not package.is_local() and existing_package_url != package.url:
-    #     # TODO handle the case where url has changed
-    #     pass
+    messenger.info("Updating {} package".format(package))
+    existing_package_url = run("git config remote.origin.url", capture_stdout=True)
+    if not package.is_local() and existing_package_url != package.url:
+        messenger.info("The Git URL for {} has changed from {} to {}".format(
+            package.full_name, existing_package_url, package.url
+        ))
+        if ask("Do you want to replace the package with the new repository?" "N"):
+            remove_package(pearl_env, package_name)
+            install_package(pearl_env, package_name)
+        pass
 
     _run('pre_update', pearl_env, package)
 
@@ -131,9 +136,9 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
         check_and_copy(Path(package.url), package.dir)
     else:
         script = dedent("""
-            source /Users/filippos/pearl/trunk/pearl-python/src/buava/lib/utils.sh
+            source {pearlroot}/buava/lib/utils.sh
             update_git_repo {pkgdir}
-        """).format(pkgdir=package.dir)
+        """).format(pearlroot=pearl_env.root, pkgdir=package.dir)
         run(script)
 
     _run('post_update', pearl_env, package)
@@ -144,7 +149,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str):
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
-    logger.info("Removing {} package".format(package))
+    messenger.info("Removing {} package".format(package))
 
     _run('pre_remove', pearl_env, package)
 
@@ -152,3 +157,31 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str):
 
     _run('post_remove', pearl_env, package, cd_home=True)
 
+
+def list_packages(pearl_env: PearlEnvironment, pattern: str = ".*"):
+    uninstalled_packages = []
+    installed_packages = []
+    regex = re.compile('{}'.format(pattern), flags=re.IGNORECASE)
+    for _, repo_packages in pearl_env.packages.items():
+        for _, package in repo_packages.items():
+            if not regex.search(package.full_name) and not regex.search(package.description):
+                continue
+            if package.is_installed():
+                installed_packages.append(package)
+            else:
+                uninstalled_packages.append(package)
+
+    for package in uninstalled_packages + installed_packages:
+        label = "[installed]" if package.is_installed() else ""
+        messenger.print(
+            "{pink}{reponame}/{cyan}{package} {installed}{normal}".format(
+                pink=Color.PINK,
+                reponame=package.repo_name,
+                cyan=Color.CYAN,
+                package=package.name,
+                installed=label,
+                normal=Color.NORMAL,
+
+            )
+        )
+        messenger.print("    {}".format(package.description))

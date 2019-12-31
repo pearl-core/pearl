@@ -13,7 +13,6 @@ PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
 
 class Package:
-    # TODO substitute pearl_env with home only
     def __init__(self, pearl_home: Path, repo_name: str, name: str, url: str, description: str):
         self._pearl_home = pearl_home
         self._repo_name = repo_name
@@ -152,7 +151,6 @@ class PearlEnvironment:
         m.update('{}\n'.format(repo).encode())
         md5_sum = m.hexdigest()
         if not (self.home / 'repos/{}/.git'.format(md5_sum)).is_dir():
-            # TODO use colors for visualizing messages
             logger.info('Initializing {} repository...'.format(repo))
             subprocess.run(['git', 'clone', '--depth 1', '--quiet', '-C', repo,
                             '{}/repos/{}'.format(self.home, md5_sum)])
@@ -161,7 +159,5 @@ class PearlEnvironment:
             # The option -C works only for git 1.8.5 https://stackoverflow.com/a/20115678
             subprocess.run(['git', '-C', '{}/repos/{}'.format(self.home, md5_sum), 'pull', '--quiet'])
 
-        # TODO change path to:
-        # return self.home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
-        return self.home / 'repos/{}/repo.conf'.format(md5_sum)
+        return self.home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
 

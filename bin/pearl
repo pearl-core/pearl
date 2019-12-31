@@ -1,25 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
-import hashlib
-import logging
-import os
-import os.path
 import textwrap
-import subprocess
-import sys
 from pathlib import Path
 
-from pearllib.package import install_package
+from pearllib.package import install_package, list_packages, remove_package, update_package, emerge_package
 from pearllib.pearlenv import PearlEnvironment
-from pearllib.utils import verify_runtime_deps
-
-logger = logging.getLogger(__name__)
-out_hdlr = logging.StreamHandler(sys.stdout)
-out_hdlr.setFormatter(logging.Formatter('%(message)s'))
-out_hdlr.setLevel(logging.INFO)
-logger.addHandler(out_hdlr)
-logger.setLevel(logging.INFO)
+from pearllib.system import init_pearl, update_pearl, remove_pearl
+from pearllib.utils import verify_runtime_deps, Messenger
 
 
 def parse_args():
@@ -55,10 +43,9 @@ def create_main_parser():
         help="update the repositories before doing any action"
     )
     parser.add_argument(
-        # TODO think about a different name for -y
-        '-y', '--yes',
+        '-n', '--no-confirm',
         action='store_true',
-        help=""
+        help="Bypass all “Are you sure?” messages."
     )
     parser.add_argument(
         '-c', '--config-file', metavar='FILE', type=str,
@@ -113,17 +100,17 @@ def create_emerge_parser(command_parsers):
 def create_init_parser(command_parsers):
     command_parsers.add_parser(
         'init',
-        help='Init ~/.config/pearl config directory'
+        help='Init $HOME/.config/pearl config directory'
     )
 
 
 def create_search_parser(command_parsers):
-    install_parser = command_parsers.add_parser(
+    command_parser = command_parsers.add_parser(
         'search',
         help='Search the available Pearl packages that match pattern'
     )
-    install_parser.add_argument(
-        'pattern', metavar='PATTERN', type=str, nargs='+'
+    command_parser.add_argument(
+        'pattern', metavar='PATTERN', type=str
     )
 
 
@@ -144,7 +131,28 @@ if __name__ == '__main__':
         update_repos=args.update_repos
     )
 
-    if args.subparser_name == 'install':
+    if args.subparser_name == 'init':
+        init_pearl(pearl_env)
+    elif args.subparser_name == 'install':
         # TODO manage exceptions from install_package.
         for package in args.packages:
             install_package(pearl_env, package)
+    elif args.subparser_name == 'update':
+        if not args.packages:
+            update_pearl(pearl_env)
+            exit(0)
+        for package in args.packages:
+            update_package(pearl_env, package)
+    elif args.subparser_name == 'remove':
+        if not args.packages:
+            remove_pearl(pearl_env)
+            exit(0)
+        for package in args.packages:
+            remove_package(pearl_env, package)
+    elif args.subparser_name == 'emerge':
+        for package in args.packages:
+            emerge_package(pearl_env, package)
+    elif args.subparser_name == 'list':
+        list_packages(pearl_env)
+    elif args.subparser_name == 'search':
+        list_packages(pearl_env, args.pattern)
