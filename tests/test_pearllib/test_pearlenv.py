@@ -6,16 +6,9 @@ import pytest
 from unittest import mock
 
 from pearllib.pearlenv import PearlEnvironment, Package
+from .utils import create_pearl_env
 
 _MODULE_UNDER_TEST = 'pearllib.pearlenv'
-
-
-def create_pearl_env(root, home, config_filename):
-    with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
-        os_mock.environ = {
-            'PEARL_ROOT': str(root),
-        }
-        return PearlEnvironment(home, config_filename=config_filename)
 
 
 @pytest.mark.parametrize(
@@ -127,7 +120,7 @@ def test_load_repos_init_repo(tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess_mock:
         pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
         repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
-        assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',)) == [repo_path / 'repo.conf']
+        assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',)) == [repo_path / 'pearl-config/repo.conf']
 
         assert subprocess_mock.run.call_args[0][0] == ['git', 'clone', '--depth 1', '--quiet', '-C', 'https://github.com/pearl-hub/repo.git', str(repo_path)]
 
@@ -154,7 +147,7 @@ def test_load_repos_update_repo(update_repos, tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess_mock:
         pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
         repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
-        assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',), update_repos=update_repos) == [repo_path / 'repo.conf']
+        assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',), update_repos=update_repos) == [repo_path / 'pearl-config/repo.conf']
         if update_repos:
             assert subprocess_mock.run.call_args[0][0] == ['git', '-C', str(repo_path), 'pull', '--quiet']
         else:

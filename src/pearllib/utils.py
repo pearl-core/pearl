@@ -82,7 +82,7 @@ def check_and_copy(src_dir: Path, dst_dir: Path):
     shutil.copytree(str(src_dir), str(dst_dir))
 
 
-def run(script, capture_stdout=False, capture_stderr=False, check=True):
+def run(script: str, capture_stdout=False, capture_stderr=False, check=True):
     return subprocess.run(
         ['/usr/bin/env', 'bash', '-c', script],
         check=check,
@@ -100,7 +100,7 @@ class Color:
     PINK = "\033[1;35m"
 
 
-def ask(prompt, yes_as_default_answer=False):
+def ask(prompt: str, yes_as_default_answer=False):
     if yes_as_default_answer:
         default_answer = "Y"
         other_answer = "n"
@@ -117,7 +117,7 @@ def ask(prompt, yes_as_default_answer=False):
     return answer == "Y"
 
 
-def apply(line, filename):
+def apply(line: str, filename: str):
     path = Path(filename)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -130,14 +130,11 @@ def apply(line, filename):
             f.write("{}\n{}".format(line, content))
 
 
-def unapply(line, filename):
+def unapply(line: str, filename: str):
     path = Path(filename)
     if not path.exists():
         return
     with path.open("r+") as f:
-        writeable_content = ''
-        for fileline in f.readlines():
-            if line.strip() != fileline.strip():
-                writeable_content += fileline
+        writeable_content = f.read().replace(line + '\n', '').replace(line, "")
     with path.open("w") as f:
         f.write(writeable_content)

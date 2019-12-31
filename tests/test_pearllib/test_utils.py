@@ -175,11 +175,16 @@ def test_ask(answers, yes_as_default_answer, expected_result):
             '',
             'This should stay on top\n',
         ),
-       pytest.param(
+        pytest.param(
+            'This should\nstay on top',
+            '',
+            'This should\nstay on top\n',
+        ),
+        pytest.param(
            'This should stay on top',
            'First line\nSecond line',
            'This should stay on top\nFirst line\nSecond line',
-       ),
+        ),
         pytest.param(
             'This should stay on top',
             'This should stay on top\nFirst line\nSecond line',
@@ -223,6 +228,11 @@ def test_apply_dir_and_file_not_exist(tmp_path):
             'First line\nSecond line',
         ),
         pytest.param(
+            'This should\nstay on top',
+            'First line\nThis should\nstay on top\nSecond line',
+            'First line\nSecond line',
+        ),
+        pytest.param(
             'This should stay on top',
             'This should stay on top\nFirst line\nSecond line',
             'First line\nSecond line',
@@ -230,6 +240,11 @@ def test_apply_dir_and_file_not_exist(tmp_path):
         pytest.param(
             'This should stay on top',
             'First line\nSecond line\nThis should stay on top',
+            'First line\nSecond line\n',
+        ),
+        pytest.param(
+            'This should stay on top',
+            'First line\nSecond line\nThis should stay on top\n',
             'First line\nSecond line\n',
         ),
         pytest.param(

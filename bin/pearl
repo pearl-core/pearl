@@ -121,7 +121,10 @@ def create_list_parser(command_parsers):
     )
 
 
-if __name__ == '__main__':
+# TODO 1 test this module
+# TODO 3 organize package structure buava/etc ...
+# TODO 5 add documentation to all functions/classes
+def main():
     verify_runtime_deps()
 
     args = parse_args()
@@ -134,7 +137,7 @@ if __name__ == '__main__':
     if args.subparser_name == 'init':
         init_pearl(pearl_env)
     elif args.subparser_name == 'install':
-        # TODO manage exceptions from install_package.
+        # TODO 2 manage exceptions from install_package.
         for package in args.packages:
             install_package(pearl_env, package)
     elif args.subparser_name == 'update':
@@ -156,3 +159,7 @@ if __name__ == '__main__':
         list_packages(pearl_env)
     elif args.subparser_name == 'search':
         list_packages(pearl_env, args.pattern)
+
+
+if __name__ == '__main__':
+    main()

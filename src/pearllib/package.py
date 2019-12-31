@@ -22,12 +22,12 @@ set -e -o pipefail
 COREUTILS_GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
 [[ -d "$COREUTILS_GNUBIN" ]] && PATH="$COREUTILS_GNUBIN:$PATH"
 
-PEARL_ROOT={pearlroot}
-PEARL_HOME={pearlhome}
-PEARL_PKGDIR={pkgdir}
-PEARL_PKGVARDIR={vardir}
-PEARL_PKGNAME={pkgname}
-PEARL_PKGREPONAME={reponame}
+PEARL_ROOT="{pearlroot}"
+PEARL_HOME="{pearlhome}"
+PEARL_PKGDIR="{pkgdir}"
+PEARL_PKGVARDIR="{vardir}"
+PEARL_PKGNAME="{pkgname}"
+PEARL_PKGREPONAME="{reponame}"
 
 cd "$PEARL_HOME"
 
@@ -45,7 +45,7 @@ INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
 
 
 def _run(script, pearl_env: PearlEnvironment, package: Package, cd_home=False):
-    _HOOK_FUNCTIONS_TEMPLATE.format(
+    hooktemplate = _HOOK_FUNCTIONS_TEMPLATE.format(
         pearlroot=pearl_env.root,
         pearlhome=pearl_env.home,
         pkgdir=package.dir,
@@ -55,7 +55,7 @@ def _run(script, pearl_env: PearlEnvironment, package: Package, cd_home=False):
     )
     cd = 'cd "$PEARL_HOME"' if cd_home else 'cd "$PEARL_PKGDIR"'
     script = '{hooktemplate}\n{cd}\n{script}'.format(
-        hooktemplate=_HOOK_FUNCTIONS_TEMPLATE,
+        hooktemplate=hooktemplate,
         cd=cd,
         script=script,
     )
@@ -93,7 +93,7 @@ def emerge_package(pearl_env: PearlEnvironment, package_name: str):
 
 
 def install_package(pearl_env: PearlEnvironment, package_name: str):
-    # TODO add more tests!
+    # TODO 4 add more tests!
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))

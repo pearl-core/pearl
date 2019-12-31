@@ -1,5 +1,6 @@
 from unittest import mock
 
+from pearllib.pearlenv import PearlEnvironment
 from pearllib.system import init_pearl, remove_pearl, update_pearl
 
 _MODULE_UNDER_TEST = 'pearllib.system'
@@ -8,7 +9,7 @@ _MODULE_UNDER_TEST = 'pearllib.system'
 def test_init(tmp_path):
     (tmp_path / 'home').mkdir(parents=True)
 
-    pearl_env = mock.Mock()
+    pearl_env = mock.Mock(spec=PearlEnvironment)
     pearl_env.home = (tmp_path / 'pearlhome')
     (pearl_env.home / 'bin').mkdir(parents=True)
     (pearl_env.home / 'bin/pearl').touch()

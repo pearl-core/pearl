@@ -31,8 +31,7 @@ def init_pearl(pearl_env: PearlEnvironment):
     if not (pearl_env.home / 'pearl.conf').exists():
         shutil.copyfile(str(pearl_env.root / 'etc/pearl.conf.template'), str(pearl_env.home / 'pearl.conf'))
 
-    apply("source ${PEARL_ROOT}/boot/sh/pearl.sh", "{}/.bashrc".format(os.environ['HOME']))
-    apply("export PEARL_ROOT={}".format(pearl_env.root), "{}/.bashrc".format(os.environ['HOME']))
+    apply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.bashrc".format(os.environ['HOME']))
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Bash'.format(
             cyan=Color.CYAN,
@@ -40,8 +39,7 @@ def init_pearl(pearl_env: PearlEnvironment):
         )
     )
 
-    apply("source ${PEARL_ROOT}/boot/sh/pearl.sh", "{}/.zshrc".format(os.environ['HOME']))
-    apply("export PEARL_ROOT={}".format(pearl_env.root), "{}/.zshrc".format(os.environ['HOME']))
+    apply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.zshrc".format(os.environ['HOME']))
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Zsh'.format(
             cyan=Color.CYAN,
@@ -49,8 +47,7 @@ def init_pearl(pearl_env: PearlEnvironment):
         )
     )
 
-    apply("source ${PEARL_ROOT}/boot/fish/pearl.fish", '{}/.config/fish/config.fish'.format(os.environ['HOME']))
-    apply("set -x PEARL_ROOT {}".format(pearl_env.root), '{}/.config/fish/config.fish'.format(os.environ['HOME']))
+    apply("set -x PEARL_ROOT {}\nsource ${{PEARL_ROOT}}/boot/fish/pearl.fish".format(pearl_env.root), '{}/.config/fish/config.fish'.format(os.environ['HOME']))
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Fish shell'.format(
             cyan=Color.CYAN,
@@ -89,8 +86,7 @@ def remove_pearl(pearl_env: PearlEnvironment):
                     remove_package(pearl_env, package.full_name)
 
     if ask("Are you sure to REMOVE all the Pearl hooks?", "N"):
-        unapply("source ${PEARL_ROOT}/boot/sh/pearl.sh", "{}/.bashrc".format(os.environ['HOME']))
-        unapply("export PEARL_ROOT={}".format(pearl_env.root), "{}/.bashrc".format(os.environ['HOME']))
+        unapply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.bashrc".format(os.environ['HOME']))
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Bash'.format(
                 cyan=Color.CYAN,
@@ -98,8 +94,7 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-        unapply("source ${PEARL_ROOT}/boot/sh/pearl.sh", "{}/.zshrc".format(os.environ['HOME']))
-        unapply("export PEARL_ROOT={}".format(pearl_env.root), "{}/.zshrc".format(os.environ['HOME']))
+        unapply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.zshrc".format(os.environ['HOME']))
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Zsh'.format(
                 cyan=Color.CYAN,
@@ -107,8 +102,7 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-        unapply("source ${PEARL_ROOT}/boot/fish/pearl.fish", '{}/.config/fish/config.fish'.format(os.environ['HOME']))
-        unapply("set -x PEARL_ROOT {}".format(pearl_env.root), '{}/.config/fish/config.fish'.format(os.environ['HOME']))
+        unapply("set -x PEARL_ROOT {}\nsource ${{PEARL_ROOT}}/boot/fish/pearl.fish".format(pearl_env.root), '{}/.config/fish/config.fish'.format(os.environ['HOME']))
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Fish shell'.format(
                 cyan=Color.CYAN,
