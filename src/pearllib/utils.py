@@ -35,7 +35,9 @@ messenger = Messenger()
 
 def verify_git_dep():
     git_version_min = 'git version 1.8.5'
-    git_status, git_version = subprocess.getstatusoutput('git version')
+    obj = run("git version", capture_stdout=True, check=False)
+    git_version = obj.stdout.strip() if obj.stdout else None
+    git_status = obj.returncode
     if git_status == 127:
         raise EnvironmentError('The command git has not been found. Exiting...')
 
@@ -52,7 +54,9 @@ def verify_git_dep():
 
 def verify_bash_dep():
     bash_version_min = "4.1"
-    bash_status, bash_version = subprocess.getstatusoutput('bash -c "echo $BASH_VERSION"')
+    obj = run("echo $BASH_VERSION", capture_stdout=True, check=False)
+    bash_version = obj.stdout.strip() if obj.stdout else None
+    bash_status = obj.returncode
     if bash_status == 127:
         raise EnvironmentError('The command bash has not been found. Exiting...')
     if bash_version is None:

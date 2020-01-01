@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError
+from pearllib.exceptions import RepoDoesNotExistError, PearlNotInRepoError, PearlAlreadyInstalledError
 from pearllib.package import install_package
 from pearllib.pearlenv import Package, PearlEnvironment
 from test_pearllib.utils import create_pearl_env
@@ -73,10 +73,10 @@ PEARL_PACKAGES = {
 }
     """)
     pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
-    with pytest.raises(PackageNotInRepoError):
+    with pytest.raises(PearlNotInRepoError):
         install_package(pearl_env, 'test/pkg-test')
 
-    with pytest.raises(PackageNotInRepoError):
+    with pytest.raises(PearlNotInRepoError):
         install_package(pearl_env, 'pkg-test')
 
 
@@ -97,6 +97,6 @@ PEARL_PACKAGES = {
 }
     """)
     pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
-    with pytest.raises(PackageAlreadyInstalledError):
+    with pytest.raises(PearlAlreadyInstalledError):
         install_package(pearl_env, 'test/test-pkg')
 

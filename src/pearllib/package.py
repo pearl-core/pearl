@@ -4,12 +4,10 @@ import shutil
 from pathlib import Path
 from textwrap import dedent
 
-from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
-    PackageNotInstalledError
+from pearllib.exceptions import PearlNotInRepoError, PearlAlreadyInstalledError, RepoDoesNotExistError, \
+    PearlNotInstalledError
 from pearllib.pearlenv import PearlEnvironment, Package
-from pearllib.utils import check_and_copy, run, ask, Messenger, Color
-
-messenger = Messenger()
+from pearllib.utils import check_and_copy, run, ask, messenger, Color
 
 
 _HOOK_FUNCTIONS_TEMPLATE = dedent("""
@@ -68,7 +66,7 @@ def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: st
     if repo_name not in pearl_env.packages:
         raise RepoDoesNotExistError('Skipping {} as {} repository does not exist.'.format(package_full_name, repo_name))
     if short_package_name not in pearl_env.packages[repo_name]:
-        raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_full_name))
+        raise PearlNotInRepoError('Skipping {} is not in the repositories.'.format(package_full_name))
 
     return pearl_env.packages[repo_name][short_package_name]
 
@@ -81,7 +79,7 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
         if package_name in repo_packages:
             return repo_packages[package_name]
 
-    raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
+    raise PearlNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
 
 def emerge_package(pearl_env: PearlEnvironment, package_name: str):
@@ -96,7 +94,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str):
     # TODO 4 add more tests!
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
-        raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
+        raise PearlAlreadyInstalledError('Skipping {} is already installed.'.format(package))
 
     messenger.info("Installing {} package".format(package))
     package.dir.mkdir(parents=True, exist_ok=True)
@@ -117,7 +115,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str):
 def update_package(pearl_env: PearlEnvironment, package_name: str):
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
-        raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
+        raise PearlNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
     messenger.info("Updating {} package".format(package))
     existing_package_url = run("git config remote.origin.url", capture_stdout=True)
@@ -147,7 +145,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
 def remove_package(pearl_env: PearlEnvironment, package_name: str):
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
-        raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
+        raise PearlNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
     messenger.info("Removing {} package".format(package))
 

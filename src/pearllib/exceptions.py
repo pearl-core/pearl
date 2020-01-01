@@ -1,15 +1,25 @@
 
-class RepoDoesNotExistError(RuntimeError):
-    pass
+class PearlError(RuntimeError):
+    def __init__(self, message, exit_status):
+        super().__init__(message)
+        self.exit_status = exit_status
 
 
-class PackageNotInRepoError(RuntimeError):
-    pass
+class RepoDoesNotExistError(PearlError):
+    def __init__(self, message):
+        super().__init__(message, 105)
 
 
-class PackageAlreadyInstalledError(RuntimeError):
-    pass
+class PearlNotInRepoError(PearlError):
+    def __init__(self, message):
+        super().__init__(message, 104)
 
 
-class PackageNotInstalledError(RuntimeError):
-    pass
+class PearlAlreadyInstalledError(PearlError):
+    def __init__(self, message):
+        super().__init__(message, 102)
+
+
+class PearlNotInstalledError(PearlError):
+    def __init__(self, message):
+        super().__init__(message, 103)

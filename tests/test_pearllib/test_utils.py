@@ -38,14 +38,20 @@ _MODULE_UNDER_TEST = 'pearllib.utils'
 )
 def test_verify_bash_dep(bash_st, bash_ver, expected_result):
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess:
-        subprocess.getstatusoutput.return_value = bash_st, bash_ver
+        sub_mock = mock.Mock()
+        sub_mock.stdout = bash_ver
+        sub_mock.returncode = bash_st
+        subprocess.run.return_value = sub_mock
         assert verify_bash_dep() == expected_result
 
 
 def test_bash_command_not_found():
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess:
         with pytest.raises(EnvironmentError):
-            subprocess.getstatusoutput.return_value = 127, 'bash'
+            sub_mock = mock.Mock()
+            sub_mock.stdout = 'bash'
+            sub_mock.returncode = 127
+            subprocess.run.return_value = sub_mock
             verify_bash_dep()
 
 
@@ -76,14 +82,20 @@ def test_bash_command_not_found():
 )
 def test_verify_git_dep(git_st, git_ver, expected_result):
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess:
-        subprocess.getstatusoutput.return_value = git_st, git_ver
+        sub_mock = mock.Mock()
+        sub_mock.stdout = git_ver
+        sub_mock.returncode = git_st
+        subprocess.run.return_value = sub_mock
         assert verify_git_dep() == expected_result
 
 
 def test_git_command_not_found():
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess:
         with pytest.raises(EnvironmentError):
-            subprocess.getstatusoutput.return_value = 127, 'git'
+            sub_mock = mock.Mock()
+            sub_mock.stdout = 'git'
+            sub_mock.returncode = 127
+            subprocess.run.return_value = sub_mock
             verify_git_dep()
 
 

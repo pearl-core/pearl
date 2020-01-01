@@ -1,164 +1,17 @@
 #!/usr/bin/env python
 
-import argparse
-import textwrap
+import os
+import sys
 from pathlib import Path
 
-from pearllib.package import install_package, list_packages, remove_package, update_package, emerge_package
-from pearllib.pearlenv import PearlEnvironment
-from pearllib.system import init_pearl, update_pearl, remove_pearl
-from pearllib.utils import verify_runtime_deps, Messenger
+from pearllib.pearl import pearl
 
 
-def parse_args():
-    parser = create_main_parser()
-
-    command_parsers = parser.add_subparsers(
-        help='For command help: %(prog)s COMMAND --help',
-        title='commands',
-        dest='subparser_name'
-    )
-
-    create_install_parser(command_parsers)
-    create_update_parser(command_parsers)
-    create_remove_parser(command_parsers)
-    create_emerge_parser(command_parsers)
-    create_init_parser(command_parsers)
-    create_search_parser(command_parsers)
-    create_list_parser(command_parsers)
-
-    args = parser.parse_args()
-    return args
-
-
-def create_main_parser():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        description=textwrap.dedent("""
-        Pearl: Because only in the best shells you will find a Pearl...
-        """))
-    parser.add_argument(
-        '-u', '--update-repos',
-        action='store_true',
-        help="update the repositories before doing any action"
-    )
-    parser.add_argument(
-        '-n', '--no-confirm',
-        action='store_true',
-        help="Bypass all “Are you sure?” messages."
-    )
-    parser.add_argument(
-        '-c', '--config-file', metavar='FILE', type=str,
-        default=None,
-        help="location of the pearl config path. Defaults to $HOME/.config/pearl/pearl.conf"
-    )
-    parser.add_argument('--verbose', '-v', action='count', default=0, help="increase output verbosity")
-    parser.add_argument('--version', '-V', action='version', version='%(prog)s 2.0')
-    return parser
-
-
-def create_install_parser(command_parsers):
-    install_parser = command_parsers.add_parser(
-        'install',
-        help='Install the packages'
-    )
-    install_parser.add_argument(
-        'packages', metavar='[REPO/]PACKAGE', type=str, nargs='+'
-    )
-
-
-def create_update_parser(command_parsers):
-    update_parser = command_parsers.add_parser(
-        'update',
-        help='Update Pearl or the packages if specified'
-    )
-    update_parser.add_argument(
-        'packages', metavar='[REPO/]PACKAGE', type=str, nargs='*'
-    )
-
-
-def create_remove_parser(command_parsers):
-    remove_parser = command_parsers.add_parser(
-        'remove',
-        help='Remove Pearl or the packages if specified'
-    )
-    remove_parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='*'
-    )
-
-
-def create_emerge_parser(command_parsers):
-    emerge_parser = command_parsers.add_parser(
-        'emerge',
-        help='Update Pearl or install/update the packages if specified'
-    )
-    emerge_parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='*'
-    )
-
-
-def create_init_parser(command_parsers):
-    command_parsers.add_parser(
-        'init',
-        help='Init $HOME/.config/pearl config directory'
-    )
-
-
-def create_search_parser(command_parsers):
-    command_parser = command_parsers.add_parser(
-        'search',
-        help='Search the available Pearl packages that match pattern'
-    )
-    command_parser.add_argument(
-        'pattern', metavar='PATTERN', type=str
-    )
-
-
-def create_list_parser(command_parsers):
-    command_parsers.add_parser(
-        'list',
-        help='List all the available Pearl packages'
-    )
-
-
-# TODO 1 test this module
 # TODO 3 organize package structure buava/etc ...
 # TODO 5 add documentation to all functions/classes
 def main():
-    verify_runtime_deps()
-
-    args = parse_args()
-
-    pearl_env = PearlEnvironment(
-        config_filename=Path(args.config_file) if args.config_file is not None else None,
-        update_repos=args.update_repos
-    )
-
-    if args.subparser_name == 'init':
-        init_pearl(pearl_env)
-    elif args.subparser_name == 'install':
-        # TODO 2 manage exceptions from install_package.
-        for package in args.packages:
-            install_package(pearl_env, package)
-    elif args.subparser_name == 'update':
-        if not args.packages:
-            update_pearl(pearl_env)
-            exit(0)
-        for package in args.packages:
-            update_package(pearl_env, package)
-    elif args.subparser_name == 'remove':
-        if not args.packages:
-            remove_pearl(pearl_env)
-            exit(0)
-        for package in args.packages:
-            remove_package(pearl_env, package)
-    elif args.subparser_name == 'emerge':
-        for package in args.packages:
-            emerge_package(pearl_env, package)
-    elif args.subparser_name == 'list':
-        list_packages(pearl_env)
-    elif args.subparser_name == 'search':
-        list_packages(pearl_env, args.pattern)
+    pearl_root_dir = Path(os.path.dirname(os.path.realpath(__file__)) + '/..').resolve()
+    pearl(sys.argv[1:], pearl_root_dir)
 
 
 if __name__ == '__main__':

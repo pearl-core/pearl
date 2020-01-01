@@ -4,9 +4,7 @@ from textwrap import dedent
 
 from pearllib.package import remove_package, update_package
 from pearllib.pearlenv import PearlEnvironment
-from pearllib.utils import Messenger, Color, apply, ask, unapply, run
-
-messenger = Messenger()
+from pearllib.utils import messenger, Color, apply, ask, unapply, run
 
 
 def init_pearl(pearl_env: PearlEnvironment):

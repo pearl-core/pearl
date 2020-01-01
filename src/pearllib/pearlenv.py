@@ -62,9 +62,9 @@ class Package:
 
 
 class PearlEnvironment:
-    def __init__(self, home: Path = None, config_filename: Path = None, update_repos: bool = False):
+    def __init__(self, home: Path = None, root: Path = None, config_filename: Path = None, update_repos: bool = False):
         self._home = self._get_home(home)
-        self._root = self._get_root()
+        self._root = self._get_root(root)
 
         self.config_filename = self._get_config_filename(self._home, config_filename)
 
@@ -83,7 +83,7 @@ class PearlEnvironment:
         return self._packages
 
     @staticmethod
-    def _get_home(home: Path=None):
+    def _get_home(home: Path = None):
         if home is None:
             default_home = '{}/.config/pearl'.format(os.environ['HOME'])
             home = Path(os.environ.get('PEARL_HOME', default_home))
@@ -96,8 +96,9 @@ class PearlEnvironment:
         return home
 
     @staticmethod
-    def _get_root():
-        root = Path(os.environ['PEARL_ROOT'])
+    def _get_root(root: Path = None):
+        if root is None:
+            root = Path(os.environ['PEARL_ROOT'])
 
         if not root.is_dir():
             msg = 'Error: The value in environment variable PEARL_ROOT is not a directory: {}'.format(root)
