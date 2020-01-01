@@ -7,7 +7,8 @@ from pathlib import Path
 from pearllib.pearl import pearl
 
 
-# TODO 5 add documentation to all functions/classes
+# TODO 4 revisit tests from the ones in the legacy pearl codebase
+# TODO 3 add documentation to all functions/classes
 def main():
     pearl_root_dir = Path(os.path.dirname(os.path.realpath(__file__)) + '/..').resolve()
     pearl(sys.argv[1:], pearl_root_dir)

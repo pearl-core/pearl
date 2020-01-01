@@ -5,21 +5,26 @@ class PearlError(RuntimeError):
         self.exit_status = exit_status
 
 
+class HookFunctionError(PearlError):
+    def __init__(self, message):
+        super().__init__(message, 101)
+
+
 class RepoDoesNotExistError(PearlError):
     def __init__(self, message):
         super().__init__(message, 105)
 
 
-class PearlNotInRepoError(PearlError):
+class PackageNotInRepoError(PearlError):
     def __init__(self, message):
         super().__init__(message, 104)
 
 
-class PearlAlreadyInstalledError(PearlError):
+class PackageAlreadyInstalledError(PearlError):
     def __init__(self, message):
         super().__init__(message, 102)
 
 
-class PearlNotInstalledError(PearlError):
+class PackageNotInstalledError(PearlError):
     def __init__(self, message):
         super().__init__(message, 103)

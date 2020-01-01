@@ -4,8 +4,8 @@ import shutil
 from pathlib import Path
 from textwrap import dedent
 
-from pearllib.exceptions import PearlNotInRepoError, PearlAlreadyInstalledError, RepoDoesNotExistError, \
-    PearlNotInstalledError
+from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
+    PackageNotInstalledError, HookFunctionError
 from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import check_and_copy, run, ask, messenger, Color
 
@@ -67,7 +67,7 @@ def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: st
     if repo_name not in pearl_env.packages:
         raise RepoDoesNotExistError('Skipping {} as {} repository does not exist.'.format(package_full_name, repo_name))
     if short_package_name not in pearl_env.packages[repo_name]:
-        raise PearlNotInRepoError('Skipping {} is not in the repositories.'.format(package_full_name))
+        raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_full_name))
 
     return pearl_env.packages[repo_name][short_package_name]
 
@@ -80,7 +80,7 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
         if package_name in repo_packages:
             return repo_packages[package_name]
 
-    raise PearlNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
+    raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
 
 def emerge_package(pearl_env: PearlEnvironment, package_name: str):
@@ -92,10 +92,10 @@ def emerge_package(pearl_env: PearlEnvironment, package_name: str):
 
 
 def install_package(pearl_env: PearlEnvironment, package_name: str):
-    # TODO 4 add more tests!
+    # TODO 1 add more tests!
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
-        raise PearlAlreadyInstalledError('Skipping {} is already installed.'.format(package))
+        raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
 
     messenger.info("Installing {} package".format(package))
     package.dir.mkdir(parents=True, exist_ok=True)
@@ -111,13 +111,17 @@ def install_package(pearl_env: PearlEnvironment, package_name: str):
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
-    _run('post_install', pearl_env, package)
+    hook = 'post_install'
+    try:
+        _run(hook, pearl_env, package)
+    except Exception as exc:
+        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
 
 def update_package(pearl_env: PearlEnvironment, package_name: str):
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
-        raise PearlNotInstalledError('Skipping {} as it has not been installed.'.format(package))
+        raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
     messenger.info("Updating {} package".format(package))
     existing_package_url = run("git config remote.origin.url", capture_stdout=True)
@@ -130,7 +134,11 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
             install_package(pearl_env, package_name)
         pass
 
-    _run('pre_update', pearl_env, package)
+    hook = 'pre_update'
+    try:
+        _run(hook, pearl_env, package)
+    except Exception as exc:
+        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
@@ -142,21 +150,33 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
         """).format(static=static, pkgdir=package.dir)
         run(script)
 
-    _run('post_update', pearl_env, package)
+    hook = 'post_update'
+    try:
+        _run(hook, pearl_env, package)
+    except Exception as exc:
+        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
 
 def remove_package(pearl_env: PearlEnvironment, package_name: str):
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
-        raise PearlNotInstalledError('Skipping {} as it has not been installed.'.format(package))
+        raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
     messenger.info("Removing {} package".format(package))
 
-    _run('pre_remove', pearl_env, package)
+    hook = 'pre_remove'
+    try:
+        _run(hook, pearl_env, package)
+    except Exception as exc:
+        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
     shutil.rmtree(str(package.dir))
 
-    _run('post_remove', pearl_env, package, cd_home=True)
+    hook = 'post_remove'
+    try:
+        _run(hook, pearl_env, package, cd_home=True)
+    except Exception as exc:
+        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
 
 def list_packages(pearl_env: PearlEnvironment, pattern: str = ".*"):

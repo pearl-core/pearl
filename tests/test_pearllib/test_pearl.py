@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from pearllib.exceptions import PearlAlreadyInstalledError
+from pearllib.exceptions import PackageAlreadyInstalledError
 from pearllib.pearl import pearl
 
 _MODULE_UNDER_TEST = 'pearllib.pearl'
@@ -135,7 +135,7 @@ def test_pearl_error(command, func_name, tmp_path):
 
         def side_eff(_, package):
             if package == 'pkg1':
-                raise PearlAlreadyInstalledError('Error!')
+                raise PackageAlreadyInstalledError('Error!')
         getattr(pack_mock, func_name).side_effect = side_eff
 
         with pytest.raises(SystemExit) as exc:

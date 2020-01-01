@@ -6,7 +6,6 @@ import pytest
 from unittest import mock
 
 from pearllib.pearlenv import PearlEnvironment, Package
-from .utils import create_pearl_env
 
 _MODULE_UNDER_TEST = 'pearllib.pearlenv'
 
@@ -111,7 +110,7 @@ PEARL_PACKAGES = {
     },
 }
 """)
-    pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
+    pearl_env = PearlEnvironment(home=pearl_home, root=pearl_root, config_filename=pearl_conf)
     assert pearl_env.packages['test']['a-test-pkg'].url == 'https://github.com/username/test-pkg'
     assert pearl_env.packages['test']['a-test-pkg'].description == 'My descr'
     assert pearl_env.packages['test']['b-test-pkg'].url == 'https://github.com/username/test-pkg'
@@ -128,7 +127,7 @@ def test_load_repos_init_repo(tmp_path):
     pearl_conf.touch()
 
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess_mock:
-        pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
+        pearl_env = PearlEnvironment(home=pearl_home, root=pearl_root, config_filename=pearl_conf)
         repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
         assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',)) == [repo_path / 'pearl-config/repo.conf']
 
@@ -155,7 +154,7 @@ def test_load_repos_update_repo(update_repos, tmp_path):
     pearl_conf.touch()
 
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess_mock:
-        pearl_env = create_pearl_env(pearl_root, pearl_home, pearl_conf)
+        pearl_env = PearlEnvironment(home=pearl_home, root=pearl_root, config_filename=pearl_conf)
         repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
         assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',), update_repos=update_repos) == [repo_path / 'pearl-config/repo.conf']
         if update_repos:

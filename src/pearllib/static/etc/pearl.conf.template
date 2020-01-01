@@ -1,12 +1,26 @@
-# vim: ft=sh
-
-# A Pearl repository is a git repository containig a list of packages.
+# A Pearl repository is a git repository containing a list of packages.
 # The following is the Official Pearl Hub repository:
-PEARL_REPOS+=("https://github.com/pearl-hub/repo.git")
+PEARL_REPOS = (
+    # TODO not-now: create the new pearl hub repo
+    "https://github.com/pearl-hub/repo2.git",
+)
 
+# The local repository name. You can assign any name you want:
+PEARL_REPO_NAME = 'local'
 
 # You can add your own Pearl packages starting from any git repository.
 # For more information on how to create your own Pearl package take a look at the README.md file.
-# Below it is an example of Pearl package definition:
-#PEARL_PACKAGES["joe-dotfiles"]="https://github.com/joe/mydotfiles.git"
-#PEARL_PACKAGES_DESCR["joe-dotfiles"]="The Joe's dotfiles"
+# Below it is an example of Pearl package definitions:
+PEARL_PACKAGES = {
+    "git-dotfiles": {
+        "url": "https://github.com/user/git-dotfiles.git",
+        "description": "My git dotfiles"
+    },
+    "local-dotfiles": {
+        "url": '/home/user/local-dotfiles/',
+        "description": "My dotfiles located in my home directory",
+    }
+}
+
+# vim: ft=python
+

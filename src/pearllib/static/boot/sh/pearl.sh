@@ -45,17 +45,6 @@ if [ "$(ls -A ${PEARL_HOME}/packages)" ]; then
             PEARL_PKGNAME=${pkgname}
             PEARL_PKGREPONAME=${reponame}
 
-            # TODO pearl-metadata directory is meant to be deprecated in the future versions
-            if [[ -e ${PEARL_PKGDIR}/pearl-metadata/config.sh ]]; then
-                source ${PEARL_PKGDIR}/pearl-metadata/config.sh
-            fi
-            if [[ -n "$BASH" ]] && [[ -e ${PEARL_PKGDIR}/pearl-metadata/config.bash ]]; then
-                source ${PEARL_PKGDIR}/pearl-metadata/config.bash
-            fi
-            if [[ -n "$ZSH_NAME" ]] && [[ -e ${PEARL_PKGDIR}/pearl-metadata/config.zsh ]]; then
-                source ${PEARL_PKGDIR}/pearl-metadata/config.zsh
-            fi
-
             if [[ -e ${PEARL_PKGDIR}/pearl-config/config.sh ]]; then
                 source ${PEARL_PKGDIR}/pearl-config/config.sh
             fi

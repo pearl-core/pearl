@@ -42,6 +42,7 @@ def _create_main_parser():
         action='store_true',
         help="update the repositories before doing any action"
     )
+    # TODO 2 handle this option:
     parser.add_argument(
         '-n', '--no-confirm',
         action='store_true',

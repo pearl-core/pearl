@@ -39,11 +39,6 @@ for reponame in $PEARL_HOME/packages/*
         set PEARL_PKGREPONAME "$reponame"
         set PEARL_PKGNAME "$pkgname"
 
-        # TODO pearl-metadata directory is meant to be deprecated in the future versions
-        if [ -e $PEARL_PKGDIR/pearl-metadata/config.fish ]
-            source $PEARL_PKGDIR/pearl-metadata/config.fish
-        end
-
         if [ -e $PEARL_PKGDIR/pearl-config/config.fish ]
             source $PEARL_PKGDIR/pearl-config/config.fish
         end
