@@ -1,5 +1,5 @@
-import logging
 import re
+import pkg_resources
 import shutil
 from pathlib import Path
 from textwrap import dedent
@@ -29,8 +29,8 @@ PEARL_PKGREPONAME="{reponame}"
 
 cd "$PEARL_HOME"
 
-source "$PEARL_ROOT"/buava/lib/utils.sh
-source "$PEARL_ROOT"/buava/lib/osx-compat.sh
+source "{static}"/buava/lib/utils.sh
+source "{static}"/buava/lib/osx-compat.sh
 
 post_install() {{ :; }}
 pre_update() {{ :; }}
@@ -50,6 +50,7 @@ def _run(script, pearl_env: PearlEnvironment, package: Package, cd_home=False):
         vardir=package.vardir,
         pkgname=package.name,
         reponame=package.repo_name,
+        static=pkg_resources.resource_filename('pearllib', 'static/'),
     )
     cd = 'cd "$PEARL_HOME"' if cd_home else 'cd "$PEARL_PKGDIR"'
     script = '{hooktemplate}\n{cd}\n{script}'.format(
@@ -101,10 +102,11 @@ def install_package(pearl_env: PearlEnvironment, package_name: str):
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
+        static = pkg_resources.resource_filename('pearllib', 'static/')
         script = dedent("""
-            source {pearlroot}/buava/lib/utils.sh
+            source {static}/buava/lib/utils.sh
             install_git_repo {pkgurl} {pkgdir}
-        """).format(pearlroot=pearl_env.root, pkgdir=package.dir, pkgurl=package.url)
+        """).format(static=static, pkgdir=package.dir, pkgurl=package.url)
         run(script)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
@@ -133,10 +135,11 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
+        static = pkg_resources.resource_filename('pearllib', 'static/')
         script = dedent("""
-            source {pearlroot}/buava/lib/utils.sh
+            source {static}/buava/lib/utils.sh
             update_git_repo {pkgdir}
-        """).format(pearlroot=pearl_env.root, pkgdir=package.dir)
+        """).format(static=static, pkgdir=package.dir)
         run(script)
 
     _run('post_update', pearl_env, package)

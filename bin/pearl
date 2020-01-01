@@ -7,7 +7,6 @@ from pathlib import Path
 from pearllib.pearl import pearl
 
 
-# TODO 3 organize package structure buava/etc ...
 # TODO 5 add documentation to all functions/classes
 def main():
     pearl_root_dir = Path(os.path.dirname(os.path.realpath(__file__)) + '/..').resolve()

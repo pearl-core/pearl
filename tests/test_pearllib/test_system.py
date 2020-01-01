@@ -1,4 +1,7 @@
+from pathlib import Path
 from unittest import mock
+
+import pkg_resources
 
 from pearllib.pearlenv import PearlEnvironment
 from pearllib.system import init_pearl, remove_pearl, update_pearl
@@ -35,11 +38,12 @@ def test_init(tmp_path):
         assert (pearl_env.home / 'bin/pearl').is_symlink()
         assert (pearl_env.home / 'pearl.conf').is_file()
 
-        assert (tmp_path / 'home/.bashrc').read_text() == "export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh\n".format(pearl_env.root)
-        assert (tmp_path / 'home/.zshrc').read_text() == "export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh\n".format(pearl_env.root)
-        assert (tmp_path / 'home/.config/fish/config.fish').read_text() == "set -x PEARL_ROOT {}\nsource ${{PEARL_ROOT}}/boot/fish/pearl.fish\n".format(pearl_env.root)
-        assert (tmp_path / 'home/.vimrc').read_text() == "source {}/boot/vim/pearl.vim\n".format(pearl_env.root)
-        assert (tmp_path / 'home/.emacs').read_text() == "source {}/boot/emacs/pearl.el\n".format(pearl_env.root)
+        static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
+        assert (tmp_path / 'home/.bashrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
+        assert (tmp_path / 'home/.zshrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
+        assert (tmp_path / 'home/.config/fish/config.fish').read_text() == "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
+        assert (tmp_path / 'home/.vimrc').read_text() == "source {}/boot/vim/pearl.vim\n".format(static)
+        assert (tmp_path / 'home/.emacs').read_text() == "source {}/boot/emacs/pearl.el\n".format(static)
 
 
 def test_remove(tmp_path):
@@ -52,20 +56,22 @@ def test_remove(tmp_path):
     pearl_env.root = (tmp_path / 'pearlroot')
     pearl_env.root.mkdir(parents=True)
 
+    static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
+
     (tmp_path / 'home/.bashrc').write_text(
-        "export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh\n".format(pearl_env.root)
+        "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
     )
     (tmp_path / 'home/.zshrc').write_text(
-        "export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh\n".format(pearl_env.root)
+        "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
     )
     (tmp_path / 'home/.config/fish/config.fish').write_text(
-        "set -x PEARL_ROOT {}\nsource ${{PEARL_ROOT}}/boot/fish/pearl.fish\n".format(pearl_env.root)
+        "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
     )
     (tmp_path / 'home/.vimrc').write_text(
-        "source {}/boot/vim/pearl.vim\n".format(pearl_env.root)
+        "source {}/boot/vim/pearl.vim\n".format(static)
     )
     (tmp_path / 'home/.emacs').write_text(
-        "source {}/boot/emacs/pearl.el\n".format(pearl_env.root)
+        "source {}/boot/emacs/pearl.el\n".format(static)
     )
 
     pearl_env.packages = {}

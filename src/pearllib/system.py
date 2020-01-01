@@ -1,6 +1,11 @@
 import os
+from pathlib import Path
+
+import pkg_resources
 import shutil
+
 from textwrap import dedent
+
 
 from pearllib.package import remove_package, update_package
 from pearllib.pearlenv import PearlEnvironment
@@ -26,10 +31,19 @@ def init_pearl(pearl_env: PearlEnvironment):
         (pearl_env.home / 'bin/pearl').unlink()
     (pearl_env.home / 'bin/pearl').symlink_to(pearl_env.root / 'bin/pearl')
 
-    if not (pearl_env.home / 'pearl.conf').exists():
-        shutil.copyfile(str(pearl_env.root / 'etc/pearl.conf.template'), str(pearl_env.home / 'pearl.conf'))
+    static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
 
-    apply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.bashrc".format(os.environ['HOME']))
+    if not (pearl_env.home / 'pearl.conf').exists():
+        pearl_conf_template = static / 'etc/pearl.conf.template'
+        shutil.copyfile(str(pearl_conf_template), str(pearl_env.home / 'pearl.conf'))
+
+    apply(
+        "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
+            pearlroot=pearl_env.root,
+            static=static,
+        ),
+        "{}/.bashrc".format(os.environ['HOME'])
+    )
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Bash'.format(
             cyan=Color.CYAN,
@@ -37,7 +51,13 @@ def init_pearl(pearl_env: PearlEnvironment):
         )
     )
 
-    apply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.zshrc".format(os.environ['HOME']))
+    apply(
+        "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
+            pearlroot=pearl_env.root,
+            static=static,
+        ),
+        "{}/.zshrc".format(os.environ['HOME'])
+    )
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Zsh'.format(
             cyan=Color.CYAN,
@@ -45,7 +65,13 @@ def init_pearl(pearl_env: PearlEnvironment):
         )
     )
 
-    apply("set -x PEARL_ROOT {}\nsource ${{PEARL_ROOT}}/boot/fish/pearl.fish".format(pearl_env.root), '{}/.config/fish/config.fish'.format(os.environ['HOME']))
+    apply(
+        "set -x PEARL_ROOT {pearlroot}\nsource {static}/boot/fish/pearl.fish".format(
+            pearlroot=pearl_env.root,
+            static=static,
+        ),
+        '{}/.config/fish/config.fish'.format(os.environ['HOME'])
+    )
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Fish shell'.format(
             cyan=Color.CYAN,
@@ -53,7 +79,12 @@ def init_pearl(pearl_env: PearlEnvironment):
         )
     )
 
-    apply("source {}/boot/vim/pearl.vim".format(pearl_env.root), "{}/.vimrc".format(os.environ['HOME']))
+    apply(
+        "source {static}/boot/vim/pearl.vim".format(
+            static=static,
+        ),
+        "{}/.vimrc".format(os.environ['HOME'])
+    )
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Vim editor'.format(
             cyan=Color.CYAN,
@@ -61,7 +92,10 @@ def init_pearl(pearl_env: PearlEnvironment):
         )
     )
 
-    apply("source {}/boot/emacs/pearl.el".format(pearl_env.root), "{}/.emacs".format(os.environ['HOME']))
+    apply(
+        "source {static}/boot/emacs/pearl.el".format(static=static),
+        "{}/.emacs".format(os.environ['HOME'])
+    )
     messenger.print(
         '{cyan}* {normal}Activated Pearl for Emacs editor'.format(
             cyan=Color.CYAN,
@@ -77,6 +111,8 @@ def init_pearl(pearl_env: PearlEnvironment):
 
 
 def remove_pearl(pearl_env: PearlEnvironment):
+    static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
+
     for repo_name, repo_packages in pearl_env.packages.items():
         if ask("Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name), "N"):
             for _, package in repo_packages.items():
@@ -84,7 +120,13 @@ def remove_pearl(pearl_env: PearlEnvironment):
                     remove_package(pearl_env, package.full_name)
 
     if ask("Are you sure to REMOVE all the Pearl hooks?", "N"):
-        unapply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.bashrc".format(os.environ['HOME']))
+        unapply(
+            "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
+                pearlroot=pearl_env.root,
+                static=static,
+            ),
+            "{}/.bashrc".format(os.environ['HOME'])
+        )
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Bash'.format(
                 cyan=Color.CYAN,
@@ -92,7 +134,13 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-        unapply("export PEARL_ROOT={}\nsource ${{PEARL_ROOT}}/boot/sh/pearl.sh".format(pearl_env.root), "{}/.zshrc".format(os.environ['HOME']))
+        unapply(
+            "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
+                pearlroot=pearl_env.root,
+                static=static,
+            ),
+            "{}/.zshrc".format(os.environ['HOME'])
+        )
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Zsh'.format(
                 cyan=Color.CYAN,
@@ -100,7 +148,13 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-        unapply("set -x PEARL_ROOT {}\nsource ${{PEARL_ROOT}}/boot/fish/pearl.fish".format(pearl_env.root), '{}/.config/fish/config.fish'.format(os.environ['HOME']))
+        unapply(
+            "set -x PEARL_ROOT {pearlroot}\nsource {static}/boot/fish/pearl.fish".format(
+                pearlroot=pearl_env.root,
+                static=static,
+            ),
+            '{}/.config/fish/config.fish'.format(os.environ['HOME'])
+        )
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Fish shell'.format(
                 cyan=Color.CYAN,
@@ -108,7 +162,10 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-        unapply("source {}/boot/vim/pearl.vim".format(pearl_env.root), "{}/.vimrc".format(os.environ['HOME']))
+        unapply(
+            "source {static}/boot/vim/pearl.vim".format(static=static),
+            "{}/.vimrc".format(os.environ['HOME'])
+        )
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Vim editor'.format(
                 cyan=Color.CYAN,
@@ -116,7 +173,10 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-        unapply("source {}/boot/emacs/pearl.el".format(pearl_env.root), "{}/.emacs".format(os.environ['HOME']))
+        unapply(
+            "source {static}/boot/emacs/pearl.el".format(static=static),
+            "{}/.emacs".format(os.environ['HOME'])
+        )
         messenger.print(
             '{cyan}* {normal}Deactivated Pearl for Emacs editor'.format(
                 cyan=Color.CYAN,
@@ -137,9 +197,12 @@ def update_pearl(pearl_env: PearlEnvironment):
             )
         )
         script = dedent("""
-            source {pearlroot}/buava/lib/utils.sh
+            source {static}/buava/lib/utils.sh
             update_git_repo {pearlroot} "master"
-        """).format(pearlroot=pearl_env.root)
+        """).format(
+            static=pkg_resources.resource_filename('pearllib', 'static/'),
+            pearlroot=pearl_env.root,
+        )
         run(script)
 
     for repo_name, repo_packages in pearl_env.packages.items():

@@ -1,0 +1,3 @@
+[submodule "src/pearllib/static/buava"]
+	path = src/pearllib/static/buava
+	url = https://github.com/fsquillace/buava

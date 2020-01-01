@@ -11,6 +11,11 @@ _MODULE_UNDER_TEST = 'pearllib.utils'
     [
         pytest.param(
             0,
+            '5.0.11(1)-release',
+            True
+        ),
+        pytest.param(
+            0,
             '4.2',
             True
         ),
