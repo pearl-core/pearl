@@ -170,7 +170,8 @@ def pearl(sys_args: list, pearl_root_dir: Path = None, pearl_home_dir: Path = No
         home=pearl_home_dir,
         root=pearl_root_dir,
         config_filename=Path(args.config_file) if args.config_file is not None else None,
-        update_repos=args.update_repos
+        update_repos=args.update_repos,
+        verbose=args.verbose,
     )
 
     try:

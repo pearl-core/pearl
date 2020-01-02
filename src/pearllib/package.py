@@ -41,7 +41,7 @@ INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
 """)
 
 
-def _run(script: str, pearl_env: PearlEnvironment, package: Package, no_confirm_input: str = None, cd_home=False):
+def _run(script: str, pearl_env: PearlEnvironment, package: Package, input: str = None, cd_home=False):
     hooktemplate = _HOOK_FUNCTIONS_TEMPLATE.format(
         pearlroot=pearl_env.root,
         pearlhome=pearl_env.home,
@@ -57,7 +57,7 @@ def _run(script: str, pearl_env: PearlEnvironment, package: Package, no_confirm_
         cd=cd,
         script=script,
     )
-    run(script, input=no_confirm_input)
+    run(script, input=input)
 
 
 def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: str) -> Package:
@@ -101,17 +101,18 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
         check_and_copy(Path(package.url), package.dir)
     else:
         static = pkg_resources.resource_filename('pearllib', 'static/')
+        quiet = "false" if options.verbose else "true"
         script = dedent("""
             source {static}/buava/lib/utils.sh
-            install_git_repo {pkgurl} {pkgdir}
-        """).format(static=static, pkgdir=package.dir, pkgurl=package.url)
+            install_git_repo {pkgurl} {pkgdir} "" {quiet}
+        """).format(static=static, pkgdir=package.dir, pkgurl=package.url, quiet=quiet)
         run(script, input='' if options.no_confirm else None)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
     hook = 'post_install'
     try:
-        _run(hook, pearl_env, package, no_confirm_input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
@@ -134,7 +135,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
 
     hook = 'pre_update'
     try:
-        _run(hook, pearl_env, package, no_confirm_input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
@@ -142,15 +143,16 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
         check_and_copy(Path(package.url), package.dir)
     else:
         static = pkg_resources.resource_filename('pearllib', 'static/')
+        quiet = "false" if options.verbose else "true"
         script = dedent("""
             source {static}/buava/lib/utils.sh
-            update_git_repo {pkgdir}
-        """).format(static=static, pkgdir=package.dir)
+            update_git_repo {pkgdir} "" {quiet}
+        """).format(static=static, pkgdir=package.dir, quiet=quiet)
         run(script, input='' if options.no_confirm else None)
 
     hook = 'post_update'
     try:
-        _run(hook, pearl_env, package, no_confirm_input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
@@ -164,7 +166,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
 
     hook = 'pre_remove'
     try:
-        _run(hook, pearl_env, package, no_confirm_input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 

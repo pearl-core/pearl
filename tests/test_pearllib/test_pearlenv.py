@@ -131,7 +131,7 @@ def test_load_repos_init_repo(tmp_path):
         repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
         assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',)) == [repo_path / 'pearl-config/repo.conf']
 
-        assert subprocess_mock.run.call_args[0][0] == ['git', 'clone', '--depth 1', '--quiet', '-C', 'https://github.com/pearl-hub/repo.git', str(repo_path)]
+        assert subprocess_mock.run.call_args[0][0] == ['git', 'clone', '--depth 1', '-C', 'https://github.com/pearl-hub/repo.git', str(repo_path), '--quiet']
 
 
 @pytest.mark.parametrize(

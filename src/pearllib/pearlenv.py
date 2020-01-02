@@ -7,6 +7,8 @@ from pathlib import Path
 
 from collections import namedtuple, OrderedDict
 
+from pearllib.utils import messenger
+
 logger = logging.getLogger(__name__)
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
@@ -66,13 +68,17 @@ class Package:
 
 
 class PearlEnvironment:
-    def __init__(self, home: Path = None, root: Path = None, config_filename: Path = None, update_repos: bool = False):
-        self._home = self._get_home(home)
-        self._root = self._get_root(root)
+    def __init__(
+            self, home: Path = None, root: Path = None,
+            config_filename: Path = None, update_repos: bool = False,
+            verbose: int = 0,
+    ):
+        self._home = self._get_home(home, verbose)
+        self._root = self._get_root(root, verbose)
 
         self.config_filename = self._get_config_filename(self._home, config_filename)
 
-        self._packages = self._load_packages(update_repos)
+        self._packages = self._load_packages(update_repos, verbose)
 
     @property
     def home(self):
@@ -87,10 +93,13 @@ class PearlEnvironment:
         return self._packages
 
     @staticmethod
-    def _get_home(home: Path = None):
+    def _get_home(home: Path = None, verbose: int = 0):
         if home is None:
             default_home = '{}/.config/pearl'.format(os.environ['HOME'])
             home = Path(os.environ.get('PEARL_HOME', default_home))
+
+        if verbose:
+            messenger.info("Found Pearl home: {}".format(home))
 
         if not home.is_dir():
             msg = 'Error: The value in environment variable PEARL_HOME is not a directory: {}'.format(home)
@@ -100,9 +109,12 @@ class PearlEnvironment:
         return home
 
     @staticmethod
-    def _get_root(root: Path = None):
+    def _get_root(root: Path = None, verbose: int = 0):
         if root is None:
             root = Path(os.environ['PEARL_ROOT'])
+
+        if verbose:
+            messenger.info("Found Pearl root: {}".format(root))
 
         if not root.is_dir():
             msg = 'Error: The value in environment variable PEARL_ROOT is not a directory: {}'.format(root)
@@ -117,16 +129,26 @@ class PearlEnvironment:
             return home / 'pearl.conf'
         return config_filename
 
-    def _load_packages(self, update_repos=False):
+    def _load_packages(self, update_repos=False, verbose: int = 0):
         packages = OrderedDict()
         config_filenames = [self.config_filename]
         while config_filenames:
             config_filename = config_filenames.pop(0)
+            if verbose:
+                messenger.info("Loading Pearl configuration: {}...".format(config_filename))
             pearl_conf = self.load_conf(config_filename)
             packages.update({
                 pearl_conf.repo_name: pearl_conf.packages
             })
-            repo_conf_filenames = self.load_repos(pearl_conf.repos, update_repos)
+            if verbose:
+                messenger.info(
+                    "Loaded Pearl configuration: {}. Repo name: {}, number of packages: {}".format(
+                        config_filename,
+                        pearl_conf.repo_name,
+                        len(pearl_conf.packages)
+                    )
+                )
+            repo_conf_filenames = self.load_repos(pearl_conf.repos, update_repos, verbose)
             config_filenames.extend(repo_conf_filenames)
         return packages
 
@@ -147,22 +169,30 @@ class PearlEnvironment:
             packages
         )
 
-    def load_repos(self, repos: list, update_repos=False):
-        return [self._load_repo(repo, update_repos) for repo in repos]
+    def load_repos(self, repos: list, update_repos=False, verbose: int = 0):
+        return [self._load_repo(repo, update_repos, verbose) for repo in repos]
 
-    def _load_repo(self, repo: str, update_repos=False):
+    def _load_repo(self, repo: str, update_repos=False, verbose: int = 0):
         m = hashlib.md5()
         # Add \n for compatibility with previous version of Pearl
         m.update('{}\n'.format(repo).encode())
         md5_sum = m.hexdigest()
         if not (self.home / 'repos/{}/.git'.format(md5_sum)).is_dir():
-            logger.info('Initializing {} repository...'.format(repo))
-            subprocess.run(['git', 'clone', '--depth 1', '--quiet', '-C', repo,
-                            '{}/repos/{}'.format(self.home, md5_sum)])
+            messenger.info('Initializing {} repository...'.format(repo))
+            clone_command = [
+                'git', 'clone', '--depth 1', '-C', repo,
+                '{}/repos/{}'.format(self.home, md5_sum)
+            ]
+            if not verbose:
+                clone_command.append('--quiet')
+            subprocess.run(clone_command)
         elif update_repos:
-            logger.info("Updating {} repository...".format(repo))
+            messenger.info("Updating {} repository...".format(repo))
             # The option -C works only for git 1.8.5 https://stackoverflow.com/a/20115678
-            subprocess.run(['git', '-C', '{}/repos/{}'.format(self.home, md5_sum), 'pull', '--quiet'])
+            pull_command = ['git', '-C', '{}/repos/{}'.format(self.home, md5_sum), 'pull']
+            if not verbose:
+                pull_command.append('--quiet')
+            subprocess.run(pull_command)
 
         return self.home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
 

@@ -196,12 +196,14 @@ def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
                 normal=Color.NORMAL,
             )
         )
+        quiet = "false" if options.verbose else "true"
         script = dedent("""
             source {static}/buava/lib/utils.sh
-            update_git_repo {pearlroot} "master"
+            update_git_repo {pearlroot} "master" {quiet}
         """).format(
             static=pkg_resources.resource_filename('pearllib', 'static/'),
             pearlroot=pearl_env.root,
+            quiet=quiet,
         )
         run(script)
 
