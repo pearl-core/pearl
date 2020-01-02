@@ -92,7 +92,6 @@ def emerge_package(pearl_env: PearlEnvironment, package_name: str):
 
 
 def install_package(pearl_env: PearlEnvironment, package_name: str):
-    # TODO 1 add more tests!
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
@@ -124,15 +123,15 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
     messenger.info("Updating {} package".format(package))
-    existing_package_url = run("git config remote.origin.url", capture_stdout=True)
-    if not package.is_local() and existing_package_url != package.url:
-        messenger.info("The Git URL for {} has changed from {} to {}".format(
-            package.full_name, existing_package_url, package.url
-        ))
-        if ask("Do you want to replace the package with the new repository?" "N"):
-            remove_package(pearl_env, package_name)
-            install_package(pearl_env, package_name)
-        pass
+    if not package.is_local():
+        existing_package_url = run("git config remote.origin.url", capture_stdout=True)
+        if existing_package_url != package.url:
+            messenger.info("The Git URL for {} has changed from {} to {}".format(
+                package.full_name, existing_package_url, package.url
+            ))
+            if ask("Do you want to replace the package with the new repository?" "N"):
+                remove_package(pearl_env, package_name)
+                install_package(pearl_env, package_name)
 
     hook = 'pre_update'
     try:
@@ -171,12 +170,6 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str):
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
     shutil.rmtree(str(package.dir))
-
-    hook = 'post_remove'
-    try:
-        _run(hook, pearl_env, package, cd_home=True)
-    except Exception as exc:
-        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
 
 def list_packages(pearl_env: PearlEnvironment, pattern: str = ".*"):
