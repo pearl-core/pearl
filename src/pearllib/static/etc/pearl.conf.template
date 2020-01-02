@@ -12,14 +12,14 @@ PEARL_REPO_NAME = 'local'
 # For more information on how to create your own Pearl package take a look at the README.md file.
 # Below it is an example of Pearl package definitions:
 PEARL_PACKAGES = {
-    "git-dotfiles": {
-        "url": "https://github.com/user/git-dotfiles.git",
-        "description": "My git dotfiles"
-    },
-    "local-dotfiles": {
-        "url": '/home/user/local-dotfiles/',
-        "description": "My dotfiles located in my home directory",
-    }
+    # "git-dotfiles": {
+    #     "url": "https://github.com/user/git-dotfiles.git",
+    #     "description": "My git dotfiles"
+    # },
+    # "local-dotfiles": {
+    #     "url": '/home/user/local-dotfiles/',
+    #     "description": "My dotfiles located in my home directory",
+    # }
 }
 
 # vim: ft=python
