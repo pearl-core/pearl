@@ -87,13 +87,14 @@ def check_and_copy(src_dir: Path, dst_dir: Path):
     shutil.copytree(str(src_dir), str(dst_dir))
 
 
-def run(script: str, capture_stdout=False, capture_stderr=False, check=True):
+def run(script: str, capture_stdout=False, capture_stderr=False, check=True, input=None):
     return subprocess.run(
         ['/usr/bin/env', 'bash', '-c', script],
         check=check,
         stdout=subprocess.PIPE if capture_stdout else None,
         stderr=subprocess.PIPE if capture_stderr else None,
-        universal_newlines=True
+        universal_newlines=True,
+        input=input,
     )
 
 

@@ -9,7 +9,6 @@ from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledEr
 from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import check_and_copy, run, ask, messenger, Color
 
-
 _HOOK_FUNCTIONS_TEMPLATE = dedent("""
 set -e -o pipefail
 
@@ -42,7 +41,7 @@ INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
 """)
 
 
-def _run(script, pearl_env: PearlEnvironment, package: Package, cd_home=False):
+def _run(script: str, pearl_env: PearlEnvironment, package: Package, no_confirm_input: str = None, cd_home=False):
     hooktemplate = _HOOK_FUNCTIONS_TEMPLATE.format(
         pearlroot=pearl_env.root,
         pearlhome=pearl_env.home,
@@ -58,7 +57,7 @@ def _run(script, pearl_env: PearlEnvironment, package: Package, cd_home=False):
         cd=cd,
         script=script,
     )
-    run(script)
+    run(script, input=no_confirm_input)
 
 
 def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: str) -> Package:
@@ -83,15 +82,15 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
     raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
 
-def emerge_package(pearl_env: PearlEnvironment, package_name: str):
+def emerge_package(pearl_env: PearlEnvironment, package_name: str, no_confirm=False):
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
-        update_package(pearl_env, package_name)
+        update_package(pearl_env, package_name, no_confirm=no_confirm)
     else:
-        install_package(pearl_env, package_name)
+        install_package(pearl_env, package_name, no_confirm=no_confirm)
 
 
-def install_package(pearl_env: PearlEnvironment, package_name: str):
+def install_package(pearl_env: PearlEnvironment, package_name: str, no_confirm=False):
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
@@ -106,18 +105,18 @@ def install_package(pearl_env: PearlEnvironment, package_name: str):
             source {static}/buava/lib/utils.sh
             install_git_repo {pkgurl} {pkgdir}
         """).format(static=static, pkgdir=package.dir, pkgurl=package.url)
-        run(script)
+        run(script, input='' if no_confirm else None)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
     hook = 'post_install'
     try:
-        _run(hook, pearl_env, package)
+        _run(hook, pearl_env, package, no_confirm_input='' if no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
 
-def update_package(pearl_env: PearlEnvironment, package_name: str):
+def update_package(pearl_env: PearlEnvironment, package_name: str, no_confirm=False):
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
@@ -135,7 +134,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
 
     hook = 'pre_update'
     try:
-        _run(hook, pearl_env, package)
+        _run(hook, pearl_env, package, no_confirm_input='' if no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
@@ -147,16 +146,16 @@ def update_package(pearl_env: PearlEnvironment, package_name: str):
             source {static}/buava/lib/utils.sh
             update_git_repo {pkgdir}
         """).format(static=static, pkgdir=package.dir)
-        run(script)
+        run(script, input='' if no_confirm else None)
 
     hook = 'post_update'
     try:
-        _run(hook, pearl_env, package)
+        _run(hook, pearl_env, package, no_confirm_input='' if no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 
 
-def remove_package(pearl_env: PearlEnvironment, package_name: str):
+def remove_package(pearl_env: PearlEnvironment, package_name: str, no_confirm=False):
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
@@ -165,7 +164,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str):
 
     hook = 'pre_remove'
     try:
-        _run(hook, pearl_env, package)
+        _run(hook, pearl_env, package, no_confirm_input='' if no_confirm else None)
     except Exception as exc:
         raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
 

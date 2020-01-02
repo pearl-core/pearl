@@ -4,7 +4,7 @@ import pytest
 
 from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError, \
     HookFunctionError, PackageNotInstalledError
-from pearllib.package import install_package, remove_package, list_packages, update_package
+from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package
 from pearllib.pearlenv import Package
 
 from .utils import create_pearl_env, create_pearl_home, create_pearl_root
@@ -34,8 +34,8 @@ class PackageBuilder:
         if is_installed:
             self._install_package(
                 install_sh_script,
-                repo_name='repo-test',
-                package_name='pkg-test',
+                repo_name=repo_name,
+                package_name=package_name,
             )
 
         package = Package(self.home_dir, repo_name, package_name, str(pkg_dir), '')
@@ -112,6 +112,35 @@ def test_install_local_package(tmp_path):
         package.name, package.repo_name
     )
     assert (home_dir / 'result').read_text() == expected_result
+
+
+def test_install_local_package_no_confirm(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    install_sh_script = """
+    post_install() {{
+        if ask "Are you sure?" "Y"
+        then
+            echo "YES" > {homedir}/result
+        else
+            echo "NO" > {homedir}/result
+        fi
+        
+        local choice=$(choose "What?" "banana" "apple" "banana" "orange")
+        echo "$choice" >> {homedir}/result
+        return 0
+    }}
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    packages = builder.build()
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    install_package(pearl_env, 'repo-test/pkg-test', no_confirm=True)
+
+    assert (home_dir / 'result').read_text() == "YES\nbanana\n"
 
 
 def test_install_package_git(tmp_path):
@@ -238,6 +267,48 @@ def test_update_local_package(tmp_path):
     assert (home_dir / 'result2').read_text() == expected_result
 
 
+def test_update_local_package_no_confirm(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    install_sh_script = """
+    pre_update() {{
+        if ask "Are you sure?" "Y"
+        then
+            echo "YES" > {homedir}/result
+        else
+            echo "NO" > {homedir}/result
+        fi
+
+        local choice=$(choose "What?" "banana" "apple" "banana" "orange")
+        echo "$choice" >> {homedir}/result
+        return 0
+    }}
+    post_update() {{
+        if ask "Are you sure?" "N"
+        then
+            echo "YES" > {homedir}/result2
+        else
+            echo "NO" > {homedir}/result2
+        fi
+
+        local choice=$(choose "What?" "orange" "apple" "banana" "orange")
+        echo "$choice" >> {homedir}/result2
+        return 0
+    }}
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    packages = builder.build()
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    update_package(pearl_env, 'repo-test/pkg-test', no_confirm=True)
+
+    assert (home_dir / 'result').read_text() == "YES\nbanana\n"
+    assert (home_dir / 'result2').read_text() == "NO\norange\n"
+
+
 def test_update_package_git_url_not_changed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     root_dir = create_pearl_root(tmp_path)
@@ -349,10 +420,32 @@ def test_update_package_not_installed(tmp_path):
         update_package(pearl_env, 'repo-test/pkg-test')
 
 
+def test_emerge_package(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, "", package_name='pkg-a-test', is_installed=False)
+    builder.add_local_package(tmp_path, "", package_name='pkg-b-test', is_installed=True)
+    packages = builder.build()
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    with mock.patch(_MODULE_UNDER_TEST + ".update_package") as update_mock, \
+            mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
+        emerge_package(pearl_env, 'repo-test/pkg-a-test')
+        assert update_mock.call_count == 0
+        assert install_mock.call_count == 1
+
+    with mock.patch(_MODULE_UNDER_TEST + ".update_package") as update_mock, \
+            mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
+        emerge_package(pearl_env, 'repo-test/pkg-b-test')
+        assert update_mock.call_count == 1
+        assert install_mock.call_count == 0
+
+
 def test_remove_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     root_dir = create_pearl_root(tmp_path)
-    (home_dir / 'packages/repo-test/pkg-test').mkdir(parents=True)
 
     install_sh_script = """
     pre_remove() {{
@@ -383,6 +476,36 @@ def test_remove_package(tmp_path):
         package.dir, package.vardir, package.name, package.repo_name
     )
     assert (home_dir / 'result').read_text() == expected_result
+
+
+def test_remove_package_no_confirm(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+
+    install_sh_script = """
+    pre_remove() {{
+        if ask "Are you sure?" "Y"
+        then
+            echo "YES" > {homedir}/result
+        else
+            echo "NO" > {homedir}/result
+        fi
+
+        local choice=$(choose "What?" "banana" "apple" "banana" "orange")
+        echo "$choice" >> {homedir}/result
+        return 0
+    }}
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    packages = builder.build()
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    remove_package(pearl_env, 'repo-test/pkg-test', no_confirm=True)
+
+    assert (home_dir / 'result').read_text() == "YES\nbanana\n"
 
 
 def test_remove_package_raise_hook(tmp_path):

@@ -110,16 +110,16 @@ def init_pearl(pearl_env: PearlEnvironment):
     messenger.print("    >> pearl list")
 
 
-def remove_pearl(pearl_env: PearlEnvironment):
+def remove_pearl(pearl_env: PearlEnvironment, no_confirm=False):
     static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
 
     for repo_name, repo_packages in pearl_env.packages.items():
-        if ask("Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name), "N"):
+        if no_confirm or ask("Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name), "N"):
             for _, package in repo_packages.items():
                 if package.is_installed():
-                    remove_package(pearl_env, package.full_name)
+                    remove_package(pearl_env, package.full_name, no_confirm=no_confirm)
 
-    if ask("Are you sure to REMOVE all the Pearl hooks?", "N"):
+    if no_confirm or ask("Are you sure to REMOVE all the Pearl hooks?", "N"):
         unapply(
             "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
                 pearlroot=pearl_env.root,
@@ -184,12 +184,12 @@ def remove_pearl(pearl_env: PearlEnvironment):
             )
         )
 
-    if ask("Are you sure to REMOVE the Pearl config $PEARL_HOME directory (NOT RECOMMENDED)?", "N"):
+    if no_confirm or ask("Are you sure to REMOVE the Pearl config $PEARL_HOME directory (NOT RECOMMENDED)?", "N"):
         shutil.rmtree(str(pearl_env.home))
 
 
-def update_pearl(pearl_env: PearlEnvironment):
-    if ask("Do you want to update Pearl main codebase located in {}?".format(pearl_env.root), "Y"):
+def update_pearl(pearl_env: PearlEnvironment, no_confirm=False):
+    if no_confirm or ask("Do you want to update Pearl main codebase located in {}?".format(pearl_env.root), "Y"):
         messenger.print(
             '{cyan}* {normal}Updating Pearl script'.format(
                 cyan=Color.CYAN,
@@ -208,4 +208,4 @@ def update_pearl(pearl_env: PearlEnvironment):
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
             if package.is_installed():
-                update_package(pearl_env, package.full_name)
+                update_package(pearl_env, package.full_name, no_confirm=no_confirm)

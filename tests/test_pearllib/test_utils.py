@@ -123,27 +123,43 @@ def test_check_and_copy_not_a_dir(tmp_path):
 
 
 @pytest.mark.parametrize(
-    'script, expected_stdout, expected_status',
+    'script, input, expected_stdout, expected_status',
     [
         pytest.param(
             'echo ciao\nfalse',
+            None,
             'ciao\n',
             1
         ),
         pytest.param(
             'echo ciao',
+            None,
             'ciao\n',
             0
         ),
         pytest.param(
             'echo ciao\nasfpoji',
+            None,
             'ciao\n',
             127
         ),
+        pytest.param(
+            'read var; echo $var\n',
+            "ciao\n",
+            'ciao\n',
+            0
+        ),
+        # No confirm
+        pytest.param(
+            'read var; [[ -z $var ]] && echo ciao; read var2; echo $var2',
+            "",
+            'ciao\n\n',
+            0
+        ),
     ]
 )
-def test_run(script, expected_stdout, expected_status):
-    result = run(script, capture_stdout=True, check=False, capture_stderr=True)
+def test_run(script, input, expected_stdout, expected_status):
+    result = run(script, input=input, capture_stdout=True, check=False, capture_stderr=True)
     assert result.stdout == expected_stdout
     assert result.returncode == expected_status
 

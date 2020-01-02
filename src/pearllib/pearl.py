@@ -42,7 +42,6 @@ def _create_main_parser():
         action='store_true',
         help="update the repositories before doing any action"
     )
-    # TODO 2 handle this option:
     parser.add_argument(
         '-n', '--no-confirm',
         action='store_true',
@@ -138,22 +137,22 @@ def _pearl(pearl_env, args):
         syst.init_pearl(pearl_env)
     elif args.subparser_name == 'install':
         for package in _package_operation(args.packages):
-            pack.install_package(pearl_env, package)
+            pack.install_package(pearl_env, package, no_confirm=args.no_confirm)
     elif args.subparser_name == 'update':
         if not args.packages:
-            syst.update_pearl(pearl_env)
+            syst.update_pearl(pearl_env, no_confirm=args.no_confirm)
         else:
             for package in _package_operation(args.packages):
-                pack.update_package(pearl_env, package)
+                pack.update_package(pearl_env, package, no_confirm=args.no_confirm)
     elif args.subparser_name == 'remove':
         if not args.packages:
-            syst.remove_pearl(pearl_env)
+            syst.remove_pearl(pearl_env, no_confirm=args.no_confirm)
         else:
             for package in _package_operation(args.packages):
-                pack.remove_package(pearl_env, package)
+                pack.remove_package(pearl_env, package, no_confirm=args.no_confirm)
     elif args.subparser_name == 'emerge':
         for package in _package_operation(args.packages):
-            pack.emerge_package(pearl_env, package)
+            pack.emerge_package(pearl_env, package, no_confirm=args.no_confirm)
     elif args.subparser_name == 'list':
         pack.list_packages(pearl_env)
     elif args.subparser_name == 'search':
