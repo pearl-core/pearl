@@ -3,7 +3,7 @@ from unittest import mock
 
 import pkg_resources
 
-from pearllib.pearlenv import PearlEnvironment
+from pearllib.pearlenv import PearlEnvironment, PearlOptions
 from pearllib.system import init_pearl, remove_pearl, update_pearl
 
 _MODULE_UNDER_TEST = 'pearllib.system'
@@ -127,7 +127,7 @@ def test_remove_no_confirm(tmp_path):
         os_mock.environ = {
             'HOME': str(tmp_path / 'home')
         }
-        remove_pearl(pearl_env, no_confirm=True)
+        remove_pearl(pearl_env, options=PearlOptions(True, 0))
 
         assert not pearl_env.home.exists()
 
@@ -163,7 +163,7 @@ def test_update_no_confirm(tmp_path):
     pearl_env.packages = {}
 
     with mock.patch(_MODULE_UNDER_TEST + '.run') as run_mock:
-        update_pearl(pearl_env, no_confirm=True)
+        update_pearl(pearl_env, options=PearlOptions(True, 0))
 
         assert run_mock.call_count == 1
 

@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
 
+PearlOptions = namedtuple('PearlOptions', ['no_confirm', 'verbose'])
+PearlOptions.__new__.__defaults__ = (False, 0)
+
+
 class Package:
     def __init__(self, pearl_home: Path, repo_name: str, name: str, url: str, description: str):
         self._pearl_home = pearl_home

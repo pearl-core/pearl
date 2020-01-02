@@ -5,7 +5,7 @@ import pytest
 from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError, \
     HookFunctionError, PackageNotInstalledError
 from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package
-from pearllib.pearlenv import Package
+from pearllib.pearlenv import Package, PearlOptions
 
 from .utils import create_pearl_env, create_pearl_home, create_pearl_root
 
@@ -138,7 +138,7 @@ def test_install_local_package_no_confirm(tmp_path):
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    install_package(pearl_env, 'repo-test/pkg-test', no_confirm=True)
+    install_package(pearl_env, 'repo-test/pkg-test', PearlOptions(no_confirm=True, verbose=False))
 
     assert (home_dir / 'result').read_text() == "YES\nbanana\n"
 
@@ -303,7 +303,7 @@ def test_update_local_package_no_confirm(tmp_path):
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    update_package(pearl_env, 'repo-test/pkg-test', no_confirm=True)
+    update_package(pearl_env, 'repo-test/pkg-test', PearlOptions(no_confirm=True, verbose=False))
 
     assert (home_dir / 'result').read_text() == "YES\nbanana\n"
     assert (home_dir / 'result2').read_text() == "NO\norange\n"
@@ -503,7 +503,7 @@ def test_remove_package_no_confirm(tmp_path):
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    remove_package(pearl_env, 'repo-test/pkg-test', no_confirm=True)
+    remove_package(pearl_env, 'repo-test/pkg-test', PearlOptions(no_confirm=True, verbose=False))
 
     assert (home_dir / 'result').read_text() == "YES\nbanana\n"
 

@@ -8,11 +8,11 @@ from textwrap import dedent
 
 
 from pearllib.package import remove_package, update_package
-from pearllib.pearlenv import PearlEnvironment
+from pearllib.pearlenv import PearlEnvironment, PearlOptions
 from pearllib.utils import messenger, Color, apply, ask, unapply, run
 
 
-def init_pearl(pearl_env: PearlEnvironment):
+def init_pearl(pearl_env: PearlEnvironment, _=PearlOptions()):
     messenger.print(
         '{cyan}* {normal}Creating Pearl configuration in {home}'.format(
             cyan=Color.CYAN,
@@ -110,16 +110,16 @@ def init_pearl(pearl_env: PearlEnvironment):
     messenger.print("    >> pearl list")
 
 
-def remove_pearl(pearl_env: PearlEnvironment, no_confirm=False):
+def remove_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
     static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
 
     for repo_name, repo_packages in pearl_env.packages.items():
-        if no_confirm or ask("Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name), "N"):
+        if options.no_confirm or ask("Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name), "N"):
             for _, package in repo_packages.items():
                 if package.is_installed():
-                    remove_package(pearl_env, package.full_name, no_confirm=no_confirm)
+                    remove_package(pearl_env, package.full_name, options=options)
 
-    if no_confirm or ask("Are you sure to REMOVE all the Pearl hooks?", "N"):
+    if options.no_confirm or ask("Are you sure to REMOVE all the Pearl hooks?", "N"):
         unapply(
             "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
                 pearlroot=pearl_env.root,
@@ -184,12 +184,12 @@ def remove_pearl(pearl_env: PearlEnvironment, no_confirm=False):
             )
         )
 
-    if no_confirm or ask("Are you sure to REMOVE the Pearl config $PEARL_HOME directory (NOT RECOMMENDED)?", "N"):
+    if options.no_confirm or ask("Are you sure to REMOVE the Pearl config $PEARL_HOME directory (NOT RECOMMENDED)?", "N"):
         shutil.rmtree(str(pearl_env.home))
 
 
-def update_pearl(pearl_env: PearlEnvironment, no_confirm=False):
-    if no_confirm or ask("Do you want to update Pearl main codebase located in {}?".format(pearl_env.root), "Y"):
+def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
+    if options.no_confirm or ask("Do you want to update Pearl main codebase located in {}?".format(pearl_env.root), "Y"):
         messenger.print(
             '{cyan}* {normal}Updating Pearl script'.format(
                 cyan=Color.CYAN,
@@ -208,4 +208,4 @@ def update_pearl(pearl_env: PearlEnvironment, no_confirm=False):
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
             if package.is_installed():
-                update_package(pearl_env, package.full_name, no_confirm=no_confirm)
+                update_package(pearl_env, package.full_name, options=options)

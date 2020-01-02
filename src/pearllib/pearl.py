@@ -6,7 +6,7 @@ import pearllib.package as pack
 import pearllib.system as syst
 from pearllib.exceptions import PearlError
 
-from pearllib.pearlenv import PearlEnvironment
+from pearllib.pearlenv import PearlEnvironment, PearlOptions
 from pearllib.utils import verify_runtime_deps, messenger
 
 
@@ -132,30 +132,32 @@ def _package_operation(packages):
         raise captured_exception
 
 
-def _pearl(pearl_env, args):
-    if args.subparser_name == 'init':
-        syst.init_pearl(pearl_env)
-    elif args.subparser_name == 'install':
+def _pearl(pearl_env: PearlEnvironment, args):
+    action = args.subparser_name
+    options = PearlOptions(args.no_confirm, args.verbose)
+    if action == 'init':
+        syst.init_pearl(pearl_env, options)
+    elif action == 'install':
         for package in _package_operation(args.packages):
-            pack.install_package(pearl_env, package, no_confirm=args.no_confirm)
-    elif args.subparser_name == 'update':
+            pack.install_package(pearl_env, package, options)
+    elif action == 'update':
         if not args.packages:
-            syst.update_pearl(pearl_env, no_confirm=args.no_confirm)
+            syst.update_pearl(pearl_env, options)
         else:
             for package in _package_operation(args.packages):
-                pack.update_package(pearl_env, package, no_confirm=args.no_confirm)
-    elif args.subparser_name == 'remove':
+                pack.update_package(pearl_env, package, options)
+    elif action == 'remove':
         if not args.packages:
-            syst.remove_pearl(pearl_env, no_confirm=args.no_confirm)
+            syst.remove_pearl(pearl_env, options)
         else:
             for package in _package_operation(args.packages):
-                pack.remove_package(pearl_env, package, no_confirm=args.no_confirm)
-    elif args.subparser_name == 'emerge':
+                pack.remove_package(pearl_env, package, options)
+    elif action == 'emerge':
         for package in _package_operation(args.packages):
-            pack.emerge_package(pearl_env, package, no_confirm=args.no_confirm)
-    elif args.subparser_name == 'list':
+            pack.emerge_package(pearl_env, package, options)
+    elif action == 'list':
         pack.list_packages(pearl_env)
-    elif args.subparser_name == 'search':
+    elif action == 'search':
         pack.list_packages(pearl_env, args.pattern)
 
 

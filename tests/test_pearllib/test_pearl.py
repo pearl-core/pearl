@@ -133,7 +133,7 @@ def test_pearl_error(command, func_name, tmp_path):
             mock.patch(_MODULE_UNDER_TEST + '.syst'), \
             mock.patch(_MODULE_UNDER_TEST + '.verify_runtime_deps') as verify_mock:
 
-        def side_eff(_, package, no_confirm=None):
+        def side_eff(_, package, options):
             if package == 'pkg1':
                 raise PackageAlreadyInstalledError('Error!')
         getattr(pack_mock, func_name).side_effect = side_eff
