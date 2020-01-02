@@ -1,5 +1,4 @@
 import hashlib
-import logging
 import os
 import subprocess
 
@@ -9,17 +8,17 @@ from collections import namedtuple, OrderedDict
 
 from pearllib.utils import messenger
 
-logger = logging.getLogger(__name__)
-
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
-
 
 PearlOptions = namedtuple('PearlOptions', ['no_confirm', 'verbose'])
 PearlOptions.__new__.__defaults__ = (False, 0)
 
 
 class Package:
-    def __init__(self, pearl_home: Path, repo_name: str, name: str, url: str, description: str):
+    def __init__(
+            self, pearl_home: Path, repo_name: str,
+            name: str, url: str, description: str
+    ):
         self._pearl_home = pearl_home
         self._repo_name = repo_name
         self._name = name
@@ -103,7 +102,7 @@ class PearlEnvironment:
 
         if not home.is_dir():
             msg = 'Error: The value in environment variable PEARL_HOME is not a directory: {}'.format(home)
-            logger.warning(msg)
+            messenger.warn(msg)
             raise ValueError(msg)
 
         return home
@@ -118,7 +117,7 @@ class PearlEnvironment:
 
         if not root.is_dir():
             msg = 'Error: The value in environment variable PEARL_ROOT is not a directory: {}'.format(root)
-            logger.warning(msg)
+            messenger.warn(msg)
             raise ValueError(msg)
 
         return root

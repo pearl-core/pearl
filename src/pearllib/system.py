@@ -9,10 +9,13 @@ from textwrap import dedent
 
 from pearllib.package import remove_package, update_package
 from pearllib.pearlenv import PearlEnvironment, PearlOptions
-from pearllib.utils import messenger, Color, apply, ask, unapply, run
+from pearllib.utils import messenger, Color, apply, ask, unapply, run_bash
 
 
 def init_pearl(pearl_env: PearlEnvironment, _=PearlOptions()):
+    """
+    Initializes the Pearl environment by setting up the PEARL_HOME configurations.
+    """
     messenger.print(
         '{cyan}* {normal}Creating Pearl configuration in {home}'.format(
             cyan=Color.CYAN,
@@ -111,6 +114,9 @@ def init_pearl(pearl_env: PearlEnvironment, _=PearlOptions()):
 
 
 def remove_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
+    """
+    Removes completely the Pearl environment.
+    """
     static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
 
     for repo_name, repo_packages in pearl_env.packages.items():
@@ -189,6 +195,7 @@ def remove_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
 
 
 def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
+    """Updates the Pearl environment."""
     if options.no_confirm or ask("Do you want to update Pearl main codebase located in {}?".format(pearl_env.root), "Y"):
         messenger.print(
             '{cyan}* {normal}Updating Pearl script'.format(
@@ -205,7 +212,7 @@ def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
             pearlroot=pearl_env.root,
             quiet=quiet,
         )
-        run(script)
+        run_bash(script)
 
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():

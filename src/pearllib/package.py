@@ -7,7 +7,7 @@ from textwrap import dedent
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
     PackageNotInstalledError, HookFunctionError
 from pearllib.pearlenv import PearlEnvironment, Package, PearlOptions
-from pearllib.utils import check_and_copy, run, ask, messenger, Color
+from pearllib.utils import check_and_copy, run_bash, ask, messenger, Color
 
 _HOOK_FUNCTIONS_TEMPLATE = dedent("""
 set -e -o pipefail
@@ -57,7 +57,7 @@ def _run(script: str, pearl_env: PearlEnvironment, package: Package, input: str 
         cd=cd,
         script=script,
     )
-    run(script, input=input)
+    run_bash(script, input=input)
 
 
 def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: str) -> Package:
@@ -83,6 +83,10 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
 
 
 def emerge_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+    """
+    Installs or updates the Pearl package.
+    This function is idempotent.
+    """
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
         update_package(pearl_env, package_name, options=options)
@@ -91,6 +95,9 @@ def emerge_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
 
 
 def install_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+    """
+    Installs the Pearl package.
+    """
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
@@ -106,7 +113,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
             source {static}/buava/lib/utils.sh
             install_git_repo {pkgurl} {pkgdir} "" {quiet}
         """).format(static=static, pkgdir=package.dir, pkgurl=package.url, quiet=quiet)
-        run(script, input='' if options.no_confirm else None)
+        run_bash(script, input='' if options.no_confirm else None)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
@@ -118,13 +125,16 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
 
 
 def update_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+    """
+    Updates the Pearl package.
+    """
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
     messenger.info("Updating {} package".format(package))
     if not package.is_local():
-        existing_package_url = run("git config remote.origin.url", capture_stdout=True)
+        existing_package_url = run_bash("git config remote.origin.url", capture_stdout=True)
         if existing_package_url != package.url:
             messenger.info("The Git URL for {} has changed from {} to {}".format(
                 package.full_name, existing_package_url, package.url
@@ -148,7 +158,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
             source {static}/buava/lib/utils.sh
             update_git_repo {pkgdir} "" {quiet}
         """).format(static=static, pkgdir=package.dir, quiet=quiet)
-        run(script, input='' if options.no_confirm else None)
+        run_bash(script, input='' if options.no_confirm else None)
 
     hook = 'post_update'
     try:
@@ -158,6 +168,9 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
 
 
 def remove_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+    """
+    Remove the Pearl package.
+    """
     package = _lookup_package(pearl_env, package_name)
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
@@ -174,6 +187,9 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
 
 
 def list_packages(pearl_env: PearlEnvironment, pattern: str = ".*", _=PearlOptions()):
+    """
+    Lists or searches Pearl packages.
+    """
     uninstalled_packages = []
     installed_packages = []
     regex = re.compile('{}'.format(pattern), flags=re.IGNORECASE)

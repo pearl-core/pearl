@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy, ask, apply, unapply, run
+from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy, ask, apply, unapply, run_bash
 
 _MODULE_UNDER_TEST = 'pearllib.utils'
 
@@ -159,7 +159,7 @@ def test_check_and_copy_not_a_dir(tmp_path):
     ]
 )
 def test_run(script, input, expected_stdout, expected_status):
-    result = run(script, input=input, capture_stdout=True, check=False, capture_stderr=True)
+    result = run_bash(script, input=input, capture_stdout=True, check=False, capture_stderr=True)
     assert result.stdout == expected_stdout
     assert result.returncode == expected_status
 

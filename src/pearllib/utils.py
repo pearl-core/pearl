@@ -36,7 +36,7 @@ messenger = Messenger()
 
 def verify_git_dep():
     git_version_min = 'git version 1.8.5'
-    obj = run("git version", capture_stdout=True, check=False)
+    obj = run_bash("git version", capture_stdout=True, check=False)
     git_version = obj.stdout.strip() if obj.stdout else None
     git_status = obj.returncode
     if git_status == 127:
@@ -55,7 +55,7 @@ def verify_git_dep():
 
 def verify_bash_dep():
     bash_version_min = "4.1"
-    obj = run("echo $BASH_VERSION", capture_stdout=True, check=False)
+    obj = run_bash("echo $BASH_VERSION", capture_stdout=True, check=False)
     bash_version = obj.stdout.strip() if obj.stdout else None
     bash_status = obj.returncode
     if bash_status == 127:
@@ -81,13 +81,20 @@ def verify_runtime_deps():
 
 
 def check_and_copy(src_dir: Path, dst_dir: Path):
+    """
+    Checks if src_dir exists and removes the dst_dir content before copying.
+    """
     if not src_dir.is_dir():
         raise NotADirectoryError('{} is not a directory'.format(src_dir))
     shutil.rmtree(str(dst_dir))
     shutil.copytree(str(src_dir), str(dst_dir))
 
 
-def run(script: str, capture_stdout=False, capture_stderr=False, check=True, input=None):
+def run_bash(
+        script: str,
+        capture_stdout=False, capture_stderr=False,
+        check=True, input=None
+):
     return subprocess.run(
         ['/usr/bin/env', 'bash', '-c', script],
         check=check,
@@ -107,6 +114,10 @@ class Color:
 
 
 def ask(prompt: str, yes_as_default_answer=False):
+    """
+    Ask a question and wait to receive an answer from stdin.
+    It returns yes_as_default_answer if no answer has been received from stdin.
+    """
     if yes_as_default_answer:
         default_answer = "Y"
         other_answer = "n"
@@ -124,6 +135,13 @@ def ask(prompt: str, yes_as_default_answer=False):
 
 
 def apply(line: str, filename: str):
+    """
+    Applies a string to a file.
+    The function is idempotent, so calling this function multiple
+    times will apply the string once.
+    If filename does not exist, the function will create the file and all its
+    parent directories (if needed).
+    """
     path = Path(filename)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -137,6 +155,13 @@ def apply(line: str, filename: str):
 
 
 def unapply(line: str, filename: str):
+    """
+    Unapply a string to a file.
+    The function is idempotent, so calling this function multiple
+    times will remove the string entirely and if the string does not exist
+    it will return successfully.
+    If filename does not exist, the function will return successfully.
+    """
     path = Path(filename)
     if not path.exists():
         return
