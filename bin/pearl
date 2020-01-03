@@ -7,7 +7,7 @@ from pathlib import Path
 from pearllib.pearl import pearl
 
 
-# TODO 4 revisit tests from the ones in the legacy pearl codebase
+# TODO 4 5 min - revisit tests from the ones in the legacy pearl codebase
 # TODO add remainig files: readme, etc
 def main():
     pearl_root_dir = Path(os.path.dirname(os.path.realpath(__file__)) + '/..').resolve()

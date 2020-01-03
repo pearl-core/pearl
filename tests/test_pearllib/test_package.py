@@ -114,6 +114,50 @@ def test_install_local_package(tmp_path):
     assert (home_dir / 'result').read_text() == expected_result
 
 
+def test_install_local_package_forced(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    install_sh_script = """
+    post_install() {{
+        return 11
+    }}
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    packages = builder.build()
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    install_package(pearl_env, 'repo-test/pkg-test', options=PearlOptions(False, 0, force=True))
+
+    # Because of rollback:
+    assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
+    assert (home_dir / 'var/repo-test/pkg-test').is_dir()
+
+
+def test_install_local_package_not_forced(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    install_sh_script = """
+    post_install() {{
+        return 11
+    }}
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    packages = builder.build()
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    with pytest.raises(HookFunctionError):
+        install_package(pearl_env, 'repo-test/pkg-test', options=PearlOptions(False, 0, force=False))
+
+    assert not (home_dir / 'packages/repo-test/pkg-test').exists()
+    assert (home_dir / 'var/repo-test/pkg-test').is_dir()
+
+
 def test_install_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     root_dir = create_pearl_root(tmp_path)
@@ -265,6 +309,34 @@ def test_update_local_package(tmp_path):
         package.name, package.repo_name
     )
     assert (home_dir / 'result2').read_text() == expected_result
+
+
+def test_update_local_package_forced(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    install_sh_script = """
+    pre_update() {{
+        return 11
+    }}
+
+    post_update() {{
+        return 12
+    }}
+
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    packages = builder.build()
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    update_package(pearl_env, 'repo-test/pkg-test', options=PearlOptions(False, 0, force=True))
+
+    with pytest.raises(HookFunctionError):
+        update_package(pearl_env, 'repo-test/pkg-test', options=PearlOptions(False, 0, force=False))
+
+    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/install.sh').is_file()
 
 
 def test_update_local_package_no_confirm(tmp_path):
@@ -478,6 +550,28 @@ def test_remove_package(tmp_path):
     assert (home_dir / 'result').read_text() == expected_result
 
 
+def test_remove_package_forced(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+
+    install_sh_script = """
+    pre_remove() {{
+        return 11
+    }}
+    """.format(homedir=home_dir)
+
+    builder = PackageBuilder(home_dir)
+    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    packages = builder.build()
+    package = packages['repo-test']['pkg-test']
+
+    pearl_env = create_pearl_env(home_dir, root_dir, packages)
+
+    remove_package(pearl_env, 'repo-test/pkg-test', options=PearlOptions(False, 0, force=True))
+
+    assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
+
+
 def test_remove_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     root_dir = create_pearl_root(tmp_path)
@@ -576,3 +670,17 @@ def test_list_packages(tmp_path):
         }
     }
     list_packages(pearl_env, 'pkg')
+
+
+def test_list_packages_not_matching(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages/repo-test/pkg-a-test').mkdir(parents=True)
+
+    pearl_env = mock.Mock()
+    pearl_env.packages = {
+        'repo-test': {
+            'pkg-a-test': Package(home_dir, 'repo-test', 'pkg-a-test', 'url', 'descr'),
+            'pkg-b-test': Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr'),
+        }
+    }
+    list_packages(pearl_env, 'pkg2')

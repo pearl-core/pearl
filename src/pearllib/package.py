@@ -108,7 +108,17 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
     try:
         _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
-        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
+        msg = "Error while performing {} hook function. Rolling back...".format(hook)
+        if options.force:
+            messenger.error("{}: {}".format(msg, exc.args))
+
+        remove_package(
+            pearl_env, package_name,
+            options=PearlOptions(options.no_confirm, options.verbose, force=True)
+        )
+        if not options.force:
+            raise HookFunctionError(msg) from exc
+
 
 
 def update_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
@@ -134,7 +144,10 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
             messenger.info("The Git URL for {} has changed from {} to {}".format(
                 package.full_name, existing_package_url, package.url
             ))
-            if ask("Do you want to replace the package with the new repository?" "N"):
+            if ask(
+                "Do you want to replace the package with the new repository?",
+                yes_as_default_answer=False
+            ):
                 remove_package(pearl_env, package_name)
                 install_package(pearl_env, package_name)
 
@@ -142,7 +155,10 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     try:
         _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
-        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
+        msg = "Error while performing {} hook function".format(hook)
+        if not options.force:
+            raise HookFunctionError(msg) from exc
+        messenger.error("{}: {}".format(msg, exc.args))
 
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
@@ -159,7 +175,10 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     try:
         _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
-        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
+        msg = "Error while performing {} hook function".format(hook)
+        if not options.force:
+            raise HookFunctionError(msg) from exc
+        messenger.error("{}: {}".format(msg, exc.args))
 
 
 def remove_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
@@ -182,7 +201,10 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     try:
         _run(hook, pearl_env, package, input='' if options.no_confirm else None)
     except Exception as exc:
-        raise HookFunctionError("Error while performing {} hook function".format(hook)) from exc
+        msg = "Error while performing {} hook function".format(hook)
+        if not options.force:
+            raise HookFunctionError(msg) from exc
+        messenger.error("{}: {}".format(msg, exc.args))
 
     shutil.rmtree(str(package.dir))
 

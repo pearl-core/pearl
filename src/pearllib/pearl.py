@@ -46,7 +46,12 @@ def _create_main_parser():
     parser.add_argument(
         '-n', '--no-confirm',
         action='store_true',
-        help="Bypass all “Are you sure?” messages."
+        help="Bypass all “Are you sure?” messages"
+    )
+    parser.add_argument(
+        '-f', '--force',
+        action='store_true',
+        help="Continue performing the action even if hooks functions fail"
     )
     parser.add_argument(
         '-c', '--config-file', metavar='FILE', type=str,
@@ -135,7 +140,7 @@ def _package_operation(packages):
 
 def _pearl(pearl_env: PearlEnvironment, args):
     action = args.subparser_name
-    options = PearlOptions(args.no_confirm, args.verbose)
+    options = PearlOptions(args.no_confirm, args.verbose, args.force)
     if action == 'init':
         syst.init_pearl(pearl_env, options)
     elif action == 'install':

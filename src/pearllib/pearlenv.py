@@ -10,8 +10,8 @@ from pearllib.messenger import messenger
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
-PearlOptions = namedtuple('PearlOptions', ['no_confirm', 'verbose'])
-PearlOptions.__new__.__defaults__ = (False, 0)
+PearlOptions = namedtuple('PearlOptions', ['no_confirm', 'verbose', 'force'])
+PearlOptions.__new__.__defaults__ = (False, 0, False)
 
 
 class Package:

@@ -123,11 +123,14 @@ def check_and_copy(src_dir: Path, dst_dir: Path):
     shutil.copytree(str(src_dir), str(dst_dir))
 
 
-def ask(prompt: str, yes_as_default_answer=False):
+def ask(prompt: str, yes_as_default_answer: bool = False, no_confirm: bool = False):
     """
     Ask a question and wait to receive an answer from stdin.
     It returns yes_as_default_answer if no answer has been received from stdin.
     """
+    if no_confirm:
+        return yes_as_default_answer
+
     if yes_as_default_answer:
         default_answer = "Y"
         other_answer = "n"
