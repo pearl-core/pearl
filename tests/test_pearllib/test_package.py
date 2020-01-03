@@ -136,28 +136,6 @@ def test_install_local_package_forced(tmp_path):
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
 
-def test_install_local_package_not_forced(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-    root_dir = create_pearl_root(tmp_path)
-    install_sh_script = """
-    post_install() {{
-        return 11
-    }}
-    """.format(homedir=home_dir)
-
-    builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
-    packages = builder.build()
-
-    pearl_env = create_pearl_env(home_dir, root_dir, packages)
-
-    with pytest.raises(HookFunctionError):
-        install_package(pearl_env, 'repo-test/pkg-test', options=PearlOptions(False, 0, force=False))
-
-    assert not (home_dir / 'packages/repo-test/pkg-test').exists()
-    assert (home_dir / 'var/repo-test/pkg-test').is_dir()
-
-
 def test_install_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     root_dir = create_pearl_root(tmp_path)
@@ -220,6 +198,10 @@ def test_install_package_raise_hook(tmp_path):
 
     with pytest.raises(HookFunctionError):
         install_package(pearl_env, 'repo-test/pkg-test')
+
+    # Because of rollback:
+    assert not (home_dir / 'packages/repo-test/pkg-test').exists()
+    assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
 
 def test_install_package_repo_not_exist(tmp_path):

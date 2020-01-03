@@ -13,13 +13,6 @@ from pearllib.pearlenv import PearlEnvironment
 _BASH_SCRIPT_HEADER_TEMPLATE = dedent("""
 set -e -o pipefail
 
-# PATH needs to be updated since GNU Coreutils is required in OSX
-# environments. Buava `osx_update_path` cannot be used because in
-# order to load osx-compat.sh file the `readlink` command is
-# required first (circular dependency).
-COREUTILS_GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
-[[ -d "$COREUTILS_GNUBIN" ]] && PATH="$COREUTILS_GNUBIN:$PATH"
-
 PEARL_ROOT="{pearlroot}"
 PEARL_HOME="{pearlhome}"
 
@@ -28,6 +21,9 @@ cd "$PEARL_HOME"
 source "{static}"/buava/lib/utils.sh
 source "{static}"/buava/lib/osx-compat.sh
 source "{static}"/builtins/utils.sh
+
+# For OSX: Update PATH with GNU coreutils, sed and grep executables
+osx_update_path
 
 """)
 

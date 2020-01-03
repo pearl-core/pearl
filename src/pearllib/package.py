@@ -120,7 +120,6 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
             raise HookFunctionError(msg) from exc
 
 
-
 def update_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
     """
     Updates the Pearl package.

@@ -1,4 +1,5 @@
 import pytest
+import os
 from unittest import mock
 
 from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy, ask, apply, unapply, run_bash, \
@@ -175,14 +176,16 @@ def test_run_pearl_bash(tmp_path):
     echo $PEARL_ROOT
     echo $PEARL_HOME
     echo $PWD
-    echo $COREUTILS_GNUBIN
+    echo $PATH
     info "Test"
     """
     result = run_pearl_bash(script, pearl_env, capture_stdout=True)
 
     assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
         root_dir, home_dir, home_dir,
-        '/usr/local/opt/coreutils/libexec/gnubin',
+        '/usr/local/opt/gnu-sed/libexec/gnubin:'
+        '/usr/local/opt/grep/libexec/gnubin:'
+        '/usr/local/opt/coreutils/libexec/gnubin:' + os.environ['PATH'],
         "\x1b[1;36mTest\x1b[0m"
     )
 
