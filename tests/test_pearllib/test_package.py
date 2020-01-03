@@ -152,7 +152,7 @@ def test_install_package_git(tmp_path):
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_bash") as run_mock:
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
         install_package(pearl_env, 'repo-test/pkg-test')
 
         assert run_mock.call_count == 2
@@ -319,7 +319,7 @@ def test_update_package_git_url_not_changed(tmp_path):
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_bash") as run_mock:
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
         run_mock.return_value = package.url
         update_package(pearl_env, 'repo-test/pkg-test')
 
@@ -335,7 +335,7 @@ def test_update_package_git_url_changed(tmp_path):
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_bash") as run_mock, \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".ask") as ask_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
@@ -349,7 +349,7 @@ def test_update_package_git_url_changed(tmp_path):
         assert install_mock.call_count == 0
         assert run_mock.call_count == 4
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_bash") as run_mock, \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".ask") as ask_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:

@@ -5,9 +5,10 @@ from pathlib import Path
 import pearllib.package as pack
 import pearllib.system as syst
 from pearllib.exceptions import PearlError
+from pearllib.messenger import messenger
 
 from pearllib.pearlenv import PearlEnvironment, PearlOptions
-from pearllib.utils import verify_runtime_deps, messenger
+from pearllib.utils import verify_runtime_deps
 
 
 def _parse_args(sys_args: list):

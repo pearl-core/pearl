@@ -6,10 +6,10 @@ import shutil
 
 from textwrap import dedent
 
-
+from pearllib.messenger import messenger, Color
 from pearllib.package import remove_package, update_package
 from pearllib.pearlenv import PearlEnvironment, PearlOptions
-from pearllib.utils import messenger, Color, apply, ask, unapply, run_bash
+from pearllib.utils import apply, ask, unapply, run_pearl_bash
 
 
 def init_pearl(pearl_env: PearlEnvironment, _=PearlOptions()):
@@ -204,15 +204,14 @@ def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
             )
         )
         quiet = "false" if options.verbose else "true"
-        script = dedent("""
-            source {static}/buava/lib/utils.sh
+        script = dedent(
+            """
             update_git_repo {pearlroot} "master" {quiet}
-        """).format(
-            static=pkg_resources.resource_filename('pearllib', 'static/'),
+            """
+        ).format(
             pearlroot=pearl_env.root,
-            quiet=quiet,
-        )
-        run_bash(script)
+            quiet=quiet)
+        run_pearl_bash(script, pearl_env, input='' if options.no_confirm else None)
 
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():

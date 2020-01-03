@@ -147,7 +147,7 @@ def test_update(tmp_path):
     pearl_env.packages = {}
 
     with mock.patch('builtins.input') as input_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.run_bash') as run_mock:
+            mock.patch(_MODULE_UNDER_TEST + '.run_pearl_bash') as run_mock:
         input_mock.return_value = 'Y'
         update_pearl(pearl_env)
 
@@ -162,7 +162,7 @@ def test_update_no_confirm(tmp_path):
 
     pearl_env.packages = {}
 
-    with mock.patch(_MODULE_UNDER_TEST + '.run_bash') as run_mock:
+    with mock.patch(_MODULE_UNDER_TEST + '.run_pearl_bash') as run_mock:
         update_pearl(pearl_env, options=PearlOptions(True, 0))
 
         assert run_mock.call_count == 1

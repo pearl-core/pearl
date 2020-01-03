@@ -6,7 +6,7 @@ from pathlib import Path
 
 from collections import namedtuple, OrderedDict
 
-from pearllib.utils import messenger
+from pearllib.messenger import messenger
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 

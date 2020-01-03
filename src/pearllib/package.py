@@ -1,35 +1,19 @@
 import re
-import pkg_resources
 import shutil
 from pathlib import Path
 from textwrap import dedent
 
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
     PackageNotInstalledError, HookFunctionError
+from pearllib.messenger import messenger, Color
 from pearllib.pearlenv import PearlEnvironment, Package, PearlOptions
-from pearllib.utils import check_and_copy, run_bash, ask, messenger, Color
+from pearllib.utils import check_and_copy, ask, run_pearl_bash
 
-_HOOK_FUNCTIONS_TEMPLATE = dedent("""
-set -e -o pipefail
-
-# PATH needs to be updated since GNU Coreutils is required in OSX
-# environments. Buava `osx_update_path` cannot be used because in
-# order to load osx-compat.sh file the `readlink` command is
-# required first (circular dependency).
-COREUTILS_GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
-[[ -d "$COREUTILS_GNUBIN" ]] && PATH="$COREUTILS_GNUBIN:$PATH"
-
-PEARL_ROOT="{pearlroot}"
-PEARL_HOME="{pearlhome}"
+_HOOK_HEADER_TEMPLATE = dedent("""
 PEARL_PKGDIR="{pkgdir}"
 PEARL_PKGVARDIR="{vardir}"
 PEARL_PKGNAME="{pkgname}"
 PEARL_PKGREPONAME="{reponame}"
-
-cd "$PEARL_HOME"
-
-source "{static}"/buava/lib/utils.sh
-source "{static}"/buava/lib/osx-compat.sh
 
 post_install() {{ :; }}
 pre_update() {{ :; }}
@@ -42,22 +26,19 @@ INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
 
 
 def _run(script: str, pearl_env: PearlEnvironment, package: Package, input: str = None, cd_home=False):
-    hooktemplate = _HOOK_FUNCTIONS_TEMPLATE.format(
-        pearlroot=pearl_env.root,
-        pearlhome=pearl_env.home,
+    hookheader = _HOOK_HEADER_TEMPLATE.format(
         pkgdir=package.dir,
         vardir=package.vardir,
         pkgname=package.name,
         reponame=package.repo_name,
-        static=pkg_resources.resource_filename('pearllib', 'static/'),
     )
     cd = 'cd "$PEARL_HOME"' if cd_home else 'cd "$PEARL_PKGDIR"'
-    script = '{hooktemplate}\n{cd}\n{script}'.format(
-        hooktemplate=hooktemplate,
+    script = '{hookheader}\n{cd}\n{script}'.format(
+        hookheader=hookheader,
         cd=cd,
         script=script,
     )
-    run_bash(script, input=input)
+    run_pearl_bash(script, pearl_env, input=input)
 
 
 def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: str) -> Package:
@@ -102,18 +83,24 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
 
-    messenger.info("Installing {} package".format(package))
+    messenger.print(
+        '{cyan}* {normal}Installing {pkg} package'.format(
+            cyan=Color.CYAN,
+            normal=Color.NORMAL,
+            pkg=package,
+        )
+    )
     package.dir.mkdir(parents=True, exist_ok=True)
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
-        static = pkg_resources.resource_filename('pearllib', 'static/')
         quiet = "false" if options.verbose else "true"
-        script = dedent("""
-            source {static}/buava/lib/utils.sh
+        script = dedent(
+            """
             install_git_repo {pkgurl} {pkgdir} "" {quiet}
-        """).format(static=static, pkgdir=package.dir, pkgurl=package.url, quiet=quiet)
-        run_bash(script, input='' if options.no_confirm else None)
+            """
+        ).format(pkgdir=package.dir, pkgurl=package.url, quiet=quiet)
+        run_pearl_bash(script, pearl_env, input='' if options.no_confirm else None)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
@@ -132,9 +119,17 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
-    messenger.info("Updating {} package".format(package))
+    messenger.print(
+        '{cyan}* {normal}Updating {pkg} package'.format(
+            cyan=Color.CYAN,
+            normal=Color.NORMAL,
+            pkg=package,
+        )
+    )
     if not package.is_local():
-        existing_package_url = run_bash("git config remote.origin.url", capture_stdout=True)
+        existing_package_url = run_pearl_bash(
+            "git config remote.origin.url", pearl_env, capture_stdout=True
+        )
         if existing_package_url != package.url:
             messenger.info("The Git URL for {} has changed from {} to {}".format(
                 package.full_name, existing_package_url, package.url
@@ -152,13 +147,13 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
-        static = pkg_resources.resource_filename('pearllib', 'static/')
         quiet = "false" if options.verbose else "true"
-        script = dedent("""
-            source {static}/buava/lib/utils.sh
+        script = dedent(
+            """
             update_git_repo {pkgdir} "" {quiet}
-        """).format(static=static, pkgdir=package.dir, quiet=quiet)
-        run_bash(script, input='' if options.no_confirm else None)
+            """
+        ).format(pkgdir=package.dir, quiet=quiet)
+        run_pearl_bash(script, pearl_env, input='' if options.no_confirm else None)
 
     hook = 'post_update'
     try:
@@ -175,7 +170,13 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
-    messenger.info("Removing {} package".format(package))
+    messenger.print(
+        '{cyan}* {normal}Removing {pkg} package'.format(
+            cyan=Color.CYAN,
+            normal=Color.NORMAL,
+            pkg=package,
+        )
+    )
 
     hook = 'pre_remove'
     try:

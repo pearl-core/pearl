@@ -1,37 +1,70 @@
-import logging
 import subprocess
 import shutil
 
 from pathlib import Path
 
-import sys
+from textwrap import dedent
+
+import pkg_resources
+
+from pearllib.messenger import messenger
+from pearllib.pearlenv import PearlEnvironment
+
+_BASH_SCRIPT_HEADER_TEMPLATE = dedent("""
+set -e -o pipefail
+
+# PATH needs to be updated since GNU Coreutils is required in OSX
+# environments. Buava `osx_update_path` cannot be used because in
+# order to load osx-compat.sh file the `readlink` command is
+# required first (circular dependency).
+COREUTILS_GNUBIN="/usr/local/opt/coreutils/libexec/gnubin"
+[[ -d "$COREUTILS_GNUBIN" ]] && PATH="$COREUTILS_GNUBIN:$PATH"
+
+PEARL_ROOT="{pearlroot}"
+PEARL_HOME="{pearlhome}"
+
+cd "$PEARL_HOME"
+
+source "{static}"/buava/lib/utils.sh
+source "{static}"/buava/lib/osx-compat.sh
+source "{static}"/builtins/utils.sh
+
+""")
 
 
-class Messenger:
-    def __init__(self):
-        self.logger = logging.getLogger('message')
-        out_hdlr = logging.StreamHandler(sys.stdout)
-        out_hdlr.setFormatter(logging.Formatter('%(message)s'))
-        out_hdlr.setLevel(logging.INFO)
-        for handler in self.logger.handlers:
-            self.logger.removeHandler(handler)
-        self.logger.addHandler(out_hdlr)
-        self.logger.setLevel(logging.INFO)
-
-    def print(self, message):
-        self.logger.info(message)
-
-    def info(self, message):
-        self.logger.info('{}{}{}'.format(Color.CYAN, message, Color.NORMAL))
-
-    def warn(self, message):
-        self.logger.warning('{}{}{}'.format(Color.YELLOW, message, Color.NORMAL))
-
-    def error(self, message):
-        self.logger.error('{}{}{}'.format(Color.RED, message, Color.NORMAL))
+def run_bash(
+        script: str,
+        capture_stdout=False, capture_stderr=False,
+        check=True, input:str = None
+):
+    return subprocess.run(
+        ['/usr/bin/env', 'bash', '-c', script],
+        check=check,
+        stdout=subprocess.PIPE if capture_stdout else None,
+        stderr=subprocess.PIPE if capture_stderr else None,
+        universal_newlines=True,
+        input=input,
+    )
 
 
-messenger = Messenger()
+def run_pearl_bash(
+        script: str, pearl_env: PearlEnvironment,
+        capture_stdout=False, capture_stderr=False,
+        check=True,
+        input: str = None,
+):
+    """Runs a bash script within the Pearl ecosystem."""
+
+    bash_header = _BASH_SCRIPT_HEADER_TEMPLATE.format(
+        pearlroot=pearl_env.root,
+        pearlhome=pearl_env.home,
+        static=pkg_resources.resource_filename('pearllib', 'static/'),
+    )
+    script = '{bashheader}\n{script}'.format(
+        bashheader=bash_header,
+        script=script,
+    )
+    return run_bash(script, capture_stdout=capture_stdout, capture_stderr=capture_stderr, check=check, input=input)
 
 
 def verify_git_dep():
@@ -88,29 +121,6 @@ def check_and_copy(src_dir: Path, dst_dir: Path):
         raise NotADirectoryError('{} is not a directory'.format(src_dir))
     shutil.rmtree(str(dst_dir))
     shutil.copytree(str(src_dir), str(dst_dir))
-
-
-def run_bash(
-        script: str,
-        capture_stdout=False, capture_stderr=False,
-        check=True, input=None
-):
-    return subprocess.run(
-        ['/usr/bin/env', 'bash', '-c', script],
-        check=check,
-        stdout=subprocess.PIPE if capture_stdout else None,
-        stderr=subprocess.PIPE if capture_stderr else None,
-        universal_newlines=True,
-        input=input,
-    )
-
-
-class Color:
-    RED = "\033[1;31m"
-    CYAN = "\033[1;36m"
-    YELLOW = "\033[1;33m"
-    NORMAL = "\033[0m"
-    PINK = "\033[1;35m"
 
 
 def ask(prompt: str, yes_as_default_answer=False):
