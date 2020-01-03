@@ -9,6 +9,7 @@
 * Add `--no-confirm option`
 * Add `--force` option
 * Add `--verbose` option
+* Add `--update-repos` option
 * Shortcut commands (i.e. `i` to specify `install` command) are no longer available
 
 ## [1.8.2][v182] - 2019-10-13 ##

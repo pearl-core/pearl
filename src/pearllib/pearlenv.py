@@ -179,7 +179,7 @@ class PearlEnvironment:
         if not (self.home / 'repos/{}/.git'.format(md5_sum)).is_dir():
             messenger.info('Initializing {} repository...'.format(repo))
             clone_command = [
-                'git', 'clone', '--depth 1', '-C', repo,
+                'git', 'clone', '--depth', '1', repo,
                 '{}/repos/{}'.format(self.home, md5_sum)
             ]
             if not verbose:
