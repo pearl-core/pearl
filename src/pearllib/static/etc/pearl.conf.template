@@ -1,7 +1,6 @@
 # A Pearl repository is a git repository containing a list of packages.
 # The following is the Official Pearl Hub repository:
 PEARL_REPOS = (
-    # TODO not-now: create the new pearl hub repo
     "https://github.com/pearl-hub/repo-v2.git",
 )
 
