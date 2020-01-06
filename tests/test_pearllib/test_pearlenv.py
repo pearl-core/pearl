@@ -55,9 +55,10 @@ def test_pearl_env_home(pearl_home_var, home, expected_home, tmp_path):
 
 
 def test_pearl_env_home_not_directory():
-    with pytest.raises(ValueError):
-        with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
-            os_mock.environ = {'HOME': '/home/myhome'}
+    with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
+        os_mock.environ = {'HOME': '/home/myhome'}
+        PearlEnvironment._get_home(env_initialized=False)
+        with pytest.raises(ValueError):
             PearlEnvironment._get_home()
 
 

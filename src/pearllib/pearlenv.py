@@ -10,9 +10,6 @@ from pearllib.messenger import messenger
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
-PearlOptions = namedtuple('PearlOptions', ['no_confirm', 'verbose', 'force'])
-PearlOptions.__new__.__defaults__ = (False, 0, False)
-
 
 class Package:
     def __init__(
@@ -70,14 +67,14 @@ class PearlEnvironment:
     def __init__(
             self, home: Path = None, root: Path = None,
             config_filename: Path = None, update_repos: bool = False,
-            verbose: int = 0,
+            verbose: int = 0, env_initialized: bool = True
     ):
-        self._home = self._get_home(home, verbose)
+        self._home = self._get_home(home, verbose, env_initialized)
         self._root = self._get_root(root, verbose)
 
-        self.config_filename = self._get_config_filename(self._home, config_filename)
-
-        self._packages = self._load_packages(update_repos, verbose)
+        if env_initialized:
+            self.config_filename = self._get_config_filename(self._home, config_filename)
+            self._packages = self._load_packages(update_repos, verbose)
 
     @property
     def home(self):
@@ -92,7 +89,7 @@ class PearlEnvironment:
         return self._packages
 
     @staticmethod
-    def _get_home(home: Path = None, verbose: int = 0):
+    def _get_home(home: Path = None, verbose: int = 0, env_initialized: bool = True):
         if home is None:
             default_home = '{}/.config/pearl'.format(os.environ['HOME'])
             home = Path(os.environ.get('PEARL_HOME', default_home))
@@ -100,7 +97,7 @@ class PearlEnvironment:
         if verbose:
             messenger.info("Found Pearl home: {}".format(home))
 
-        if not home.is_dir():
+        if env_initialized and not home.is_dir():
             msg = 'Error: The value in environment variable PEARL_HOME is not a directory: {}'.format(home)
             messenger.warn(msg)
             raise ValueError(msg)

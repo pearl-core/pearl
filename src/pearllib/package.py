@@ -1,13 +1,17 @@
 import re
 import shutil
+from argparse import Namespace
 from pathlib import Path
 from textwrap import dedent
 
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
     PackageNotInstalledError, HookFunctionError
 from pearllib.messenger import messenger, Color
-from pearllib.pearlenv import PearlEnvironment, Package, PearlOptions
+from pearllib.parser import parse_args
+from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import check_and_copy, ask, run_pearl_bash
+
+_DEFAULT_OPTIONS = parse_args([])
 
 _HOOK_HEADER_TEMPLATE = dedent("""
 PEARL_PKGDIR="{pkgdir}"
@@ -63,19 +67,19 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
     raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
 
-def emerge_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+def emerge_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
     """
     Installs or updates the Pearl package.
     This function is idempotent.
     """
     package = _lookup_package(pearl_env, package_name)
     if package.is_installed():
-        update_package(pearl_env, package_name, options=options)
+        update_package(pearl_env, package_name, args=args)
     else:
-        install_package(pearl_env, package_name, options=options)
+        install_package(pearl_env, package_name, args=args)
 
 
-def install_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
     """
     Installs the Pearl package.
     """
@@ -94,33 +98,35 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, options=Pear
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
-        quiet = "false" if options.verbose else "true"
+        quiet = "false" if args.verbose else "true"
         script = dedent(
             """
             install_git_repo {pkgurl} {pkgdir} "" {quiet}
             """
         ).format(pkgdir=package.dir, pkgurl=package.url, quiet=quiet)
-        run_pearl_bash(script, pearl_env, input='' if options.no_confirm else None)
+        run_pearl_bash(script, pearl_env, input='' if args.no_confirm else None)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
     hook = 'post_install'
     try:
-        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
     except Exception as exc:
         msg = "Error while performing {} hook function. Rolling back...".format(hook)
-        if options.force:
+        forced = args.force
+        if forced:
             messenger.error("{}: {}".format(msg, exc.args))
 
+        args.force = True
         remove_package(
             pearl_env, package_name,
-            options=PearlOptions(options.no_confirm, options.verbose, force=True)
+            args=args,
         )
-        if not options.force:
+        if not forced:
             raise HookFunctionError(msg) from exc
 
 
-def update_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
     """
     Updates the Pearl package.
     """
@@ -137,8 +143,8 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
     )
     if not package.is_local():
         existing_package_url = run_pearl_bash(
-            "git config remote.origin.url", pearl_env, capture_stdout=True
-        )
+            "git -C {} config remote.origin.url".format(package.dir), pearl_env, capture_stdout=True
+        ).stdout.strip()
         if existing_package_url != package.url:
             messenger.info("The Git URL for {} has changed from {} to {}".format(
                 package.full_name, existing_package_url, package.url
@@ -147,40 +153,40 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
                 "Do you want to replace the package with the new repository?",
                 yes_as_default_answer=False
             ):
-                remove_package(pearl_env, package_name)
-                install_package(pearl_env, package_name)
+                remove_package(pearl_env, package_name, args)
+                install_package(pearl_env, package_name, args)
 
     hook = 'pre_update'
     try:
-        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
     except Exception as exc:
         msg = "Error while performing {} hook function".format(hook)
-        if not options.force:
+        if not args.force:
             raise HookFunctionError(msg) from exc
         messenger.error("{}: {}".format(msg, exc.args))
 
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
     else:
-        quiet = "false" if options.verbose else "true"
+        quiet = "false" if args.verbose else "true"
         script = dedent(
             """
             update_git_repo {pkgdir} "" {quiet}
             """
         ).format(pkgdir=package.dir, quiet=quiet)
-        run_pearl_bash(script, pearl_env, input='' if options.no_confirm else None)
+        run_pearl_bash(script, pearl_env, input='' if args.no_confirm else None)
 
     hook = 'post_update'
     try:
-        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
     except Exception as exc:
         msg = "Error while performing {} hook function".format(hook)
-        if not options.force:
+        if not args.force:
             raise HookFunctionError(msg) from exc
         messenger.error("{}: {}".format(msg, exc.args))
 
 
-def remove_package(pearl_env: PearlEnvironment, package_name: str, options=PearlOptions()):
+def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
     """
     Remove the Pearl package.
     """
@@ -198,22 +204,23 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, options=Pearl
 
     hook = 'pre_remove'
     try:
-        _run(hook, pearl_env, package, input='' if options.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
     except Exception as exc:
         msg = "Error while performing {} hook function".format(hook)
-        if not options.force:
+        if not args.force:
             raise HookFunctionError(msg) from exc
         messenger.error("{}: {}".format(msg, exc.args))
 
     shutil.rmtree(str(package.dir))
 
 
-def list_packages(pearl_env: PearlEnvironment, pattern: str = ".*", _=PearlOptions()):
+def list_packages(pearl_env: PearlEnvironment, args: Namespace):
     """
     Lists or searches Pearl packages.
     """
     uninstalled_packages = []
     installed_packages = []
+    pattern = args.pattern if hasattr(args, 'pattern') else ".*"
     regex = re.compile('{}'.format(pattern), flags=re.IGNORECASE)
     for _, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
@@ -225,16 +232,26 @@ def list_packages(pearl_env: PearlEnvironment, pattern: str = ".*", _=PearlOptio
                 uninstalled_packages.append(package)
 
     for package in uninstalled_packages + installed_packages:
-        label = "[installed]" if package.is_installed() else ""
-        messenger.print(
-            "{pink}{reponame}/{cyan}{package} {installed}{normal}".format(
-                pink=Color.PINK,
-                reponame=package.repo_name,
-                cyan=Color.CYAN,
-                package=package.name,
-                installed=label,
-                normal=Color.NORMAL,
-
+        if args.package_only:
+            template = "{reponame}/{package}"
+            messenger.print(
+                template.format(
+                    reponame=package.repo_name,
+                    package=package.name,
+                )
             )
-        )
-        messenger.print("    {}".format(package.description))
+        else:
+            label = "[installed]" if package.is_installed() else ""
+            template = "{pink}{{reponame}}/{cyan}{{package}} {{installed}}{normal}".format(
+                pink=Color.PINK,
+                cyan=Color.CYAN,
+                normal=Color.NORMAL,
+            )
+            messenger.print(
+                template.format(
+                    reponame=package.repo_name,
+                    package=package.name,
+                    installed=label,
+                )
+            )
+            messenger.print("    {}".format(package.description))

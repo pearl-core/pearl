@@ -1,12 +1,23 @@
+from argparse import Namespace
 from pathlib import Path
 from unittest import mock
 
 import pkg_resources
 
-from pearllib.pearlenv import PearlEnvironment, PearlOptions
+from pearllib.pearlenv import PearlEnvironment
 from pearllib.system import init_pearl, remove_pearl, update_pearl
 
 _MODULE_UNDER_TEST = 'pearllib.system'
+
+
+class SysArgs(Namespace):
+    def __init__(
+            self, no_confirm=False, verbose=0, force=False,
+    ):
+        super().__init__()
+        self.no_confirm = no_confirm
+        self.verbose = verbose
+        self.force = force
 
 
 def test_init(tmp_path):
@@ -27,7 +38,7 @@ def test_init(tmp_path):
         os_mock.environ = {
             'HOME': str(tmp_path / 'home')
         }
-        init_pearl(pearl_env)
+        init_pearl(pearl_env, SysArgs())
 
         assert (pearl_env.home / 'bin').is_dir()
         assert (pearl_env.home / 'packages').is_dir()
@@ -85,7 +96,7 @@ def test_remove(tmp_path):
             'HOME': str(tmp_path / 'home')
         }
         input_mock.return_value = 'Y'
-        remove_pearl(pearl_env)
+        remove_pearl(pearl_env, SysArgs())
 
         assert not pearl_env.home.exists()
 
@@ -130,7 +141,7 @@ def test_remove_no_confirm(tmp_path):
         os_mock.environ = {
             'HOME': str(tmp_path / 'home')
         }
-        remove_pearl(pearl_env, options=PearlOptions(no_confirm=True, verbose=0))
+        remove_pearl(pearl_env, args=SysArgs(no_confirm=True, verbose=0))
 
         assert pearl_env.home.exists()
 
@@ -182,7 +193,7 @@ def test_remove_no_answer(tmp_path):
             'HOME': str(tmp_path / 'home')
         }
         input_mock.return_value = 'N'
-        remove_pearl(pearl_env)
+        remove_pearl(pearl_env, SysArgs())
 
         assert pearl_env.home.exists()
 
@@ -209,7 +220,7 @@ def test_update(tmp_path):
     with mock.patch('builtins.input') as input_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.run_pearl_bash') as run_mock:
         input_mock.return_value = 'Y'
-        update_pearl(pearl_env)
+        update_pearl(pearl_env, SysArgs())
 
         assert run_mock.call_count == 1
 
@@ -223,7 +234,7 @@ def test_update_no_confirm(tmp_path):
     pearl_env.packages = {}
 
     with mock.patch(_MODULE_UNDER_TEST + '.run_pearl_bash') as run_mock:
-        update_pearl(pearl_env, options=PearlOptions(no_confirm=True, verbose=0))
+        update_pearl(pearl_env, args=SysArgs(no_confirm=True, verbose=0))
 
         assert run_mock.call_count == 0
 
@@ -239,6 +250,6 @@ def test_update_no_answer(tmp_path):
     with mock.patch('builtins.input') as input_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.run_pearl_bash') as run_mock:
         input_mock.return_value = 'N'
-        update_pearl(pearl_env)
+        update_pearl(pearl_env, SysArgs())
 
         assert run_mock.call_count == 0

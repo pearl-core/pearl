@@ -1,0 +1,47 @@
+# vim: ft=yaml
+
+language: bash
+
+sudo: required
+
+jobs:
+  include:
+    - os: linux
+      env:
+        - PYTHON_VERSION="3.5"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: linux
+      env:
+        - PYTHON_VERSION="3.7"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: osx
+      env:
+        - PYTHON_VERSION="3.5"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: osx
+      env:
+        - PYTHON_VERSION="3.7"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+
+before_install:
+  - PYTHON_VERSION=$PYTHON_VERSION make conda-init
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./integ-tests/install-linux-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./integ-tests/install-osx-deps.sh; fi;
+
+install:
+  - make init
+  - make install
+  - make create-wrappers
+  - PATH=${HOME}/miniconda3/envs/pearl/bin/wrappers/:$PATH
+
+script:
+  - git --version
+  - bash --version
+  - zsh --version
+  - fish --version
+  - make test
+  - pearl --help
+  - bash ./integ-tests/integ-tests.sh $PWD
+  - zsh ./integ-tests/integ-tests.sh $PWD
+#  - fish ./integ-tests/integ-tests.sh $PWD
+

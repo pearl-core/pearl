@@ -1,4 +1,5 @@
 import os
+from argparse import Namespace
 from pathlib import Path
 
 import pkg_resources
@@ -8,11 +9,11 @@ from textwrap import dedent
 
 from pearllib.messenger import messenger, Color
 from pearllib.package import remove_package, update_package
-from pearllib.pearlenv import PearlEnvironment, PearlOptions
+from pearllib.pearlenv import PearlEnvironment
 from pearllib.utils import apply, ask, unapply, run_pearl_bash
 
 
-def init_pearl(pearl_env: PearlEnvironment, _=PearlOptions()):
+def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     """
     Initializes the Pearl environment by setting up the PEARL_HOME configurations.
     """
@@ -113,7 +114,7 @@ def init_pearl(pearl_env: PearlEnvironment, _=PearlOptions()):
     messenger.print("    >> pearl list")
 
 
-def remove_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
+def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
     """
     Removes completely the Pearl environment.
     """
@@ -122,15 +123,15 @@ def remove_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
     for repo_name, repo_packages in pearl_env.packages.items():
         if ask(
             "Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name),
-            yes_as_default_answer=False, no_confirm=options.no_confirm
+            yes_as_default_answer=False, no_confirm=args.no_confirm
         ):
             for _, package in repo_packages.items():
                 if package.is_installed():
-                    remove_package(pearl_env, package.full_name, options=options)
+                    remove_package(pearl_env, package.full_name, args=args)
 
     if ask(
         "Are you sure to REMOVE all the Pearl hooks?",
-        yes_as_default_answer=False, no_confirm=options.no_confirm
+        yes_as_default_answer=False, no_confirm=args.no_confirm
     ):
         unapply(
             "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
@@ -198,17 +199,17 @@ def remove_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
 
     if ask(
         "Are you sure to REMOVE the Pearl config $PEARL_HOME directory (NOT RECOMMENDED)?",
-        yes_as_default_answer=False, no_confirm=options.no_confirm
+        yes_as_default_answer=False, no_confirm=args.no_confirm
     ):
         shutil.rmtree(str(pearl_env.home))
 
 
-def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
+def update_pearl(pearl_env: PearlEnvironment, args: Namespace):
     """Updates the Pearl environment."""
     if ask(
         "Do you want to update Pearl main codebase located in {}?".format(pearl_env.root),
         yes_as_default_answer=False,
-        no_confirm=options.no_confirm,
+        no_confirm=args.no_confirm,
     ):
         messenger.print(
             '{cyan}* {normal}Updating Pearl script'.format(
@@ -216,7 +217,7 @@ def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
                 normal=Color.NORMAL,
             )
         )
-        quiet = "false" if options.verbose else "true"
+        quiet = "false" if args.verbose else "true"
         script = dedent(
             """
             update_git_repo {pearlroot} "master" {quiet}
@@ -224,9 +225,9 @@ def update_pearl(pearl_env: PearlEnvironment, options=PearlOptions()):
         ).format(
             pearlroot=pearl_env.root,
             quiet=quiet)
-        run_pearl_bash(script, pearl_env, input='' if options.no_confirm else None)
+        run_pearl_bash(script, pearl_env, input='' if args.no_confirm else None)
 
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
             if package.is_installed():
-                update_package(pearl_env, package.full_name, options=options)
+                update_package(pearl_env, package.full_name, args=args)
