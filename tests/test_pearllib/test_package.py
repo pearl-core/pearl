@@ -15,7 +15,7 @@ _MODULE_UNDER_TEST = 'pearllib.package'
 class PackageBuilder:
     def __init__(self, home_dir):
         self.packages = {}
-        self.home_dir =home_dir
+        self.home_dir = home_dir
 
     def add_local_package(
             self,
@@ -147,7 +147,6 @@ def test_install_local_package_no_confirm(tmp_path):
         else
             echo "NO" > {homedir}/result
         fi
-        
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
         echo "$choice" >> {homedir}/result
         return 0
@@ -255,7 +254,6 @@ def test_update_local_package(tmp_path):
         echo $PEARL_PKGREPONAME >> {homedir}/result
         return 0
     }}
-    
     post_update() {{
         echo $PWD > {homedir}/result2
         echo $PEARL_HOME >> {homedir}/result2
@@ -266,7 +264,6 @@ def test_update_local_package(tmp_path):
         echo $PEARL_PKGREPONAME >> {homedir}/result2
         return 0
     }}
-    
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
@@ -545,7 +542,6 @@ def test_remove_package_forced(tmp_path):
     builder = PackageBuilder(home_dir)
     builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
     packages = builder.build()
-    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 

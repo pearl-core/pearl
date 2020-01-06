@@ -23,5 +23,3 @@ def create_pearl_env(home_dir, root_dir, packages):
     pearl_env.root = root_dir
     pearl_env.packages = packages
     return pearl_env
-
-

@@ -35,5 +35,3 @@ class Messenger:
 
 
 messenger = Messenger()
-
-

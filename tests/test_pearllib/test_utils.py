@@ -1,3 +1,5 @@
+import platform
+
 import pytest
 import os
 from unittest import mock
@@ -181,21 +183,28 @@ def test_run_pearl_bash(tmp_path):
     """
     result = run_pearl_bash(script, pearl_env, capture_stdout=True)
 
-    assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
-        root_dir, home_dir, home_dir,
-        '/usr/local/opt/gnu-sed/libexec/gnubin:'
-        '/usr/local/opt/grep/libexec/gnubin:'
-        '/usr/local/opt/coreutils/libexec/gnubin:' + os.environ['PATH'],
-        "\x1b[1;36mTest\x1b[0m"
-    )
+    if platform.system() == 'Darwin':
+        assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
+            root_dir, home_dir, home_dir,
+            '/usr/local/opt/gnu-sed/libexec/gnubin:'
+            '/usr/local/opt/grep/libexec/gnubin:'
+            '/usr/local/opt/coreutils/libexec/gnubin:' + os.environ['PATH'],
+            "\x1b[1;36mTest\x1b[0m"
+        )
+    elif platform.system() == 'Linux':
+        assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
+            root_dir, home_dir, home_dir,
+            os.environ['PATH'],
+            "\x1b[1;36mTest\x1b[0m"
+        )
 
 
 @pytest.mark.parametrize(
     'answers, yes_as_default_answer, expected_result',
     [
-       pytest.param(
-           ['Y'], False, True
-       ),
+        pytest.param(
+            ['Y'], False, True
+        ),
         pytest.param(
             ['N'], True, False
         ),
@@ -240,9 +249,9 @@ def test_ask(answers, yes_as_default_answer, expected_result):
             'This should\nstay on top\n',
         ),
         pytest.param(
-           'This should stay on top',
-           'First line\nSecond line',
-           'This should stay on top\nFirst line\nSecond line',
+            'This should stay on top',
+            'First line\nSecond line',
+            'This should stay on top\nFirst line\nSecond line',
         ),
         pytest.param(
             'This should stay on top',

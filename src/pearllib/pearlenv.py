@@ -194,4 +194,3 @@ class PearlEnvironment:
             subprocess.run(pull_command)
 
         return self.home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
-

@@ -31,7 +31,7 @@ osx_update_path
 def run_bash(
         script: str,
         capture_stdout=False, capture_stderr=False,
-        check=True, input:str = None
+        check=True, input: str = None
 ):
     return subprocess.run(
         ['/usr/bin/env', 'bash', '-c', script],

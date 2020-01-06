@@ -39,9 +39,12 @@ def test_init(tmp_path):
         assert (pearl_env.home / 'pearl.conf').is_file()
 
         static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
-        assert (tmp_path / 'home/.bashrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
-        assert (tmp_path / 'home/.zshrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
-        assert (tmp_path / 'home/.config/fish/config.fish').read_text() == "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
+        assert (tmp_path / 'home/.bashrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(
+            pearl_env.root, static)
+        assert (tmp_path / 'home/.zshrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(
+            pearl_env.root, static)
+        assert (tmp_path / 'home/.config/fish/config.fish').read_text() == "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(
+            pearl_env.root, static)
         assert (tmp_path / 'home/.vimrc').read_text() == "source {}/boot/vim/pearl.vim\n".format(static)
         assert (tmp_path / 'home/.emacs').read_text() == "source {}/boot/emacs/pearl.el\n".format(static)
 
@@ -134,13 +137,13 @@ def test_remove_no_confirm(tmp_path):
         assert (tmp_path / 'home/.bashrc').read_text() == \
             "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
         assert (tmp_path / 'home/.zshrc').read_text() == \
-               "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
+            "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
         assert (tmp_path / 'home/.config/fish/config.fish').read_text() == \
-               "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
+            "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
         assert (tmp_path / 'home/.vimrc').read_text() == \
-               "source {}/boot/vim/pearl.vim\n".format(static)
+            "source {}/boot/vim/pearl.vim\n".format(static)
         assert (tmp_path / 'home/.emacs').read_text() == \
-               "source {}/boot/emacs/pearl.el\n".format(static)
+            "source {}/boot/emacs/pearl.el\n".format(static)
 
 
 def test_remove_no_answer(tmp_path):
@@ -184,15 +187,15 @@ def test_remove_no_answer(tmp_path):
         assert pearl_env.home.exists()
 
         assert (tmp_path / 'home/.bashrc').read_text() == \
-               "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
+            "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
         assert (tmp_path / 'home/.zshrc').read_text() == \
-               "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
+            "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(pearl_env.root, static)
         assert (tmp_path / 'home/.config/fish/config.fish').read_text() == \
-               "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
+            "set -x PEARL_ROOT {}\nsource {}/boot/fish/pearl.fish\n".format(pearl_env.root, static)
         assert (tmp_path / 'home/.vimrc').read_text() == \
-               "source {}/boot/vim/pearl.vim\n".format(static)
+            "source {}/boot/vim/pearl.vim\n".format(static)
         assert (tmp_path / 'home/.emacs').read_text() == \
-               "source {}/boot/emacs/pearl.el\n".format(static)
+            "source {}/boot/emacs/pearl.el\n".format(static)
 
 
 def test_update(tmp_path):
@@ -239,4 +242,3 @@ def test_update_no_answer(tmp_path):
         update_pearl(pearl_env)
 
         assert run_mock.call_count == 0
-

@@ -1,0 +1,7 @@
+coverage
+flake8
+pip
+pytest
+tox
+twine
+watchdog
