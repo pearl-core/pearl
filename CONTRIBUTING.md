@@ -153,7 +153,7 @@ All Pearl issues are tracked as [GitHub issues](https://guides.github.com/featur
 #### Unit Tests ####
 To run unit tests:
 ```sh
-TBD
+make test
 ```
 
 #### Integration Tests ####

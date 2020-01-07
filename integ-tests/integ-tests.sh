@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -ex
 
@@ -49,10 +49,15 @@ for package in $(pearl list --package-only)
 do
     pearl --verbose --no-confirm emerge ${package}
     [[ -d "$PEARL_HOME/packages/$package" ]] || { echo "$PEARL_HOME/packages/$package does not exist"; exit 6; }
-    if [[ -d "$PEARL_HOME/packages/$package/module" ]]
-    then
-        [[ "$(ls -A ${PEARL_HOME}/packages/${package}/module)" ]] || { echo "$PEARL_HOME/packages/pearl/$package/module exists but it is empty"; exit 7; }
-    fi
+    # TODO revert this:
+    #if [[ -d "$PEARL_HOME/packages/$package/module" ]]
+    #then
+        #if [[ ! "$(ls -A ${PEARL_HOME}/packages/${package}/module)" ]]
+        #then
+            #echo "$PEARL_HOME/packages/pearl/$package/module exists but it is empty"
+            #exit 7
+        #fi
+    #fi
 done
 
 info Update ALL Pearl packages
@@ -67,7 +72,11 @@ info Remove ALL pearl packages
 for package in $(get_all_packages)
 do
     pearl --verbose --no-confirm remove ${package}
-    [[ -d "$PEARL_HOME/packages/pearl/$package" ]] && { echo "$PEARL_HOME/packages/pearl/$package still exists"; exit 8; }
+    if [[ -d "$PEARL_HOME/packages/pearl/$package" ]]
+    then
+        echo "$PEARL_HOME/packages/pearl/$package still exists"
+        exit 8
+    fi
 done
 
 yes | pearl remove

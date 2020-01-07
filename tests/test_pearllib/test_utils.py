@@ -1,7 +1,8 @@
-import platform
-
-import pytest
 import os
+import platform
+import pytest
+import re
+
 from unittest import mock
 
 from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy, ask, apply, unapply, run_bash, \
@@ -208,8 +209,7 @@ def test_run_pearl_bash_show_xtrace(tmp_path):
 
     script = "echo hello"
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, show_xtrace=True)
-
-    assert result.stderr == "+ echo hello\n"
+    assert re.match(r"\+\s?echo hello\n", result.stderr) is not None
 
 
 @pytest.mark.parametrize(
