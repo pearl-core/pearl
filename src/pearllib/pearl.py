@@ -66,5 +66,5 @@ def pearl(sys_args: list, pearl_root_dir: Path = None, pearl_home_dir: Path = No
     try:
         _pearl(pearl_env, args)
     except PearlError as ex:
-        messenger.error('Pearl error: '.format(ex.args))
+        messenger.exception('Pearl error: {}'.format(ex.args))
         exit(ex.exit_status)

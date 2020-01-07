@@ -122,7 +122,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
         msg = "Error while performing {} hook function. Rolling back...".format(hook)
         forced = args.force
         if forced:
-            messenger.error("{}: {}".format(msg, exc.args))
+            messenger.exception("{}: {}".format(msg, exc.args))
 
         args.force = True
         remove_package(
@@ -170,7 +170,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
             raise HookFunctionError(msg) from exc
-        messenger.error("{}: {}".format(msg, exc.args))
+        messenger.exception("{}: {}".format(msg, exc.args))
 
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
@@ -190,7 +190,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
             raise HookFunctionError(msg) from exc
-        messenger.error("{}: {}".format(msg, exc.args))
+        messenger.exception("{}: {}".format(msg, exc.args))
 
 
 def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
@@ -216,7 +216,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
             raise HookFunctionError(msg) from exc
-        messenger.error("{}: {}".format(msg, exc.args))
+        messenger.exception("{}: {}".format(msg, exc.args))
 
     shutil.rmtree(str(package.dir))
 
