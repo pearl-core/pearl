@@ -117,7 +117,7 @@ def test_install_local_package(tmp_path):
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    install_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+    install_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/install.sh').is_file()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
@@ -288,7 +288,7 @@ def test_update_local_package(tmp_path):
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    update_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+    update_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/install.sh').is_file()
 
@@ -536,7 +536,7 @@ def test_remove_package(tmp_path):
 
     pearl_env = create_pearl_env(home_dir, root_dir, packages)
 
-    remove_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+    remove_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
 
     assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
 

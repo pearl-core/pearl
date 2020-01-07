@@ -181,7 +181,9 @@ def test_run_pearl_bash(tmp_path):
     echo $PATH
     info "Test"
     """
-    result = run_pearl_bash(script, pearl_env, capture_stdout=True)
+    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, show_xtrace=False)
+
+    assert result.stderr == ''
 
     if platform.system() == 'Darwin':
         assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
@@ -197,6 +199,17 @@ def test_run_pearl_bash(tmp_path):
             os.environ['PATH'],
             "\x1b[1;36mTest\x1b[0m"
         )
+
+
+def test_run_pearl_bash_show_xtrace(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    pearl_env = create_pearl_env(home_dir, root_dir, {})
+
+    script = "echo hello"
+    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, show_xtrace=True)
+
+    assert result.stderr == "+ echo hello\n"
 
 
 @pytest.mark.parametrize(

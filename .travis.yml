@@ -39,6 +39,7 @@ script:
   - bash --version
   - zsh --version
   - fish --version
+  - make lint
   - make test
   - pearl --help
   - bash ./integ-tests/integ-tests.sh $PWD

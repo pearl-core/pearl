@@ -30,8 +30,8 @@ osx_update_path
 
 def run_bash(
         script: str,
-        capture_stdout=False, capture_stderr=False,
-        check=True, input: str = None
+        capture_stdout: bool = False, capture_stderr: bool = False,
+        check: bool = True, input: str = None
 ):
     return subprocess.run(
         ['/usr/bin/env', 'bash', '-c', script],
@@ -45,9 +45,10 @@ def run_bash(
 
 def run_pearl_bash(
         script: str, pearl_env: PearlEnvironment,
-        capture_stdout=False, capture_stderr=False,
-        check=True,
+        capture_stdout: bool = False, capture_stderr: bool = False,
+        check: bool = True,
         input: str = None,
+        show_xtrace: bool = False,
 ):
     """Runs a bash script within the Pearl ecosystem."""
 
@@ -56,7 +57,9 @@ def run_pearl_bash(
         pearlhome=pearl_env.home,
         static=pkg_resources.resource_filename('pearllib', 'static/'),
     )
-    script = '{bashheader}\n{script}'.format(
+    script_template = '{bashheader}\nset -x\n{script}' if show_xtrace else '{bashheader}\n{script}'
+
+    script = script_template.format(
         bashheader=bash_header,
         script=script,
     )

@@ -29,7 +29,14 @@ INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
 """)
 
 
-def _run(script: str, pearl_env: PearlEnvironment, package: Package, input: str = None, cd_home=False):
+def _run(
+        script: str,
+        pearl_env: PearlEnvironment,
+        package: Package,
+        input: str = None,
+        cd_home: bool = False,
+        show_xtrace: bool = False,
+):
     hookheader = _HOOK_HEADER_TEMPLATE.format(
         pkgdir=package.dir,
         vardir=package.vardir,
@@ -42,7 +49,7 @@ def _run(script: str, pearl_env: PearlEnvironment, package: Package, input: str 
         cd=cd,
         script=script,
     )
-    run_pearl_bash(script, pearl_env, input=input)
+    run_pearl_bash(script, pearl_env, input=input, show_xtrace=show_xtrace)
 
 
 def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: str) -> Package:
@@ -110,7 +117,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
 
     hook = 'post_install'
     try:
-        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None, show_xtrace=(args.verbose >= 2))
     except Exception as exc:
         msg = "Error while performing {} hook function. Rolling back...".format(hook)
         forced = args.force
@@ -158,7 +165,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
 
     hook = 'pre_update'
     try:
-        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None, show_xtrace=(args.verbose >= 2))
     except Exception as exc:
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
@@ -178,7 +185,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
 
     hook = 'post_update'
     try:
-        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None, show_xtrace=(args.verbose >= 2))
     except Exception as exc:
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
@@ -204,7 +211,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
 
     hook = 'pre_remove'
     try:
-        _run(hook, pearl_env, package, input='' if args.no_confirm else None)
+        _run(hook, pearl_env, package, input='' if args.no_confirm else None, show_xtrace=(args.verbose >= 2))
     except Exception as exc:
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
