@@ -1,19 +1,16 @@
 
 # Init environment
 
-Follow steps to install miniconda [here](https://docs.conda.io/projects/conda/en/latest/index.html).
+The following make commands will install conda and create a conda env called `pearl`:
 
-The following make commands `init` will update conda, create a conda env called `pearl` and install all stable version
-dependencies:
-
-```
-make conda-init
-make init
+```bash
+make install-conda
+make init-env-conda
 ```
 
-# Install Pearl package in site-packages
+# Install Pearl package and its dev dependencies
 
-```
+```bash
 make install
 ```
 
@@ -21,7 +18,7 @@ make install
 The following step will update the dependencies in `requirements-dev.in` and
 include them into the file `requirements-dev.txt`:
 
-```
+```bash
 make upgrade
 ```
 
@@ -30,7 +27,7 @@ make upgrade
 
 Creates the tar file and wheel under `dist` directory.
 
-```
+```bash
 make dist
 ```
 

@@ -61,7 +61,10 @@ setup(
     setup_requires=[],
     install_requires=requirements,
     test_suite='tests',
-    tests_require=test_requirements,
     # “optional” dependencies
-    extras_require={},
+    extras_require={
+        'dev': test_requirements
+    },
+    # Alternatively, use tests_requires to use the setup.py command "test".
+    # tests_require=test_requirements,
 )

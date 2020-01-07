@@ -33,6 +33,8 @@ CONDA_ENV_BIN = $(CONDA_ENV_DIR)/bin/wrappers/conda
 PYTHON = $(CONDA_ENV_BIN)/python
 PYTEST = $(PYTHON) -m pytest
 PIP = $(PYTHON) -m pip
+FLAKE8 = $(PYTHON) -m flake8
+COVERAGE = $(PYTHON) -m coverage
 
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
@@ -59,7 +61,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 src tests
+	$(FLAKE8) src tests
 
 test: ## run tests quickly with the default Python
 	$(PYTEST)
@@ -68,9 +70,9 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source pearllib -m pytest
-	coverage report -m
-	coverage html
+	$(COVERAGE) run --source pearllib -m pytest
+	$(COVERAGE) report -m
+	$(COVERAGE) html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
@@ -92,23 +94,24 @@ dist: clean ## builds source and wheel package
 	python setup.py bdist_wheel
 	ls -l dist
 
-PYTHON_VERSION ?= 3.5
-conda-init: ## init the environment
+clean-conda: ## removes conda
 	rm -rf ~/miniconda3
+
+install-conda: clean-conda ## install conda
 	./integ-tests/install-conda.sh
 	$(CONDA_EXE) update --yes conda
+
+PYTHON_VERSION ?= 3.5
+init-env-conda: ## init the conda environment
 	$(CONDA_EXE) create --yes -n pearl python=$(PYTHON_VERSION)
 	$(CONDA_EXE) install --yes -n pearl -c conda-forge conda-wrappers
 
-create-wrappers: ## create wrapper executables to be accessible outside the environment activation
+create-conda-wrappers: ## create wrapper executables to be accessible outside the environment activation
 	$(CONDA_ENV_DIR)/bin/create-wrappers -t conda -b $(CONDA_ENV_DIR)/bin -d $(CONDA_ENV_DIR)/bin/wrappers/ --conda-env-dir $(CONDA_ENV_DIR)
-
-init: ## installs stable dependencies
-	$(PIP) install -r requirements-dev.txt
 
 upgrade: ## upgrades all dependencies
 	$(PIP) install --upgrade -r requirements-dev.in
 	$(PIP) freeze >> requirements-dev.txt
 
 install: clean ## install the package to the active Python's site-packages
-	$(PIP) install -e .
+	$(PIP) install -e .[dev]
