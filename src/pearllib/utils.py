@@ -48,7 +48,7 @@ def run_pearl_bash(
         capture_stdout: bool = False, capture_stderr: bool = False,
         check: bool = True,
         input: str = None,
-        show_xtrace: bool = False,
+        enable_xtrace: bool = False,
         enable_errexit: bool = True,
 ):
     """Runs a bash script within the Pearl ecosystem."""
@@ -58,7 +58,7 @@ def run_pearl_bash(
         pearlhome=pearl_env.home,
         static=pkg_resources.resource_filename('pearllib', 'static/'),
     )
-    script_template = '{bashheader}\nset -x\n{script}' if show_xtrace else '{bashheader}\n{script}'
+    script_template = '{bashheader}\nset -x\n{script}' if enable_xtrace else '{bashheader}\n{script}'
     if enable_errexit:
         script_template = 'set -e\n{}'.format(script_template)
 

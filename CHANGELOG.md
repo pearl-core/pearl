@@ -6,9 +6,11 @@
 * Remove the `post_remove`
 * `pearl.conf` is not a python script. This requires manual intervention. Take a look at the `pearl.conf.template` file in codebase
 * `pearl-metadata` directory is finally deprecated
-* Add `--no-confirm option`
+* Add `--no-confirm` option
 * Add `--force` option
+  * This option bypasses failures even during the hook function execution
 * Add `--verbose` option
+  * `-vv` allows to enable xtrace in hook functions
 * Add `--update-repos` option
 * Shortcut commands (i.e. `i` to specify `install` command) are no longer available
 

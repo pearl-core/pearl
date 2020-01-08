@@ -182,7 +182,7 @@ def test_run_pearl_bash(tmp_path):
     echo $PATH
     info "Test"
     """
-    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, show_xtrace=False)
+    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, enable_xtrace=False)
 
     assert result.stderr == ''
 
@@ -202,13 +202,13 @@ def test_run_pearl_bash(tmp_path):
         )
 
 
-def test_run_pearl_bash_show_xtrace(tmp_path):
+def test_run_pearl_bash_enable_xtrace(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     root_dir = create_pearl_root(tmp_path)
     pearl_env = create_pearl_env(home_dir, root_dir, {})
 
     script = "echo hello"
-    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, show_xtrace=True)
+    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, enable_xtrace=True)
     assert re.match(r"\+\s?echo hello\n", result.stderr) is not None
 
 

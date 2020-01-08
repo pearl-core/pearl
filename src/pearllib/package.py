@@ -35,7 +35,7 @@ def _run(
         package: Package,
         input: str = None,
         cd_home: bool = False,
-        show_xtrace: bool = False,
+        enable_xtrace: bool = False,
         enable_errexit: bool = True,
 ):
     hookheader = _HOOK_HEADER_TEMPLATE.format(
@@ -50,7 +50,7 @@ def _run(
         cd=cd,
         script=script,
     )
-    run_pearl_bash(script, pearl_env, input=input, show_xtrace=show_xtrace, enable_errexit=enable_errexit)
+    run_pearl_bash(script, pearl_env, input=input, enable_xtrace=enable_xtrace, enable_errexit=enable_errexit)
 
 
 def _lookup_package_full_name(pearl_env: PearlEnvironment, package_full_name: str) -> Package:
@@ -121,7 +121,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
         _run(
             hook, pearl_env, package,
             input='' if args.no_confirm else None,
-            show_xtrace=(args.verbose >= 2),
+            enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
     except Exception as exc:
@@ -172,7 +172,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         _run(
             hook, pearl_env, package,
             input='' if args.no_confirm else None,
-            show_xtrace=(args.verbose >= 2),
+            enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
     except Exception as exc:
@@ -197,7 +197,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         _run(
             hook, pearl_env, package,
             input='' if args.no_confirm else None,
-            show_xtrace=(args.verbose >= 2),
+            enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
     except Exception as exc:
@@ -228,7 +228,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         _run(
             hook, pearl_env, package,
             input='' if args.no_confirm else None,
-            show_xtrace=(args.verbose >= 2),
+            enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
     except Exception as exc:
