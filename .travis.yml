@@ -12,7 +12,15 @@ jobs:
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
     - os: linux
       env:
+        - PYTHON_VERSION="3.6"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: linux
+      env:
         - PYTHON_VERSION="3.7"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: linux
+      env:
+        - PYTHON_VERSION="3.8"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
     - os: osx
       env:
@@ -20,7 +28,15 @@ jobs:
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
     - os: osx
       env:
+        - PYTHON_VERSION="3.6"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: osx
+      env:
         - PYTHON_VERSION="3.7"
+        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+    - os: osx
+      env:
+        - PYTHON_VERSION="3.8"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
 
 before_install:
@@ -45,5 +61,5 @@ script:
   - pearl --help
   - bash ./integ-tests/integ-tests.sh $PWD
   - zsh ./integ-tests/integ-tests.sh $PWD
-#  - fish ./integ-tests/integ-tests.sh $PWD
+  - fish ./integ-tests/integ-tests.sh $PWD
 

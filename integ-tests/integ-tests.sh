@@ -49,15 +49,6 @@ for package in $(pearl list --package-only)
 do
     pearl --verbose --no-confirm emerge ${package}
     [[ -d "$PEARL_HOME/packages/$package" ]] || { echo "$PEARL_HOME/packages/$package does not exist"; exit 6; }
-    # TODO revert this:
-    #if [[ -d "$PEARL_HOME/packages/$package/module" ]]
-    #then
-        #if [[ ! "$(ls -A ${PEARL_HOME}/packages/${package}/module)" ]]
-        #then
-            #echo "$PEARL_HOME/packages/pearl/$package/module exists but it is empty"
-            #exit 7
-        #fi
-    #fi
 done
 
 info Update ALL Pearl packages

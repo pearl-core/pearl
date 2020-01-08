@@ -49,7 +49,11 @@ def _create_main_parser():
         default=None,
         help="location of the pearl config path. Defaults to $HOME/.config/pearl/pearl.conf"
     )
-    parser.add_argument('--verbose', '-v', action='count', default=0, help="increase output verbosity")
+    parser.add_argument(
+        '--verbose', '-v', action='count', default=0,
+        help="-v increases output verbosity. "
+             "-vv shows xtrace during the hook function execution."
+    )
     parser.add_argument('--version', '-V', action='version', version='%(prog)s 2.0')
     return parser
 
