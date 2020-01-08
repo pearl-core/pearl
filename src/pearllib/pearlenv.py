@@ -110,15 +110,13 @@ class PearlEnvironment:
         return home
 
     @staticmethod
-    def _get_root(root: Path = None, verbose: int = 0) -> Path:
-        if root is None:
-            root = Path(os.environ['PEARL_ROOT'])
-
+    def _get_root(root: Path, verbose: int = 0) -> Path:
         if verbose:
             messenger.info("Found Pearl root: {}".format(root))
 
         if not root.is_dir():
-            msg = 'Error: The value in environment variable PEARL_ROOT is not a directory: {}'.format(root)
+            msg = 'Error: The Pearl root ' \
+                  '(where the pearl command is located) is not a directory: {}'.format(root)
             messenger.warn(msg)
             raise ValueError(msg)
 

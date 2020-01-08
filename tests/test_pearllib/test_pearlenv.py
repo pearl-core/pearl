@@ -62,28 +62,13 @@ def test_pearl_env_home_not_directory():
             PearlEnvironment._get_home()
 
 
-def test_pearl_env_root(tmp_path):
-    with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
-        os_mock.environ = {'PEARL_ROOT': str(tmp_path)}
-        assert str(tmp_path) == str(PearlEnvironment._get_root())
-
-
 def test_pearl_env_root_raise_error():
-    with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
-        os_mock.environ = {'PEARL_ROOT': '/path/to/root'}
-        with pytest.raises(ValueError):
-            PearlEnvironment._get_root()
+    with pytest.raises(ValueError):
+        PearlEnvironment._get_root(Path('/path/to/root'))
 
 
 def test_pearl_env_root_from_arg(tmp_path):
     assert tmp_path == PearlEnvironment._get_root(tmp_path)
-
-
-def test_pearl_env_root_keyerror():
-    with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
-        os_mock.environ = {}
-        with pytest.raises(KeyError):
-            PearlEnvironment._get_root()
 
 
 def test_config_filename():
