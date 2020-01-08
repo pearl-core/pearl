@@ -120,16 +120,14 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
         _run(hook, pearl_env, package, input='' if args.no_confirm else None, show_xtrace=(args.verbose >= 2))
     except Exception as exc:
         msg = "Error while performing {} hook function. Rolling back...".format(hook)
-        forced = args.force
-        if forced:
+        if args.force:
             messenger.exception("{}: {}".format(msg, exc.args))
-
-        args.force = True
-        remove_package(
-            pearl_env, package_name,
-            args=args,
-        )
-        if not forced:
+        else:
+            args.force = True
+            remove_package(
+                pearl_env, package_name,
+                args=args,
+            )
             raise HookFunctionError(msg) from exc
 
 

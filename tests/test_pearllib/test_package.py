@@ -146,8 +146,8 @@ def test_install_local_package_forced(tmp_path):
 
     install_package(pearl_env, 'repo-test/pkg-test', args=PackageArgs(force=True))
 
-    # Because of rollback:
-    assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
+    # Because rollback did not occur:
+    assert (home_dir / 'packages/repo-test/pkg-test/').exists()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
 
