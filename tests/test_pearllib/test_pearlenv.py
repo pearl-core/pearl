@@ -1,4 +1,4 @@
-
+import os
 from pathlib import Path
 
 import pytest
@@ -16,29 +16,29 @@ _MODULE_UNDER_TEST = 'pearllib.pearlenv'
         pytest.param(
             None,
             None,
-            'home-dir/.config/pearl'
+            'home-dir/.local/share/pearl'
         ),
         pytest.param(
-            'home/myhome2/.config/pearl2',
+            'home/myhome2/.local/share/pearl2',
             None,
-            'home/myhome2/.config/pearl2',
+            'home/myhome2/.local/share/pearl2',
         ),
         pytest.param(
-            'home/myhome2/.config/pearl2',
-            'home/myhome3/.config/pearl3',
-            'home/myhome3/.config/pearl3',
+            'home/myhome2/.local/share/pearl2',
+            'home/myhome3/.local/share/pearl3',
+            'home/myhome3/.local/share/pearl3',
         ),
         pytest.param(
             None,
-            'home/myhome3/.config/pearl3',
-            'home/myhome3/.config/pearl3',
+            'home/myhome3/.local/share/pearl3',
+            'home/myhome3/.local/share/pearl3',
         ),
     ]
 )
 def test_pearl_env_home(pearl_home_var, home, expected_home, tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + '.os') as os_mock:
         home_dir = tmp_path / 'home-dir'
-        (home_dir / '.config/pearl').mkdir(parents=True)
+        (home_dir / '.local/share/pearl').mkdir(parents=True)
         default_environ = {'HOME': home_dir}
 
         if pearl_home_var is not None:
@@ -87,8 +87,8 @@ def test_pearl_env_root_keyerror():
 
 
 def test_config_filename():
-    assert PearlEnvironment._get_config_filename(Path('/myhome'), Path('/myhome2/pearl.conf')) == Path('/myhome2/pearl.conf')
-    assert PearlEnvironment._get_config_filename(Path('/myhome'), None) == Path('/myhome/pearl.conf')
+    assert PearlEnvironment._get_config_filename(Path('/myhome2/pearl.conf')) == Path('/myhome2/pearl.conf')
+    assert PearlEnvironment._get_config_filename(None) == Path('{}/.config/pearl/pearl.conf'.format(os.environ['HOME']))
 
 
 def test_packages(tmp_path):

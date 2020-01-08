@@ -83,15 +83,20 @@ def expected_syst_calls(init=0, update=0, remove=0):
     ]
 )
 def test_pearl(args, expected_pack_call_counts, expected_syst_call_counts, tmp_path):
-    pearl_root_dir = tmp_path / 'root'
-    pearl_root_dir.mkdir(parents=True)
-    pearl_home_dir = tmp_path / 'home'
+    home_dir = tmp_path / 'home'
+    home_dir.mkdir(parents=True)
+    (home_dir / 'pearl.conf').touch()
+
+    pearl_home_dir = tmp_path / 'pearlhome'
     pearl_home_dir.mkdir(parents=True)
-    (pearl_home_dir / 'pearl.conf').touch()
+
+    pearl_root_dir = tmp_path / 'pearlroot'
+    pearl_root_dir.mkdir(parents=True)
+
     with mock.patch(_MODULE_UNDER_TEST + '.pack') as pack_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.syst') as syst_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.verify_runtime_deps') as verify_mock:
-        pearl(args, pearl_home_dir=pearl_home_dir, pearl_root_dir=pearl_root_dir)
+        pearl(['-c', str(home_dir / 'pearl.conf')] + args, pearl_home_dir=pearl_home_dir, pearl_root_dir=pearl_root_dir)
 
         for func_name, count in expected_pack_call_counts.items():
             assert getattr(pack_mock, func_name).call_count == count
@@ -124,11 +129,16 @@ def test_pearl(args, expected_pack_call_counts, expected_syst_call_counts, tmp_p
     ]
 )
 def test_pearl_error(command, func_name, tmp_path):
-    pearl_root_dir = tmp_path / 'root'
+    home_dir = tmp_path / 'home'
+    home_dir.mkdir(parents=True)
+    (home_dir / 'pearl.conf').touch()
+
+    pearl_root_dir = tmp_path / 'pearlroot'
     pearl_root_dir.mkdir(parents=True)
-    pearl_home_dir = tmp_path / 'home'
+
+    pearl_home_dir = tmp_path / 'pearlhome'
     pearl_home_dir.mkdir(parents=True)
-    (pearl_home_dir / 'pearl.conf').touch()
+
     with mock.patch(_MODULE_UNDER_TEST + '.pack') as pack_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.syst'), \
             mock.patch(_MODULE_UNDER_TEST + '.verify_runtime_deps') as verify_mock:
@@ -139,7 +149,7 @@ def test_pearl_error(command, func_name, tmp_path):
         getattr(pack_mock, func_name).side_effect = side_eff
 
         with pytest.raises(SystemExit) as exc:
-            pearl([command, 'pkg1', 'pkg2'], pearl_home_dir=pearl_home_dir, pearl_root_dir=pearl_root_dir)
+            pearl(['-c', str(home_dir / 'pearl.conf'), command, 'pkg1', 'pkg2'], pearl_home_dir=pearl_home_dir, pearl_root_dir=pearl_root_dir)
             assert exc.value.code == 102
             assert getattr(pack_mock, func_name).call_count == 2
             assert verify_mock.call_count == 1

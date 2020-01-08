@@ -15,10 +15,10 @@ from pearllib.utils import apply, ask, unapply, run_pearl_bash
 
 def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     """
-    Initializes the Pearl environment by setting up the PEARL_HOME configurations.
+    Initializes the Pearl environment by setting up the PEARL_HOME files and directories and the `pearl.conf` file.
     """
     messenger.print(
-        '{cyan}* {normal}Creating Pearl configuration in {home}'.format(
+        '{cyan}* {normal}Setting up $PEARL_HOME directory as {home}'.format(
             cyan=Color.CYAN,
             normal=Color.NORMAL,
             home=pearl_env.home,
@@ -37,9 +37,17 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
 
     static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
 
-    if not (pearl_env.home / 'pearl.conf').exists():
+    if not pearl_env.config_filename.exists():
+        messenger.print(
+            '{cyan}* {normal}Creating the Pearl configuration file {configfile} from template $PEARL_HOME'.format(
+                cyan=Color.CYAN,
+                normal=Color.NORMAL,
+                configfile=pearl_env.config_filename,
+            )
+        )
+        pearl_env.config_filename.parent.mkdir(parents=True, exist_ok=True)
         pearl_conf_template = static / 'etc/pearl.conf.template'
-        shutil.copyfile(str(pearl_conf_template), str(pearl_env.home / 'pearl.conf'))
+        shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
 
     apply(
         "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(

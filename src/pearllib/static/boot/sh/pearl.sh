@@ -6,7 +6,7 @@
 [[ ! -d "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT directory '${PEARL_ROOT}' does not exist." 1>&2; return 2; }
 
 export PEARL_ROOT
-export PEARL_HOME=${HOME}/.config/pearl
+export PEARL_HOME=${XDG_DATA_HOME:="$HOME/.local/share"}/pearl
 # Fallback to a default temp directory if tty does not work
 if tty -s
 then

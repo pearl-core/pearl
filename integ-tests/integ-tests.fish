@@ -10,7 +10,7 @@ end
 source $HOME/.config/fish/config.fish
 
 set -x PEARL_ROOT $argv[1]
-set -x PEARL_HOME "$HOME/.config/pearl"
+set -x PEARL_HOME "$HOME/.local/share/pearl"
 set -x PATH $PEARL_ROOT/bin $PATH
 
 function pearl_remove_home --on-process-exit %self

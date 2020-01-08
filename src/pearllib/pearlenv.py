@@ -71,27 +71,32 @@ class PearlEnvironment:
     ):
         self._home = self._get_home(home, verbose, env_initialized)
         self._root = self._get_root(root, verbose)
+        self._config_filename = self._get_config_filename(config_filename)
 
         if env_initialized:
-            self.config_filename = self._get_config_filename(self._home, config_filename)
             self._packages = self._load_packages(update_repos, verbose)
 
     @property
-    def home(self):
+    def home(self) -> Path:
         return self._home
 
     @property
-    def root(self):
+    def root(self) -> Path:
         return self._root
+
+    @property
+    def config_filename(self) -> Path:
+        return self._config_filename
 
     @property
     def packages(self):
         return self._packages
 
     @staticmethod
-    def _get_home(home: Path = None, verbose: int = 0, env_initialized: bool = True):
+    def _get_home(home: Path = None, verbose: int = 0, env_initialized: bool = True) -> Path:
         if home is None:
-            default_home = '{}/.config/pearl'.format(os.environ['HOME'])
+            xdg_data_home = os.environ.get('XDG_DATA_HOME', '{}/.local/share'.format(os.environ['HOME']))
+            default_home = '{}/pearl'.format(xdg_data_home)
             home = Path(os.environ.get('PEARL_HOME', default_home))
 
         if verbose:
@@ -105,7 +110,7 @@ class PearlEnvironment:
         return home
 
     @staticmethod
-    def _get_root(root: Path = None, verbose: int = 0):
+    def _get_root(root: Path = None, verbose: int = 0) -> Path:
         if root is None:
             root = Path(os.environ['PEARL_ROOT'])
 
@@ -120,9 +125,11 @@ class PearlEnvironment:
         return root
 
     @staticmethod
-    def _get_config_filename(home: Path, config_filename: Path):
+    def _get_config_filename(config_filename: Path = None) -> Path:
         if config_filename is None:
-            return home / 'pearl.conf'
+            xdg_config_home = os.environ.get('XDG_CONFIG_HOME', '{}/.config'.format(os.environ['HOME']))
+            config_home = Path('{}/pearl'.format(xdg_config_home))
+            return config_home / 'pearl.conf'
         return config_filename
 
     def _load_packages(self, update_repos=False, verbose: int = 0):

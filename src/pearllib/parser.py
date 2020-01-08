@@ -101,7 +101,7 @@ def _create_emerge_parser(command_parsers):
 def _create_init_parser(command_parsers):
     command_parsers.add_parser(
         'init',
-        help='Init $HOME/.config/pearl config directory'
+        help='Init Pearl directories and files: $HOME/.local/share/pearl and $HOME/.config/pearl/pearl.conf'
     )
 
 

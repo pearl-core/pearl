@@ -66,8 +66,9 @@ Despite of this, Ansible has few drawbacks when using it for lightweight forms o
 
 Quickstart
 ==========
-The Pearl CLI script allows to: `list`, `search`, `install`, `update`, `emerge`,
-`remove` the Pearl packages defined according to the configuration located in `~/.config/pearl/pearl.conf`
+The Pearl command allows to: `list`, `search`, `install`, `update`, `emerge`,
+`remove` the Pearl packages defined according to the configuration located in
+`$XDG_CONFIG_HOME/pearl/pearl.conf` (defaults to `~/.config/pearl/pearl.conf`)
 
 ![quickstart](https://raw.githubusercontent.com/pearl-core/resources/master/pearl-opt3.gif)
 
@@ -259,8 +260,8 @@ This will make sure that `~/.bashrc` will run at shell startup.
 Create your own Pearl package in seconds!
 ===============
 **Any git repository is already a Pearl package**. For instance, in order
-to see a dotfiles repository in Pearl, you just need to change
-the Pearl configuration file located in `$HOME/.config/pearl/pearl.conf`.
+to manage a dotfiles repository in Pearl, you just need to change
+the Pearl configuration file located in `$XDG_CONFIG_HOME/pearl/pearl.conf`.
 
 Add the following line to `pearl.conf` file:
 
@@ -308,7 +309,7 @@ The files inside `pearl-config` are also **optional** scripts:
 
 The following variables can be used in any of the previous scripts:
 
-- `PEARL_HOME`          - Pearl location (default: `$HOME/.config/pearl`)
+- `PEARL_HOME`          - Pearl location (`$XDG_DATA_HOME/pearl` which by default is `$HOME/.local/share/pearl`)
 - `PEARL_ROOT`          - Pearl script location
 - `PEARL_PKGDIR`        - Pearl package location
 - `PEARL_PKGVARDIR`     - Pearl package location containing data needed for package
@@ -482,7 +483,7 @@ project inside Pearl environment.
 
 ### Point directly to the third-party git repository ###
 Let's suppose you want to install the [vim-rails](https://github.com/tpope/vim-rails) plugin.
-In your Pearl configuration (~/.config/pearl/pearl.conf), add your new Pearl package:
+In your Pearl configuration (`$XDG_CONFIG_HOME/pearl/pearl.conf`), add your new Pearl package:
 
     PEARL_PACKAGES = {
         "vim-rails": {

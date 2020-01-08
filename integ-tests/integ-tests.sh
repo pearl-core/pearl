@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -ex
+set -e
 
 unset PEARL_ROOT
 unset PEARL_HOME
@@ -14,7 +14,7 @@ then
 fi
 
 export PEARL_ROOT="$1"
-export PEARL_HOME="${HOME}/.config/pearl"
+export PEARL_HOME="${HOME}/.local/share/pearl"
 export PATH=$PEARL_ROOT/bin:$PATH
 
 # In later versions of Travis the signals are not recognized in zsh: QUIT TERM KILL ABRT

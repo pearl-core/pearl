@@ -13,6 +13,10 @@
   * `-vv` allows to enable xtrace in hook functions
 * Add `--update-repos` option
 * Shortcut commands (i.e. `i` to specify `install` command) are no longer available
+* Pearl file locations change drastically in order to be complaint with the
+[XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
+  * As of now, `pearl.conf` resides in `$XDG_CONFIG_HOME/pearl` (default `~/.config/pearl`)
+  * The new location for `$PEARL_HOME` is `$XDG_DATA_HOME/pearl` (default `~/.local/share/pearl`)
 
 ## [1.8.2][v182] - 2019-10-13 ##
 

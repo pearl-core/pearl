@@ -25,8 +25,7 @@ def test_init(tmp_path):
 
     pearl_env = mock.Mock(spec=PearlEnvironment)
     pearl_env.home = (tmp_path / 'pearlhome')
-    (pearl_env.home / 'bin').mkdir(parents=True)
-    (pearl_env.home / 'bin/pearl').touch()
+    pearl_env.config_filename = (tmp_path / 'home/.config/pearl/pearl.conf')
 
     pearl_env.root = (tmp_path / 'pearlroot')
     (pearl_env.root / 'bin').mkdir(parents=True)
@@ -47,7 +46,7 @@ def test_init(tmp_path):
         assert (pearl_env.home / 'var').is_dir()
 
         assert (pearl_env.home / 'bin/pearl').is_symlink()
-        assert (pearl_env.home / 'pearl.conf').is_file()
+        assert pearl_env.config_filename.is_file()
 
         static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
         assert (tmp_path / 'home/.bashrc').read_text() == "export PEARL_ROOT={}\nsource {}/boot/sh/pearl.sh\n".format(
