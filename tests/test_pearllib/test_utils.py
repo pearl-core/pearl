@@ -212,6 +212,23 @@ def test_run_pearl_bash_show_xtrace(tmp_path):
     assert re.match(r"\+\s?echo hello\n", result.stderr) is not None
 
 
+def test_run_pearl_bash_enable_errexit(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    root_dir = create_pearl_root(tmp_path)
+    pearl_env = create_pearl_env(home_dir, root_dir, {})
+
+    script = """
+    echo hello1
+    false
+    echo hello2
+    """
+    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, check=False, enable_errexit=True)
+    assert "hello1\n" == result.stdout
+
+    result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, check=False, enable_errexit=False)
+    assert "hello1\nhello2\n" == result.stdout
+
+
 @pytest.mark.parametrize(
     'answers, yes_as_default_answer, expected_result',
     [

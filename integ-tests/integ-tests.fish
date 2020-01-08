@@ -49,7 +49,7 @@ pearl list
 info Install ALL pearl packages
 for package in (pearl list --package-only)
     pearl --verbose --no-confirm emerge $package; or die "Error on pearl install $package"
-    [ -d "$PEARL_HOME/packages/pearl/$package" ]; or die "$PEARL_HOME/packages/pearl/$package does not exist"
+    [ -d "$PEARL_HOME/packages/$package" ]; or die "$PEARL_HOME/packages/$package does not exist"
 end
 
 info Update ALL Pearl packages
@@ -62,7 +62,7 @@ pearl list
 info Remove ALL pearl packages
 for package in (get_all_packages)
     pearl --verbose --no-confirm remove $package; or die "Error on pearl remove $package"
-    [ -d "$PEARL_HOME/packages/pearl/$package" ]; and die "$PEARL_HOME/packages/pearl/$package still exists"
+    [ -d "$PEARL_HOME/packages/$package" ]; and die "$PEARL_HOME/packages/$package still exists"
 end
 
 yes | pearl remove; or die "Error on pearl remove"

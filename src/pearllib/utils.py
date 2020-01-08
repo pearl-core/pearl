@@ -11,7 +11,7 @@ from pearllib.messenger import messenger
 from pearllib.pearlenv import PearlEnvironment
 
 _BASH_SCRIPT_HEADER_TEMPLATE = dedent("""
-set -e -o pipefail
+set -o pipefail
 
 PEARL_ROOT="{pearlroot}"
 PEARL_HOME="{pearlhome}"
@@ -49,6 +49,7 @@ def run_pearl_bash(
         check: bool = True,
         input: str = None,
         show_xtrace: bool = False,
+        enable_errexit: bool = True,
 ):
     """Runs a bash script within the Pearl ecosystem."""
 
@@ -58,6 +59,8 @@ def run_pearl_bash(
         static=pkg_resources.resource_filename('pearllib', 'static/'),
     )
     script_template = '{bashheader}\nset -x\n{script}' if show_xtrace else '{bashheader}\n{script}'
+    if enable_errexit:
+        script_template = 'set -e\n{}'.format(script_template)
 
     script = script_template.format(
         bashheader=bash_header,
