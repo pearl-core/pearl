@@ -157,16 +157,16 @@ make test
 ```
 
 #### Integration Tests ####
-The integration tests attempt to test Pearl code by creating a fake `$HOME` directory.
+The integration tests attempt to test Pearl code
+and modify the content of the `$PEARL_HOME`.
 You need to specify the Pearl code location (aka `PEARL_ROOT`).
 
 For instance, to run locally the integration tests against Pearl
-located in `$HOME/.local/share/pearl` using `Bash`, `Zsh` and `Fish` shells:
+located in `$HOME/pearl` using `Bash`, `Zsh` and `Fish` shells:
 ```sh
-# TBD:
-# bash ./tests/integ-tests/integ-tests.sh $HOME/.local/share/pearl
-# zsh ./tests/integ-tests/integ-tests.sh $HOME/.local/share/pearl
-# fish ./tests/integ-tests/integ-tests.fish $HOME/.local/share/pearl
+# bash ./integ-tests/integ-tests.sh $HOME/pearl
+# zsh ./integ-tests/integ-tests.sh $HOME/pearl
+# fish ./integ-tests/integ-tests.fish $HOME/pearl
 ```
 
 Generally, there is no need to run integration tests locally

@@ -102,10 +102,15 @@ class PearlEnvironment:
         if verbose:
             messenger.info("Found Pearl home: {}".format(home))
 
-        if env_initialized and not home.is_dir():
-            msg = 'Error: The value in environment variable PEARL_HOME is not a directory: {}'.format(home)
-            messenger.warn(msg)
-            raise ValueError(msg)
+        if env_initialized:
+            if home.exists() and not home.is_dir():
+                msg = 'Error: The value in environment variable PEARL_HOME is not a directory: {}.'.format(home)
+                messenger.warn(msg)
+                raise ValueError(msg)
+            elif not home.exists():
+                msg = 'Pearl environment has not been initialized. Run "pearl init" first.'
+                messenger.warn(msg)
+                raise ValueError(msg)
 
         return home
 

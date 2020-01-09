@@ -18,10 +18,11 @@ requirements = []
 
 setup(
     # General project information:
-    name="Pearl",
+    name="pearl-pm",
     url='http://github.com/pearl-core/pearl',
+    download_url='https://github.com/pearl-core/pearl/releases',
     version=version,
-    keywords='pearl',
+    keywords=['pearl', 'shell', 'dotfiles', 'package manager'],
     description="Pearl is a lightweight package manager for automating "
                 "reproducible environments between different systems (Linux and OSX)."
                 "It can be used for dotfiles, plugins, programs and "
@@ -33,6 +34,7 @@ setup(
     license="GNU General Public License v3",
     # https://pypi.org/classifiers/
     classifiers=[
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
@@ -44,6 +46,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
+        'Topic :: Software Development :: Build Tools',
         "Topic :: System :: Software Distribution",
         "Topic :: System :: Shells",
         "Topic :: Utilities",

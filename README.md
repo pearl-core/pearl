@@ -204,27 +204,44 @@ Dependencies
 Before installing Pearl be sure that all dependencies are properly installed in your system.
 The Pearl dependencies are the following:
 
+### Mandatory
+- [python (>=3.5)](https://www.python.org/)
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8)](https://git-scm.com/)
-- [GNU coreutils](https://www.gnu.org/software/coreutils/)
-- [grep](https://www.gnu.org/software/grep/) optional
-- [sed](https://www.gnu.org/software/sed/) optional
 
+### Optional
+The following are not mandatory dependencies but can be handy to have for writing the hook functions in Pearl packages.
+All the Linux distributions have these dependencies already installed.
+
+- [GNU coreutils](https://www.gnu.org/software/coreutils/)
+- [grep](https://www.gnu.org/software/grep/) 
+- [sed](https://www.gnu.org/software/sed/) 
+
+### Additional shells supported
 Pearl supports also the following shells:
 
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
 
+
 Linux
 -----
 Assuming all Pearl [dependencies](#dependencies) are properly installed
-in the system, to install Pearl run the following:
-```sh
-wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
-# or
-curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+in the system, to install Pearl you can use the `pip` command.
+It is not a good option to use virtual environments such as
+`virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
+It is recommended to use the system-wide `pip`.
+The following will install the package in your `$HOME` directory (`~/.local/`):
+```
+/usr/bin/pip install --user pearlshell
+export PATH="~/.local/bin:$PATH"
+```
 
-bash install.sh
+Pearl command will be located in `~/.local/bin/pearl`
+
+To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
+```
+pearl init
 ```
 
 OSX
@@ -234,17 +251,23 @@ In order to install all Pearl dependencies, you first need to install [Homebrew]
 To install all the needed dependencies via Homebrew:
 ```sh
 brew update
-brew install bash git coreutils grep gnu-sed
+brew install bash git coreutils grep gnu-sed python
 ```
 
-Once all Pearl dependencies are properly installed in the system, to install Pearl
-run the following:
-```sh
-wget https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
-# or
-curl -LO  https://raw.githubusercontent.com/pearl-core/installer/master/install.sh
+It is not a good option to use virtual environments such as
+`virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
+It is recommended to use the system-wide `pip`.
+The following will install the package in your `$HOME` directory (`~/.local/`):
+```
+/usr/bin/pip install --user pearlshell
+export PATH="~/.local/bin:$PATH"
+```
 
-bash install.sh
+Pearl command will be located in `~/.local/bin/pearl`
+
+To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
+```
+pearl init
 ```
 
 **IMPORTANT NOTE**: Pearl gets loaded through `~/.bashrc`. The problem is that in OSX,

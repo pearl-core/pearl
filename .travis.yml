@@ -62,4 +62,3 @@ script:
   - bash ./integ-tests/integ-tests.sh $PWD
   - zsh ./integ-tests/integ-tests.sh $PWD
   - fish ./integ-tests/integ-tests.fish $PWD
-

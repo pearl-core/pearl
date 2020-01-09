@@ -98,7 +98,7 @@ clean-conda: ## removes conda
 	rm -rf ~/miniconda3
 
 install-conda: clean-conda ## install conda
-	./integ-tests/install-conda.sh
+	./bin/install-conda.sh
 	$(CONDA_EXE) update --yes conda
 
 PYTHON_VERSION ?= 3.5
