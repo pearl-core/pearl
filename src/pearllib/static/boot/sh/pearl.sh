@@ -2,10 +2,6 @@
 # vim: set ft=sh ts=4 sw=4 noet:
 
 ####################### VARIABLES & IMPORTS ############################
-[[ -z "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT environment variable does not exist." 1>&2; return 1; }
-[[ ! -d "${PEARL_ROOT}" ]] && { echo "Error: PEARL_ROOT directory '${PEARL_ROOT}' does not exist." 1>&2; return 2; }
-
-export PEARL_ROOT
 export PEARL_HOME=${XDG_DATA_HOME:="$HOME/.local/share"}/pearl
 # Fallback to a default temp directory if tty does not work
 if tty -s
@@ -19,10 +15,6 @@ mkdir -p ${PEARL_TEMPORARY}
 if [[ $PATH != *"${PEARL_HOME}/bin"* ]]
 then
     PATH=$PATH:${PEARL_HOME}/bin
-fi
-if [[ $MANPATH != *"${PEARL_ROOT}/man"* ]]
-then
-    MANPATH=$MANPATH:${PEARL_ROOT}/man
 fi
 
 ################################# MAIN ##############################
@@ -62,6 +54,8 @@ if [ "$(ls -A ${PEARL_HOME}/packages)" ]; then
 fi
 
 function pearl-source() {
-    source ${PEARL_ROOT}/boot/sh/pearl.sh
+    [[ -n "$ZSH_NAME" ]] && source ${HOME}/.zshrc
+    [[ -n "$BASH" ]] && source ${HOME}/.bashrc
+    return 0
 }
 

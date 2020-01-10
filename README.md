@@ -210,7 +210,7 @@ The Pearl dependencies are the following:
 - [git (>=1.8)](https://git-scm.com/)
 
 ### Optional
-The following are not mandatory dependencies but can be handy to have for writing the hook functions in Pearl packages.
+The following are not mandatory dependencies but can be handy to have for the hook functions in Pearl package.
 All the Linux distributions have these dependencies already installed.
 
 - [GNU coreutils](https://www.gnu.org/software/coreutils/)
@@ -228,12 +228,12 @@ Linux
 -----
 Assuming all Pearl [dependencies](#dependencies) are properly installed
 in the system, to install Pearl you can use the `pip` command.
-It is not a good option to use virtual environments such as
+Unless there is a specific use case, it is not a good option to use virtual environments such as
 `virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
-It is recommended to use the system-wide `pip`.
+It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
 The following will install the package in your `$HOME` directory (`~/.local/`):
 ```
-/usr/bin/pip install --user pearlshell
+/usr/bin/pip install --user pearlcli
 export PATH="~/.local/bin:$PATH"
 ```
 
@@ -254,12 +254,12 @@ brew update
 brew install bash git coreutils grep gnu-sed python
 ```
 
-It is not a good option to use virtual environments such as
+Unless there is a specific use case, it is not a good option to use virtual environments such as
 `virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
-It is recommended to use the system-wide `pip`.
+It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
 The following will install the package in your `$HOME` directory (`~/.local/`):
 ```
-/usr/bin/pip install --user pearlshell
+/usr/bin/pip install --user pearlcli
 export PATH="~/.local/bin:$PATH"
 ```
 
@@ -333,7 +333,6 @@ The files inside `pearl-config` are also **optional** scripts:
 The following variables can be used in any of the previous scripts:
 
 - `PEARL_HOME`          - Pearl location (`$XDG_DATA_HOME/pearl` which by default is `$HOME/.local/share/pearl`)
-- `PEARL_ROOT`          - Pearl script location
 - `PEARL_PKGDIR`        - Pearl package location
 - `PEARL_PKGVARDIR`     - Pearl package location containing data needed for package
 - `PEARL_PKGNAME`       - Pearl package name

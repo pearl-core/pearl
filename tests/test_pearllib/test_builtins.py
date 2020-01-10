@@ -1,11 +1,10 @@
 from pearllib.utils import run_pearl_bash
-from test_pearllib.utils import create_pearl_home, create_pearl_root, create_pearl_env
+from test_pearllib.utils import create_pearl_home, create_pearl_env
 
 
 def test_link_to_path_null_executable_path(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = """
     link_to_path ""
@@ -17,8 +16,7 @@ def test_link_to_path_null_executable_path(tmp_path):
 def test_link_to_path(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     (home_dir / 'bin').mkdir()
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = """
     echo "Content" > {tmppath}/binary
@@ -34,8 +32,7 @@ def test_link_to_path(tmp_path):
 def test_link_to_path_new_executable_name(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     (home_dir / 'bin').mkdir()
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = """
     echo "Content" > {tmppath}/binary
@@ -50,8 +47,7 @@ def test_link_to_path_new_executable_name(tmp_path):
 
 def test_unlink_from_path_null_executable_path(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = """
     unlink_from_path ""
@@ -67,8 +63,7 @@ def test_unlink_from_path(tmp_path):
     (home_dir / 'bin').mkdir()
     (home_dir / 'bin/binary').symlink_to(tmp_path / 'binary')
 
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     assert (home_dir / 'bin/binary').exists()
 
@@ -89,8 +84,7 @@ def test_unlink_from_path_new_executable_name(tmp_path):
     (home_dir / 'bin').mkdir()
     (home_dir / 'bin/new_binary').symlink_to(tmp_path / 'binary')
 
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     assert (home_dir / 'bin/new_binary').exists()
 

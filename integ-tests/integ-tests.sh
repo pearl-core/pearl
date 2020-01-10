@@ -2,7 +2,6 @@
 
 set -e
 
-unset PEARL_ROOT
 unset PEARL_HOME
 unset PEARL_TEMPORARY
 

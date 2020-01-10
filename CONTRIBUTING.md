@@ -159,7 +159,7 @@ make test
 #### Integration Tests ####
 The integration tests attempt to test Pearl code
 and modify the content of the `$PEARL_HOME`.
-You need to specify the Pearl code location (aka `PEARL_ROOT`).
+You need to specify the Pearl code location.
 
 For instance, to run locally the integration tests against Pearl
 located in `$HOME/pearl` using `Bash`, `Zsh` and `Fish` shells:

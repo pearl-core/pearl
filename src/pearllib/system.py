@@ -5,12 +5,10 @@ from pathlib import Path
 import pkg_resources
 import shutil
 
-from textwrap import dedent
-
 from pearllib.messenger import messenger, Color
 from pearllib.package import remove_package, update_package
 from pearllib.pearlenv import PearlEnvironment
-from pearllib.utils import apply, ask, unapply, run_pearl_bash
+from pearllib.utils import apply, ask, unapply
 
 
 def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
@@ -31,10 +29,6 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     (pearl_env.home / 'tmp').mkdir(parents=True, exist_ok=True)
     (pearl_env.home / 'var').mkdir(parents=True, exist_ok=True)
 
-    if (pearl_env.home / 'bin/pearl').exists():
-        (pearl_env.home / 'bin/pearl').unlink()
-    (pearl_env.home / 'bin/pearl').symlink_to(pearl_env.root / 'bin/pearl')
-
     static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
 
     if not pearl_env.config_filename.exists():
@@ -50,8 +44,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
         shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
 
     apply(
-        "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
-            pearlroot=pearl_env.root,
+        "source {static}/boot/sh/pearl.sh".format(
             static=static,
         ),
         "{}/.bashrc".format(os.environ['HOME'])
@@ -64,8 +57,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
-            pearlroot=pearl_env.root,
+        "source {static}/boot/sh/pearl.sh".format(
             static=static,
         ),
         "{}/.zshrc".format(os.environ['HOME'])
@@ -78,8 +70,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "set -x PEARL_ROOT {pearlroot}\nsource {static}/boot/fish/pearl.fish".format(
-            pearlroot=pearl_env.root,
+        "source {static}/boot/fish/pearl.fish".format(
             static=static,
         ),
         '{}/.config/fish/config.fish'.format(os.environ['HOME'])
@@ -105,7 +96,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "source {static}/boot/emacs/pearl.el".format(static=static),
+        "(load-file \"{static}/boot/emacs/pearl.el\")".format(static=static),
         "{}/.emacs".format(os.environ['HOME'])
     )
     messenger.print(
@@ -142,8 +133,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         yes_as_default_answer=False, no_confirm=args.no_confirm
     ):
         unapply(
-            "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
-                pearlroot=pearl_env.root,
+            "source {static}/boot/sh/pearl.sh".format(
                 static=static,
             ),
             "{}/.bashrc".format(os.environ['HOME'])
@@ -156,8 +146,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "export PEARL_ROOT={pearlroot}\nsource {static}/boot/sh/pearl.sh".format(
-                pearlroot=pearl_env.root,
+            "source {static}/boot/sh/pearl.sh".format(
                 static=static,
             ),
             "{}/.zshrc".format(os.environ['HOME'])
@@ -170,8 +159,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "set -x PEARL_ROOT {pearlroot}\nsource {static}/boot/fish/pearl.fish".format(
-                pearlroot=pearl_env.root,
+            "source {static}/boot/fish/pearl.fish".format(
                 static=static,
             ),
             '{}/.config/fish/config.fish'.format(os.environ['HOME'])
@@ -195,7 +183,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "source {static}/boot/emacs/pearl.el".format(static=static),
+            "(load-file \"{static}/boot/emacs/pearl.el\")".format(static=static),
             "{}/.emacs".format(os.environ['HOME'])
         )
         messenger.print(
@@ -214,27 +202,6 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
 
 def update_pearl(pearl_env: PearlEnvironment, args: Namespace):
     """Updates the Pearl environment."""
-    if ask(
-        "Do you want to update Pearl main codebase located in {}?".format(pearl_env.root),
-        yes_as_default_answer=False,
-        no_confirm=args.no_confirm,
-    ):
-        messenger.print(
-            '{cyan}* {normal}Updating Pearl script'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-            )
-        )
-        quiet = "false" if args.verbose else "true"
-        script = dedent(
-            """
-            update_git_repo {pearlroot} "master" {quiet}
-            """
-        ).format(
-            pearlroot=pearl_env.root,
-            quiet=quiet)
-        run_pearl_bash(script, pearl_env, input='' if args.no_confirm else None)
-
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
             if package.is_installed():

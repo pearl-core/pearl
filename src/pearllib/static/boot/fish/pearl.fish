@@ -3,16 +3,6 @@
 # vim: set ft=fish ts=4 sw=4 noet:
 
 ####################### VARIABLES & IMPORTS ############################
-if [ -z "$PEARL_ROOT" ]
-    echo "Error: PEARL_ROOT environment variable does not exist." 1>&2
-    exit 1
-end
-
-if [ ! -d "$PEARL_ROOT" ]
-    echo "Error: PEARL_ROOT directory '$PEARL_ROOT' does not exist." 1>&2
-    exit 2
-end
-
 set -x PEARL_HOME $HOME/.local/share/pearl
 # Fallback to a default temp directory if tty does not work
 if tty -s
@@ -24,9 +14,6 @@ mkdir -p $PEARL_TEMPORARY
 
 if not contains $PEARL_HOME/bin $PATH
     set PATH $PATH $PEARL_HOME/bin
-end
-if not contains $PEARL_ROOT/man $MANPATH
-    set MANPATH $MANPATH $PEARL_ROOT/man
 end
 
 ################################# MAIN ##############################
@@ -50,5 +37,5 @@ for reponame in $PEARL_HOME/packages/*
 end
 
 function pearl-source
-    source $PEARL_ROOT/boot/fish/pearl.fish
+    source $HOME/.config/fish/config.fish
 end

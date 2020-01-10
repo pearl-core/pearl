@@ -1,5 +1,5 @@
 
-if isdirectory($PEARL_ROOT) && isdirectory($PEARL_HOME)
+if isdirectory($PEARL_HOME)
     """"""""""""""""""
     " Package loader
     """"""""""""""""""

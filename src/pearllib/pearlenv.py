@@ -65,13 +65,12 @@ class Package:
 
 class PearlEnvironment:
     def __init__(
-            self, home: Path = None, root: Path = None,
+            self, home: Path = None,
             config_filename: Path = None, update_repos: bool = False,
             verbose: int = 0, env_initialized: bool = True
     ):
         self._home = self._get_home(home, verbose, env_initialized)
-        self._root = self._get_root(root, verbose)
-        self._config_filename = self._get_config_filename(config_filename)
+        self._config_filename = self._get_config_filename(config_filename, env_initialized)
 
         if env_initialized:
             self._packages = self._load_packages(update_repos, verbose)
@@ -79,10 +78,6 @@ class PearlEnvironment:
     @property
     def home(self) -> Path:
         return self._home
-
-    @property
-    def root(self) -> Path:
-        return self._root
 
     @property
     def config_filename(self) -> Path:
@@ -97,7 +92,7 @@ class PearlEnvironment:
         if home is None:
             xdg_data_home = os.environ.get('XDG_DATA_HOME', '{}/.local/share'.format(os.environ['HOME']))
             default_home = '{}/pearl'.format(xdg_data_home)
-            home = Path(os.environ.get('PEARL_HOME', default_home))
+            home = Path(default_home)
 
         if verbose:
             messenger.info("Found Pearl home: {}".format(home))
@@ -115,24 +110,21 @@ class PearlEnvironment:
         return home
 
     @staticmethod
-    def _get_root(root: Path, verbose: int = 0) -> Path:
-        if verbose:
-            messenger.info("Found Pearl root: {}".format(root))
-
-        if not root.is_dir():
-            msg = 'Error: The Pearl root ' \
-                  '(where the pearl command is located) is not a directory: {}'.format(root)
-            messenger.warn(msg)
-            raise ValueError(msg)
-
-        return root
-
-    @staticmethod
-    def _get_config_filename(config_filename: Path = None) -> Path:
+    def _get_config_filename(config_filename: Path = None, env_initialized: bool = True) -> Path:
         if config_filename is None:
             xdg_config_home = os.environ.get('XDG_CONFIG_HOME', '{}/.config'.format(os.environ['HOME']))
             config_home = Path('{}/pearl'.format(xdg_config_home))
-            return config_home / 'pearl.conf'
+            config_filename = config_home / 'pearl.conf'
+
+        if env_initialized:
+            if config_filename.exists() and not config_filename.is_file():
+                msg = 'Error: The configuration in {} is not a file.'.format(config_filename)
+                messenger.warn(msg)
+                raise ValueError(msg)
+            elif not config_filename.exists():
+                msg = 'Pearl configuration file does not exist. Run "pearl init" first.'
+                messenger.warn(msg)
+                raise ValueError(msg)
         return config_filename
 
     def _load_packages(self, update_repos=False, verbose: int = 0):

@@ -18,7 +18,7 @@ requirements = []
 
 setup(
     # General project information:
-    name="pearl-pm",
+    name="pearlcli",
     url='http://github.com/pearl-core/pearl',
     download_url='https://github.com/pearl-core/pearl/releases',
     version=version,
@@ -56,6 +56,7 @@ setup(
     packages=find_packages(where="src", exclude=("tests",)),
     package_dir={"": "src"},
     package_data={"pearllib": ["static/buava/lib/*"]},
+    include_package_data=True,
     data_files=data_files,
     scripts=['bin/pearl'],
 

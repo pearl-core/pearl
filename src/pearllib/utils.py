@@ -13,7 +13,6 @@ from pearllib.pearlenv import PearlEnvironment
 _BASH_SCRIPT_HEADER_TEMPLATE = dedent("""
 set -o pipefail
 
-PEARL_ROOT="{pearlroot}"
 PEARL_HOME="{pearlhome}"
 
 cd "$PEARL_HOME"
@@ -54,7 +53,6 @@ def run_pearl_bash(
     """Runs a bash script within the Pearl ecosystem."""
 
     bash_header = _BASH_SCRIPT_HEADER_TEMPLATE.format(
-        pearlroot=pearl_env.root,
         pearlhome=pearl_env.home,
         static=pkg_resources.resource_filename('pearllib', 'static/'),
     )

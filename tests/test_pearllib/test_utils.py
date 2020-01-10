@@ -7,7 +7,7 @@ from unittest import mock
 
 from pearllib.utils import verify_bash_dep, verify_git_dep, check_and_copy, ask, apply, unapply, run_bash, \
     run_pearl_bash
-from test_pearllib.utils import create_pearl_env, create_pearl_home, create_pearl_root
+from test_pearllib.utils import create_pearl_env, create_pearl_home
 
 _MODULE_UNDER_TEST = 'pearllib.utils'
 
@@ -172,11 +172,9 @@ def test_run_bash(script, input, expected_stdout, expected_status):
 
 def test_run_pearl_bash(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = """
-    echo $PEARL_ROOT
     echo $PEARL_HOME
     echo $PWD
     echo $PATH
@@ -188,15 +186,15 @@ def test_run_pearl_bash(tmp_path):
 
     if platform.system() == 'Darwin':
         assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
-            root_dir, home_dir, home_dir,
+            home_dir, home_dir,
             '/usr/local/opt/gnu-sed/libexec/gnubin:'
             '/usr/local/opt/grep/libexec/gnubin:'
             '/usr/local/opt/coreutils/libexec/gnubin:' + os.environ['PATH'],
             "\x1b[1;36mTest\x1b[0m"
         )
     elif platform.system() == 'Linux':
-        assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
-            root_dir, home_dir, home_dir,
+        assert result.stdout == "{}\n{}\n{}\n{}\n".format(
+            home_dir, home_dir,
             os.environ['PATH'],
             "\x1b[1;36mTest\x1b[0m"
         )
@@ -204,8 +202,7 @@ def test_run_pearl_bash(tmp_path):
 
 def test_run_pearl_bash_enable_xtrace(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = "echo hello"
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, capture_stderr=True, enable_xtrace=True)
@@ -214,8 +211,7 @@ def test_run_pearl_bash_enable_xtrace(tmp_path):
 
 def test_run_pearl_bash_enable_errexit(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    root_dir = create_pearl_root(tmp_path)
-    pearl_env = create_pearl_env(home_dir, root_dir, {})
+    pearl_env = create_pearl_env(home_dir, {})
 
     script = """
     echo hello1

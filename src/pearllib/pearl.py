@@ -49,14 +49,13 @@ def _pearl(pearl_env: PearlEnvironment, args):
         pack.list_packages(pearl_env, args)
 
 
-def pearl(sys_args: list, pearl_root_dir: Path = None, pearl_home_dir: Path = None):
+def pearl(sys_args: list, pearl_home_dir: Path = None):
     verify_runtime_deps()
 
     args = parse_args(sys_args)
 
     pearl_env = PearlEnvironment(
         home=pearl_home_dir,
-        root=pearl_root_dir,
         config_filename=Path(args.config_file) if args.config_file is not None else None,
         update_repos=args.update_repos,
         verbose=args.verbose,

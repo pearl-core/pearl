@@ -8,8 +8,7 @@ from pearllib.pearl import pearl
 
 
 def main():
-    pearl_root_dir = Path(os.path.dirname(os.path.realpath(__file__)) + '/..').resolve()
-    pearl(sys.argv[1:], pearl_root_dir)
+    pearl(sys.argv[1:])
 
 
 if __name__ == '__main__':
