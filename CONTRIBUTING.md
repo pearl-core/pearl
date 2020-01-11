@@ -164,9 +164,9 @@ You need to specify the Pearl code location.
 For instance, to run locally the integration tests against Pearl
 located in `$HOME/pearl` using `Bash`, `Zsh` and `Fish` shells:
 ```sh
-# bash ./integ-tests/integ-tests.sh $HOME/pearl
-# zsh ./integ-tests/integ-tests.sh $HOME/pearl
-# fish ./integ-tests/integ-tests.fish $HOME/pearl
+# bash ./ci/integ-tests.sh $HOME/pearl
+# zsh ./ci/integ-tests.sh $HOME/pearl
+# fish ./ci/integ-tests.fish $HOME/pearl
 ```
 
 Generally, there is no need to run integration tests locally

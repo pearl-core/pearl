@@ -30,11 +30,13 @@ CONDA_EXE = ~/miniconda3/condabin/conda
 CONDA_ENV_DIR = $(shell cat ${HOME}/.conda/environments.txt | grep envs/pearl)
 CONDA_ENV_BIN = $(CONDA_ENV_DIR)/bin/wrappers/conda
 
-PYTHON = $(CONDA_ENV_BIN)/python
-PYTEST = $(PYTHON) -m pytest
-PIP = $(PYTHON) -m pip
-FLAKE8 = $(PYTHON) -m flake8
 COVERAGE = $(PYTHON) -m coverage
+FLAKE8 = $(PYTHON) -m flake8
+PIP = $(PYTHON) -m pip
+PYTEST = $(PYTHON) -m pytest
+PYTHON = $(CONDA_ENV_BIN)/python
+TOX = $(PYTHON) -m tox
+TWINE = $(PYTHON) -m twine
 
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
@@ -67,7 +69,7 @@ test: ## run tests quickly with the default Python
 	$(PYTEST)
 
 test-all: ## run tests on every Python version with tox
-	tox
+	$(TOX)
 
 coverage: ## check code coverage quickly with the default Python
 	$(COVERAGE) run --source pearllib -m pytest
@@ -86,12 +88,17 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
+TWINE_REPOSITORY ?= https://pypi.org/legacy/
 release: dist ## package and upload a release
-	twine upload dist/*
+	$(TWINE) upload --repository-url $(TWINE_REPOSITORY) dist/*
+
+release-ci: dist ## package and upload a release from CI
+    # @ will not show the command to avoid exposing the password
+	@$(TWINE) upload -p $(TWINE_PASSWORD) -u $(TWINE_USER) --repository-url $(TWINE_REPOSITORY) dist/*
 
 dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
+	$(PYTHON) setup.py sdist
+	$(PYTHON) setup.py bdist_wheel
 	ls -l dist
 
 clean-conda: ## removes conda
@@ -111,7 +118,7 @@ create-conda-wrappers: ## create wrapper executables to be accessible outside th
 
 upgrade: ## upgrades all dependencies
 	$(PIP) install --upgrade -r requirements-dev.in
-	$(PIP) freeze >> requirements-dev.txt
+	$(PIP) freeze | grep -v pearl > requirements-dev.txt
 
 install: clean ## install the package to the active Python's site-packages
 	$(PIP) install -e .[dev]

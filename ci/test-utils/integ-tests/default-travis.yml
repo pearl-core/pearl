@@ -1,0 +1,27 @@
+# This is the Travis yml file template.
+# Copy this to the Pearl package.
+#
+# vim: ft=yaml
+
+os:
+  - linux
+  - osx
+
+language: bash
+
+sudo: required
+
+env:
+  - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.0"
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./tests/test-utils/installs/install-linux-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./tests/test-utils/installs/install-osx-deps.sh; fi;
+
+install:
+  - curl -sL https://git.io/vV4yE | sh
+  - source ~/.bashrc
+  - echo "PEARL_PACKAGES['test']='${PWD}'" >> ~/.config/pearl/pearl.conf
+
+script:
+  - bash ./tests/test-utils/integ-tests/default-integ-tests.sh

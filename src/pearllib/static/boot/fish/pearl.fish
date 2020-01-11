@@ -30,5 +30,5 @@ for reponame in $PEARL_HOME/packages/*
 end
 
 function pearl-source
-    source "${PEARL_HOME}/boot/fish/pearl.fish"
+    source "$PEARL_HOME/boot/fish/pearl.fish"
 end

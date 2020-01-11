@@ -1,7 +1,9 @@
 # Change Log #
 
-## [2.0.0][v200] - 2020-01-02 ##
+## [2.0.1][v201] - 2020-01-11 ##
 
+* Manual intervention to switch to Pearl v2
+  * [Migration page](https://github.com/pearl-core/pearl/wiki/Migration-to-Pearl-version-2)
 * Codebase re-written in Python
 * Remove the `post_remove`
 * `pearl.conf` is not a python script. This requires manual intervention. Take a look at the `pearl.conf.template` file in codebase
@@ -223,4 +225,4 @@
 [v180]: https://github.com/pearl-core/pearl/releases/tag/1.8.0
 [v181]: https://github.com/pearl-core/pearl/releases/tag/1.8.1
 [v182]: https://github.com/pearl-core/pearl/releases/tag/1.8.2
-[v200]: https://github.com/pearl-core/pearl/releases/tag/2.0.0
+[v201]: https://github.com/pearl-core/pearl/releases/tag/2.0.1

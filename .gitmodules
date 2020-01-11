@@ -1,6 +1,6 @@
 [submodule "src/pearllib/static/buava"]
 	path = src/pearllib/static/buava
 	url = https://github.com/fsquillace/buava
-[submodule "integ-tests/test-utils"]
-	path = integ-tests/test-utils
+[submodule "ci/test-utils"]
+	path = ci/test-utils
 	url = https://github.com/pearl-core/test-utils.git

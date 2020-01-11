@@ -4,46 +4,55 @@ language: bash
 
 sudo: required
 
+
 jobs:
   include:
     - os: linux
       env:
         - PYTHON_VERSION="3.5"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: linux
       env:
         - PYTHON_VERSION="3.6"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: linux
       env:
         - PYTHON_VERSION="3.7"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: linux
       env:
         - PYTHON_VERSION="3.8"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: osx
       env:
         - PYTHON_VERSION="3.5"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: osx
       env:
         - PYTHON_VERSION="3.6"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: osx
       env:
         - PYTHON_VERSION="3.7"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
     - os: osx
       env:
         - PYTHON_VERSION="3.8"
         - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        - secure: "mBCYzW67w+zzOCpwdeoLn+Z/FrE3B2LDYHa0ges7p5FFr8NaOjgZtNoOxKHWdyvnXyZXfb/fcBp6NvOZxcTGz1oCpnlpoWbfZRaSjlYav18pRJ6Wxu8YWsSo76be+/bkf4UufO1PUPxK33/h+jfioNARFwaBtbnBk7mo8O5VsIBZ/Xb/HZakN1btwLm5TakJ1MXrBPJR908H7qA/q895BbLucj7o5lhzMRl5mzhUoEyWWNgTI91+AybtAwHEWSWtymMzGbQeDegFNtt8G8aO6at5YgcJrlshmqDvWCCv+SxEQZWfltnpgmdw3Pbo0xGSVKndZtZ7Xgg1mn4F6J+CrrmtXaDlEmby96dHmWAB7L9Zgd1UgOMXa/FsOuIdnc2rHrkIxyvVPzJfucK66Yb5DGYb0GllDRJMqelvGMef0MFhmM2ra/RAz2/tY7Y7gCsM2VjxVZnKD+JbR/93xTIr5Cl6DbYxtnkwBHvbiT1aGO2ZLe73ifwtD6lN62mDJJBe8B8RbMotjS141We4VhuBC+qc2+o5whe3UvTo09LVYXbxeTv75N194XnhRJjirz+SIi6G6aZLjaPfrkCAwpsYtsIOMTamHVDMpp56noi3UlkBRgebYqKBT9sD2XKYLy7gP8Hji0e4ShVhHHw2YiUiOmQpNmoDZiByB30mEut2r6A="
 
 before_install:
   - make install-conda
   - PYTHON_VERSION=$PYTHON_VERSION make init-env-conda
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./integ-tests/test-utils/installs/install-linux-deps.sh; fi;
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./integ-tests/test-utils/installs/install-osx-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./ci/test-utils/installs/install-linux-deps.sh; fi;
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./ci/test-utils/installs/install-osx-deps.sh; fi;
 
 install:
   - make install
@@ -59,6 +68,9 @@ script:
   - make lint
   - make test
   - pearl --help
-  - bash ./integ-tests/integ-tests.sh $PWD
-  - zsh ./integ-tests/integ-tests.sh $PWD
-  - fish ./integ-tests/integ-tests.fish $PWD
+  - bash ./ci/integ-tests.sh $PWD
+  - zsh ./ci/integ-tests.sh $PWD
+  - fish ./ci/integ-tests.fish $PWD
+
+after_success:
+  - ./ci/deploy.sh
