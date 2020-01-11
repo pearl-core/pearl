@@ -88,7 +88,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-TWINE_REPOSITORY ?= https://pypi.org/legacy/
+TWINE_REPOSITORY ?= https://upload.pypi.org/legacy/
 release: dist ## package and upload a release
 	$(TWINE) upload --repository-url $(TWINE_REPOSITORY) dist/*
 

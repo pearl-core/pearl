@@ -1,4 +1,5 @@
 import argparse
+import pkg_resources
 import textwrap
 
 
@@ -54,7 +55,8 @@ def _create_main_parser():
         help="-v increases output verbosity. "
              "-vv shows xtrace during the hook function execution."
     )
-    parser.add_argument('--version', '-V', action='version', version='%(prog)s 2.0')
+    version = pkg_resources.require("pearlcli")[0].version
+    parser.add_argument('--version', '-V', action='version', version='%(prog)s {}'.format(version))
     return parser
 
 

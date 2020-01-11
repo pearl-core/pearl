@@ -1,5 +1,10 @@
 # Change Log #
 
+## [2.0.2][v202] - 2020-01-11 ##
+
+* Add instructions to install Pearl in Arch Linux
+* Fix bug for version option
+
 ## [2.0.1][v201] - 2020-01-11 ##
 
 * Manual intervention to switch to Pearl v2
@@ -225,4 +230,4 @@
 [v180]: https://github.com/pearl-core/pearl/releases/tag/1.8.0
 [v181]: https://github.com/pearl-core/pearl/releases/tag/1.8.1
 [v182]: https://github.com/pearl-core/pearl/releases/tag/1.8.2
-[v201]: https://github.com/pearl-core/pearl/releases/tag/2.0.1
+[v202]: https://github.com/pearl-core/pearl/releases/tag/2.0.2

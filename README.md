@@ -226,6 +226,21 @@ Pearl supports also the following shells:
 
 Linux
 -----
+
+### Arch Linux
+
+Pearl can be installed in Arch Linux through AUR.
+The package is [pearl-git](https://aur.archlinux.org/packages/pearl-git/).
+
+For example, to install Pearl via [yay](https://github.com/Jguer/yay) AUR helper:
+```
+yay -S pearl-git
+```
+
+Any other AUR helpers can be found [here](https://wiki.archlinux.org/index.php/AUR_helpers).
+
+### Other Linux distributions
+
 Assuming all Pearl [dependencies](#dependencies) are properly installed
 in the system, to install Pearl you can use the `pip` command.
 Unless there is a specific use case, it is not a good option to use virtual environments such as
