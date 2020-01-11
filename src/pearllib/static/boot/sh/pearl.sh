@@ -3,14 +3,6 @@
 
 ####################### VARIABLES & IMPORTS ############################
 export PEARL_HOME=${XDG_DATA_HOME:="$HOME/.local/share"}/pearl
-# Fallback to a default temp directory if tty does not work
-if tty -s
-then
-    export PEARL_TEMPORARY=${PEARL_HOME}/tmp/$(tty)
-else
-    export PEARL_TEMPORARY=${PEARL_HOME}/tmp/default-tty
-fi
-mkdir -p ${PEARL_TEMPORARY}
 
 if [[ $PATH != *"${PEARL_HOME}/bin"* ]]
 then
@@ -54,8 +46,7 @@ if [ "$(ls -A ${PEARL_HOME}/packages)" ]; then
 fi
 
 function pearl-source() {
-    [[ -n "$ZSH_NAME" ]] && source ${HOME}/.zshrc
-    [[ -n "$BASH" ]] && source ${HOME}/.bashrc
+    source "${PEARL_HOME}/boot/sh/pearl.sh"
     return 0
 }
 

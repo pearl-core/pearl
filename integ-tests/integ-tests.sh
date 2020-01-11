@@ -3,7 +3,6 @@
 set -e
 
 unset PEARL_HOME
-unset PEARL_TEMPORARY
 
 if [[ -z "$1" ]]
 then
@@ -39,7 +38,6 @@ pearl init
 
 [[ -d "$PEARL_ROOT" ]] || { echo "$PEARL_ROOT does not exist"; exit 3; }
 [[ -d "$PEARL_HOME" ]] || { echo "$PEARL_HOME does not exist"; exit 4; }
-[[ -d "$PEARL_TEMPORARY" ]] || { echo "$PEARL_TEMPORARY does not exist"; exit 5; }
 
 pearl list
 

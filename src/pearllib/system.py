@@ -26,10 +26,13 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     (pearl_env.home / 'bin').mkdir(parents=True, exist_ok=True)
     (pearl_env.home / 'packages').mkdir(parents=True, exist_ok=True)
     (pearl_env.home / 'repos').mkdir(parents=True, exist_ok=True)
-    (pearl_env.home / 'tmp').mkdir(parents=True, exist_ok=True)
     (pearl_env.home / 'var').mkdir(parents=True, exist_ok=True)
 
     static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
+
+    if (pearl_env.home / 'boot').exists():
+        (pearl_env.home / 'boot').unlink()
+    (pearl_env.home / 'boot').symlink_to(static / 'boot')
 
     if not pearl_env.config_filename.exists():
         messenger.print(
@@ -44,8 +47,8 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
         shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
 
     apply(
-        "source {static}/boot/sh/pearl.sh".format(
-            static=static,
+        "source {home}/boot/sh/pearl.sh".format(
+            home=pearl_env.home,
         ),
         "{}/.bashrc".format(os.environ['HOME'])
     )
@@ -57,8 +60,8 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "source {static}/boot/sh/pearl.sh".format(
-            static=static,
+        "source {home}/boot/sh/pearl.sh".format(
+            home=pearl_env.home,
         ),
         "{}/.zshrc".format(os.environ['HOME'])
     )
@@ -70,8 +73,8 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "source {static}/boot/fish/pearl.fish".format(
-            static=static,
+        "source {home}/boot/fish/pearl.fish".format(
+            home=pearl_env.home,
         ),
         '{}/.config/fish/config.fish'.format(os.environ['HOME'])
     )
@@ -83,8 +86,8 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "source {static}/boot/vim/pearl.vim".format(
-            static=static,
+        "source {home}/boot/vim/pearl.vim".format(
+            home=pearl_env.home,
         ),
         "{}/.vimrc".format(os.environ['HOME'])
     )
@@ -96,7 +99,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     )
 
     apply(
-        "(load-file \"{static}/boot/emacs/pearl.el\")".format(static=static),
+        "(load-file \"{home}/boot/emacs/pearl.el\")".format(home=pearl_env.home),
         "{}/.emacs".format(os.environ['HOME'])
     )
     messenger.print(
@@ -117,8 +120,6 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
     """
     Removes completely the Pearl environment.
     """
-    static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
-
     for repo_name, repo_packages in pearl_env.packages.items():
         if ask(
             "Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name),
@@ -133,8 +134,8 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         yes_as_default_answer=False, no_confirm=args.no_confirm
     ):
         unapply(
-            "source {static}/boot/sh/pearl.sh".format(
-                static=static,
+            "source {home}/boot/sh/pearl.sh".format(
+                home=pearl_env.home,
             ),
             "{}/.bashrc".format(os.environ['HOME'])
         )
@@ -146,8 +147,8 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "source {static}/boot/sh/pearl.sh".format(
-                static=static,
+            "source {home}/boot/sh/pearl.sh".format(
+                home=pearl_env.home,
             ),
             "{}/.zshrc".format(os.environ['HOME'])
         )
@@ -159,8 +160,8 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "source {static}/boot/fish/pearl.fish".format(
-                static=static,
+            "source {home}/boot/fish/pearl.fish".format(
+                home=pearl_env.home,
             ),
             '{}/.config/fish/config.fish'.format(os.environ['HOME'])
         )
@@ -172,7 +173,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "source {static}/boot/vim/pearl.vim".format(static=static),
+            "source {home}/boot/vim/pearl.vim".format(home=pearl_env.home),
             "{}/.vimrc".format(os.environ['HOME'])
         )
         messenger.print(
@@ -183,7 +184,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         )
 
         unapply(
-            "(load-file \"{static}/boot/emacs/pearl.el\")".format(static=static),
+            "(load-file \"{home}/boot/emacs/pearl.el\")".format(home=pearl_env.home),
             "{}/.emacs".format(os.environ['HOME'])
         )
         messenger.print(

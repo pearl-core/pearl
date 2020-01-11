@@ -185,7 +185,7 @@ def test_run_pearl_bash(tmp_path):
     assert result.stderr == ''
 
     if platform.system() == 'Darwin':
-        assert result.stdout == "{}\n{}\n{}\n{}\n{}\n".format(
+        assert result.stdout == "{}\n{}\n{}\n{}\n".format(
             home_dir, home_dir,
             '/usr/local/opt/gnu-sed/libexec/gnubin:'
             '/usr/local/opt/grep/libexec/gnubin:'

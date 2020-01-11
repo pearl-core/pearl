@@ -42,7 +42,6 @@ pearl init; or die "Error on pearl init"
 source $HOME/.config/fish/config.fish; or die "Error on sourcing config.fish"
 [ -e $PEARL_ROOT ]; or die "$PEARL_ROOT does not exist"
 [ -e $PEARL_HOME ]; or die "$PEARL_HOME does not exist"
-[ -e $PEARL_TEMPORARY ]; or die "$PEARL_TEMPORARY does not exist"
 
 pearl list
 

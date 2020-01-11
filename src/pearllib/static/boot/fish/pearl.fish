@@ -4,13 +4,6 @@
 
 ####################### VARIABLES & IMPORTS ############################
 set -x PEARL_HOME $HOME/.local/share/pearl
-# Fallback to a default temp directory if tty does not work
-if tty -s
-    set -x PEARL_TEMPORARY $PEARL_HOME/tmp/(tty)
-else
-    set -x PEARL_TEMPORARY $PEARL_HOME/tmp/default-tty
-end
-mkdir -p $PEARL_TEMPORARY
 
 if not contains $PEARL_HOME/bin $PATH
     set PATH $PATH $PEARL_HOME/bin
@@ -37,5 +30,5 @@ for reponame in $PEARL_HOME/packages/*
 end
 
 function pearl-source
-    source $HOME/.config/fish/config.fish
+    source "${PEARL_HOME}/boot/fish/pearl.fish"
 end
