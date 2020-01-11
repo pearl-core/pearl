@@ -7,11 +7,10 @@ from textwrap import dedent
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
     PackageNotInstalledError, HookFunctionError
 from pearllib.messenger import messenger, Color
-from pearllib.parser import parse_args
 from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import check_and_copy, ask, run_pearl_bash
 
-_DEFAULT_OPTIONS = parse_args([])
+_DEFAULT_INPUT = 1000000 * '\n'
 
 _HOOK_HEADER_TEMPLATE = dedent("""
 PEARL_PKGDIR="{pkgdir}"
@@ -112,7 +111,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
             install_git_repo {pkgurl} {pkgdir} "" {quiet}
             """
         ).format(pkgdir=package.dir, pkgurl=package.url, quiet=quiet)
-        run_pearl_bash(script, pearl_env, input='' if args.no_confirm else None)
+        run_pearl_bash(script, pearl_env, input=_DEFAULT_INPUT if args.no_confirm else None)
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
@@ -120,7 +119,7 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
     try:
         _run(
             hook, pearl_env, package,
-            input='' if args.no_confirm else None,
+            input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
@@ -171,7 +170,7 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
     try:
         _run(
             hook, pearl_env, package,
-            input='' if args.no_confirm else None,
+            input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
@@ -190,13 +189,13 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
             update_git_repo {pkgdir} "" {quiet}
             """
         ).format(pkgdir=package.dir, quiet=quiet)
-        run_pearl_bash(script, pearl_env, input='' if args.no_confirm else None)
+        run_pearl_bash(script, pearl_env, input=_DEFAULT_INPUT if args.no_confirm else None)
 
     hook = 'post_update'
     try:
         _run(
             hook, pearl_env, package,
-            input='' if args.no_confirm else None,
+            input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
@@ -227,7 +226,7 @@ def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
     try:
         _run(
             hook, pearl_env, package,
-            input='' if args.no_confirm else None,
+            input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
         )
