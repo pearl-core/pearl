@@ -274,11 +274,12 @@ Unless there is a specific use case, it is not a good option to use virtual envi
 It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
 The following will install the package in your `$HOME` directory (`~/.local/`):
 ```
-/usr/bin/pip install --user pearlcli
-export PATH="~/.local/bin:$PATH"
+/usr/local/bin/pip3 install pearlcli
+# If the bin path is not already in $PATH:
+export PATH="/usr/local/bin:$PATH"
 ```
 
-Pearl command will be located in `~/.local/bin/pearl`
+Pearl command will be located in `/usr/local/bin/pearl`
 
 To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
 ```
