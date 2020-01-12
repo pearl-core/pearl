@@ -4,6 +4,9 @@ language: bash
 
 sudo: required
 
+cache:
+  directories:
+    - $HOME/.local/share/pearl/var
 
 jobs:
   include:
