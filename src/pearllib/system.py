@@ -43,7 +43,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
             )
         )
         pearl_env.config_filename.parent.mkdir(parents=True, exist_ok=True)
-        pearl_conf_template = static / 'etc/pearl.conf.template'
+        pearl_conf_template = static / 'templates/pearl.conf.template'
         shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
 
     apply(

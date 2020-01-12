@@ -1,7 +1,8 @@
 # Change Log #
 
-## [2.0.3][v203] - 2020-01-12 ##
+## [2.1.0][v210] - 2020-01-12 ##
 
+* Add `create` command
 * Fix procedure to install Pearl in OSX
 * Fix ci to upload to PyPI
 
@@ -237,4 +238,4 @@
 [v182]: https://github.com/pearl-core/pearl/releases/tag/1.8.2
 [v201]: https://github.com/pearl-core/pearl/releases/tag/2.0.1
 [v202]: https://github.com/pearl-core/pearl/releases/tag/2.0.2
-[v203]: https://github.com/pearl-core/pearl/releases/tag/2.0.3
+[v210]: https://github.com/pearl-core/pearl/releases/tag/2.1.0

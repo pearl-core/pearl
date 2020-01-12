@@ -1,4 +1,6 @@
 import argparse
+from pathlib import Path
+
 import pkg_resources
 import textwrap
 
@@ -19,6 +21,7 @@ def parse_args(sys_args: list):
     _create_init_parser(command_parsers)
     _create_search_parser(command_parsers)
     _create_list_parser(command_parsers)
+    _create_create_parser(command_parsers)
 
     args = parser.parse_args(sys_args)
     return args
@@ -132,4 +135,19 @@ def _create_list_parser(command_parsers):
         '-p', '--package-only',
         action='store_true',
         help="List the package names only"
+    )
+
+
+def _create_create_parser(command_parsers):
+    parser = command_parsers.add_parser(
+        'create',
+        help='Create a new local Pearl package to a new or already existing directory'
+    )
+    parser.add_argument(
+        'name', metavar='NAME', type=str,
+        help="Name of the local package"
+    )
+    parser.add_argument(
+        'dest_dir', metavar='DEST_DIR', type=Path,
+        help="Directory path where the 'pearl-config' directory template will be placed"
     )

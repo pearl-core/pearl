@@ -9,7 +9,7 @@ PEARL_REPO_NAME = 'local'
 
 # You can add your own Pearl packages starting from any git repository.
 # For more information on how to create your own Pearl package take a look at the README.md file.
-# Below it is an example of Pearl package definitions:
+# Below are examples of Pearl package definitions:
 PEARL_PACKAGES = {
     # "git-dotfiles": {
     #     "url": "https://github.com/user/git-dotfiles.git",
@@ -22,4 +22,3 @@ PEARL_PACKAGES = {
 }
 
 # vim: ft=python
-

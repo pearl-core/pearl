@@ -10,6 +10,8 @@ from pearllib.messenger import messenger
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
+_DEFAULT_LOCAL_REPO_NAME = 'local'
+
 
 class Package:
     def __init__(
@@ -69,7 +71,7 @@ class PearlEnvironment:
             config_filename: Path = None, update_repos: bool = False,
             verbose: int = 0, env_initialized: bool = True
     ):
-        self._home = self._get_home(home, verbose, env_initialized)
+        self._home = self._get_home(home, env_initialized)
         self._config_filename = self._get_config_filename(config_filename, env_initialized)
 
         if env_initialized:
@@ -88,14 +90,13 @@ class PearlEnvironment:
         return self._packages
 
     @staticmethod
-    def _get_home(home: Path = None, verbose: int = 0, env_initialized: bool = True) -> Path:
+    def _get_home(home: Path = None, env_initialized: bool = True) -> Path:
         if home is None:
             xdg_data_home = os.environ.get('XDG_DATA_HOME', '{}/.local/share'.format(os.environ['HOME']))
             default_home = '{}/pearl'.format(xdg_data_home)
             home = Path(default_home)
 
-        if verbose:
-            messenger.info("Found Pearl home: {}".format(home))
+        messenger.debug("Found Pearl home: {}".format(home))
 
         if env_initialized:
             if home.exists() and not home.is_dir():
@@ -132,20 +133,18 @@ class PearlEnvironment:
         config_filenames = [self.config_filename]
         while config_filenames:
             config_filename = config_filenames.pop(0)
-            if verbose:
-                messenger.info("Loading Pearl configuration: {}...".format(config_filename))
+            messenger.debug("Loading Pearl configuration: {}...".format(config_filename))
             pearl_conf = self.load_conf(config_filename)
             packages.update({
                 pearl_conf.repo_name: pearl_conf.packages
             })
-            if verbose:
-                messenger.info(
-                    "Loaded Pearl configuration: {}. Repo name: {}, number of packages: {}".format(
-                        config_filename,
-                        pearl_conf.repo_name,
-                        len(pearl_conf.packages)
-                    )
+            messenger.debug(
+                "Loaded Pearl configuration: {}. Repo name: {}, number of packages: {}".format(
+                    config_filename,
+                    pearl_conf.repo_name,
+                    len(pearl_conf.packages)
                 )
+            )
             repo_conf_filenames = self.load_repos(pearl_conf.repos, update_repos, verbose)
             config_filenames.extend(repo_conf_filenames)
         return packages
@@ -153,7 +152,7 @@ class PearlEnvironment:
     def load_conf(self, config_filename: Path):
         local_dict = {}
         exec(config_filename.open().read(), {}, local_dict)
-        repo_name = local_dict.get('PEARL_REPO_NAME', 'default')
+        repo_name = local_dict.get('PEARL_REPO_NAME', _DEFAULT_LOCAL_REPO_NAME)
         packages = OrderedDict()
         for package_name, package_info in local_dict.get('PEARL_PACKAGES', {}).items():
             packages[package_name] = Package(

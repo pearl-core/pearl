@@ -4,6 +4,8 @@ from argparse import Namespace
 from pathlib import Path
 from textwrap import dedent
 
+import pkg_resources
+
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
     PackageNotInstalledError, HookFunctionError
 from pearllib.messenger import messenger, Color
@@ -280,3 +282,21 @@ def list_packages(pearl_env: PearlEnvironment, args: Namespace):
                 )
             )
             messenger.print("    {}".format(package.description))
+
+
+def create_package(pearl_env: PearlEnvironment, args: Namespace):
+    """
+    Creates package from template.
+    """
+    static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
+    pearl_config_template = static / 'templates/pearl-config.template'
+    dest_pearl_config = args.dest_dir / 'pearl-config'
+    if dest_pearl_config.exists():
+        raise RuntimeError('The pearl-config directory already exists in {}'.format(args.dest_dir))
+    shutil.copytree(str(pearl_config_template), str(dest_pearl_config))
+
+    messenger.info('Updating {} to add package in local repository...'.format(pearl_env.config_filename))
+    with pearl_env.config_filename.open('a') as pearl_conf_file:
+        pearl_conf_file.write('PEARL_PACKAGES["{}"] = {{"url": "{}"}}\n'.format(args.name, args.dest_dir))
+
+    messenger.info('Run "pearl search local" to see your new local package available')

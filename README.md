@@ -21,8 +21,8 @@ Because only in the best Shells you will find a Pearl...
   - [Dependencies](#dependencies)
   - [Linux](#linux)
   - [OSX](#osx)
-- [Create your own Pearl package in seconds!](#create-your-own-pearl-package-in-seconds)
-- [Create your own Pearl repository in seconds!](#create-your-own-pearl-repository-in-seconds)
+- [Create your own Pearl package](#create-your-own-pearl-package)
+- [Create your own Pearl repository](#create-your-own-pearl-repository)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 
@@ -36,16 +36,16 @@ accessible via git.
 As soon as a package gets installed, its content can be activated out of the box
 according to certain events, like, for instance, a shell startup (Bash, Zsh or Fish) or
 an editor startup (Vim or Emacs). This is possible via a smart and simple
-[hook mechanism](#create-your-own-pearl-package-in-seconds)
+[hook mechanism](#create-your-own-pearl-package)
 that integrates the package content within the Pearl ecosystem.
 
 The main advantages on using Pearl are:
 
-- Create your own Pearl package ***in seconds*** (any git repository is already a Pearl package)!
+- Create your own Pearl package in a very simple way.
 - Full control and sync of your dotfiles across different systems.
 - Automatic bootstrap of the package content whenever shells or editors get started.
 - Access to a wide range of existing packages via the [OPH (Official Pearl Hub)](https://github.com/pearl-hub).
-- Allows to create your own package repository that can be shared with your friends!
+- Allows to create your own shareable package repository.
 - Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl) for Linux and OSX.
 - Small number of [dependencies](#dependencies) needed in order to ensure compatibility with most of the systems.
 
@@ -54,7 +54,7 @@ Comparison with similar solution: Ansible
 You could achieve something similar from what Pearl provide by using
 [Ansible](https://www.ansible.com/). Ansible is a powerful software for IT
 automation which can be widely used for many use cases.
-Despite of this, Ansible has few drawbacks when using it for lightweight forms of automations:
+Despite of this, Ansible has few drawbacks when using it for lightweight forms of automation:
 
 - Pearl uses bash for writing simple scripts for automation:
   - it makes easier the integration with other programs in the system (without existing Playbooks may be hard and tedious to achieve this in Ansible);
@@ -66,11 +66,25 @@ Despite of this, Ansible has few drawbacks when using it for lightweight forms o
 
 Quickstart
 ==========
-The Pearl command allows to: `list`, `search`, `install`, `update`, `emerge`,
+The Pearl command allows to: `create`, `list`, `search`, `install`, `update`, `emerge`,
 `remove` the Pearl packages defined according to the configuration located in
 `$XDG_CONFIG_HOME/pearl/pearl.conf` (defaults to `~/.config/pearl/pearl.conf`)
 
 ![quickstart](https://raw.githubusercontent.com/pearl-core/resources/master/pearl-opt3.gif)
+
+Create
+------
+- Command `create` helps you create a new local Pearl package:
+
+```sh
+$ pearl create mydotfiles ~/dotfiles
+```
+This will create a directory `pearl-config` in `~/dotfiles` containing all the templates to help you
+start writing a Pearl package. `~/dotfiles` does not need to be an empty directory.
+Additionally, the local repository in `$XDG_CONFIG_HOME/pearl/pearl.conf` will be updated with
+the new package entry called `mydotfiles`.
+
+For more information about the `pearl-config` content look at the [section](#create-your-own-pearl-package) below.
 
 List
 ----
@@ -296,7 +310,7 @@ echo "[[ -f ~/.bashrc ]] && source ~/.bashrc" >> ~/.bash_profile
 
 This will make sure that `~/.bashrc` will run at shell startup.
 
-Create your own Pearl package in seconds!
+Create your own Pearl package
 ===============
 **Any git repository is already a Pearl package**. For instance, in order
 to manage a dotfiles repository in Pearl, you just need to change
@@ -541,7 +555,7 @@ any pearl config to *"enrich"* the third-party project inside
 the Pearl environment.
 
 
-Create your own Pearl repository in seconds!
+Create your own Pearl repository
 ===============
 A Pearl repository is just a git repository containing a file located in `pearl-config/pearl.conf`
 with a list of packages. For instance, the *OPH* repository is available

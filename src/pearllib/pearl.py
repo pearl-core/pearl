@@ -47,12 +47,18 @@ def _pearl(pearl_env: PearlEnvironment, args):
         pack.list_packages(pearl_env, args)
     elif action == 'search':
         pack.list_packages(pearl_env, args)
+    elif action == 'create':
+        pack.create_package(pearl_env, args)
 
 
 def pearl(sys_args: list, pearl_home_dir: Path = None):
     verify_runtime_deps()
 
     args = parse_args(sys_args)
+    if args.verbose:
+        messenger.enable_debug()
+
+    messenger.debug(args)
 
     pearl_env = PearlEnvironment(
         home=pearl_home_dir,

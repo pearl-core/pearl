@@ -8,13 +8,14 @@ from pearllib.pearl import pearl
 _MODULE_UNDER_TEST = 'pearllib.pearl'
 
 
-def expected_pack_calls(install_pkg=0, update_pkg=0, emerge_pkg=0, remove_pkg=0, list_pkg=0):
+def expected_pack_calls(install_pkg=0, update_pkg=0, emerge_pkg=0, remove_pkg=0, list_pkg=0, create_pkg=0):
     return {
         'install_package': install_pkg,
         'update_package': update_pkg,
         'emerge_package': emerge_pkg,
         'remove_package': remove_pkg,
         'list_packages': list_pkg,
+        'create_package': create_pkg,
     }
 
 
@@ -62,6 +63,11 @@ def expected_syst_calls(init=0, update=0, remove=0):
         pytest.param(
             ['search', 'pattern'],
             expected_pack_calls(list_pkg=1),
+            expected_syst_calls()
+        ),
+        pytest.param(
+            ['create', 'name', 'dest_dir'],
+            expected_pack_calls(create_pkg=1),
             expected_syst_calls()
         ),
 

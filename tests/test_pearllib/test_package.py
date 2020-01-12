@@ -6,7 +6,8 @@ import pytest
 
 from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError, \
     HookFunctionError, PackageNotInstalledError
-from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package
+from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package, \
+    create_package
 from pearllib.pearlenv import Package
 
 from .utils import create_pearl_env, create_pearl_home
@@ -17,7 +18,8 @@ _MODULE_UNDER_TEST = 'pearllib.package'
 class PackageArgs(Namespace):
     def __init__(
         self, no_confirm=False, verbose=0, force=False,
-        pattern=".*", package_only=False
+        pattern=".*", package_only=False,
+        name="", dest_dir=None
     ):
         super().__init__()
         self.no_confirm = no_confirm
@@ -25,6 +27,8 @@ class PackageArgs(Namespace):
         self.force = force
         self.pattern = pattern
         self.package_only = package_only
+        self.name = name
+        self.dest_dir = dest_dir
 
 
 class PackageBuilder:
@@ -651,3 +655,41 @@ def test_list_packages_not_matching(tmp_path):
         }
     }
     list_packages(pearl_env, PackageArgs(pattern='pkg2'))
+
+
+def test_create_package(tmp_path):
+    dest_dir = tmp_path / 'new-pkg'
+    dest_dir.mkdir(parents=True)
+    config_file = tmp_path / 'pearl.conf'
+
+    pearl_env = mock.Mock()
+    pearl_env.config_filename = config_file
+
+    create_package(
+        pearl_env,
+        PackageArgs(
+            name="mypkg",
+            dest_dir=dest_dir
+        )
+    )
+
+    assert (dest_dir / 'pearl-config').exists()
+    assert config_file.read_text() == 'PEARL_PACKAGES["mypkg"] = {{"url": "{}"}}\n'.format(dest_dir)
+
+
+def test_create_package_pearl_config_exists(tmp_path):
+    dest_dir = tmp_path / 'new-pkg'
+    (dest_dir / 'pearl-config').mkdir(parents=True)
+    config_file = tmp_path / 'pearl.conf'
+
+    pearl_env = mock.Mock()
+    pearl_env.config_filename = config_file
+
+    with pytest.raises(RuntimeError):
+        create_package(
+            pearl_env,
+            PackageArgs(
+                name="mypkg",
+                dest_dir=dest_dir
+            )
+        )
