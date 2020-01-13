@@ -3,6 +3,7 @@
 ## [2.1.2][v212] - 2020-01-14 ##
 
 * Change name PyPI package from `pearcli` to `pearl`
+* Add `package.conf`
 
 ## [2.1.1][v211] - 2020-01-13 ##
 

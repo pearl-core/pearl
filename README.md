@@ -343,11 +343,12 @@ named `pearl-config` used by Pearl to integrate the package with the Pearl envir
     │   ├── config.zsh
     │   ├── config.fish
     │   ├── config.vim
-    │   └── config.el
+    │   ├── config.el
+    │   └── package.conf
     │
     └── (additional package content)
 
-The files inside `pearl-config` are also **optional** scripts:
+The files inside `pearl-config` are also **optional** script/configuration files:
 
 - `hooks.sh` - contains the [hooks functions](#hook-functions) executed during the `install`, `update` and `remove` events.
 - `config.sh` - will be sourced whenever a new Bash/Zsh shell is starting up.
@@ -356,6 +357,7 @@ The files inside `pearl-config` are also **optional** scripts:
 - `config.fish` - will be sourced whenever a new Fish shell is starting up.
 - `config.vim` - will be executed whenever Vim editor is starting up.
 - `config.el` - will be sourced whenever Emacs editor is starting up.
+- `package.conf` - contains optional metadata information (name, author, description, keywords, etc) about the package that are useful when indexing the package in a repository list.
 
 The following variables can be used in any of the previous scripts:
 
@@ -430,6 +432,14 @@ very quickly.
 
 **Note**: For OSX system, the GNU version `sed` and `grep` are automatically
 imported in `hooks.sh` and can be directly used if needed.
+
+### The package.conf file
+`package.conf` is meant to contain metadata about the package. To simplify the creation of packages, this file
+is completely optional. It contains name of package, description, author, os compatibility, license and more.
+In case you include such information, they may be used to populate the repository file `repo.conf` so
+that searching for packages will be easier.
+It can be also used to establish dependencies between packages.
+If you do not need such features for your package, just ignore this file.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
