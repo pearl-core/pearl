@@ -18,7 +18,7 @@ requirements = []
 
 setup(
     # General project information:
-    name="pearlcli",
+    name="pearl",
     url='http://github.com/pearl-core/pearl',
     download_url='https://github.com/pearl-core/pearl/releases',
     version=version,

@@ -59,7 +59,7 @@ def _create_main_parser():
         help="-v increases output verbosity. "
              "-vv shows xtrace during the hook function execution."
     )
-    version = pkg_resources.require("pearlcli")[0].version
+    version = pkg_resources.require("pearl")[0].version
     parser.add_argument('--version', '-V', action='version', version='%(prog)s {}'.format(version))
     return parser
 

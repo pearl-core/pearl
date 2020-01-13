@@ -262,7 +262,7 @@ Unless there is a specific use case, it is not a good option to use virtual envi
 It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
 The following will install the package in your `$HOME` directory (`~/.local/`):
 ```
-/usr/bin/pip install --user pearlcli
+/usr/bin/pip install --user pearl
 export PATH="~/.local/bin:$PATH"
 ```
 
@@ -285,7 +285,7 @@ brew install bash git coreutils grep gnu-sed python
 
 The following will install the package under `/usr/local`:
 ```
-/usr/local/bin/pip3 install pearlcli
+/usr/local/bin/pip3 install pearl
 # If the bin path is not already in $PATH:
 export PATH="/usr/local/bin:$PATH"
 ```

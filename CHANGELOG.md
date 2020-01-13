@@ -1,5 +1,9 @@
 # Change Log #
 
+## [2.1.2][v212] - 2020-01-14 ##
+
+* Change name PyPI package from `pearcli` to `pearl`
+
 ## [2.1.1][v211] - 2020-01-13 ##
 
 * Replace `install.sh` with `hooks.sh`
@@ -246,3 +250,4 @@
 [v202]: https://github.com/pearl-core/pearl/releases/tag/2.0.2
 [v210]: https://github.com/pearl-core/pearl/releases/tag/2.1.0
 [v211]: https://github.com/pearl-core/pearl/releases/tag/2.1.1
+[v212]: https://github.com/pearl-core/pearl/releases/tag/2.1.2
