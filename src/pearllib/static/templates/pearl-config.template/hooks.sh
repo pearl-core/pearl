@@ -1,4 +1,4 @@
-# Remove this file if install.sh hooks are not needed
+# Remove this file if hooks.sh hooks are not needed
 #
 # The following variables can be used inside the hook functions:
 # - *PEARL_HOME*        - Pearl location

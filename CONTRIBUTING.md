@@ -277,7 +277,7 @@ types:
 The public API refers to the following parts of Pearl system:
 
 - Pearl script CLI
-- The `pearl-config` structure (includes `config.*` and `install.sh` files)
+- The `pearl-config` structure (includes `config.*` and `hooks.sh` files)
 - Pearl hooks on bash, zsh, fish, vim and emacs config files in `$HOME` directory
 - `pearl.conf` file format
 

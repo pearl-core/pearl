@@ -11,8 +11,9 @@ def parse_args(sys_args: list):
     command_parsers = parser.add_subparsers(
         help='For command help: %(prog)s COMMAND --help',
         title='commands',
-        dest='subparser_name'
+        dest='command',
     )
+    command_parsers.required = True
 
     _create_install_parser(command_parsers)
     _create_update_parser(command_parsers)

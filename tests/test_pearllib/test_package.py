@@ -38,7 +38,7 @@ class PackageBuilder:
 
     def add_local_package(
             self,
-            tmp_path, install_sh_script,
+            tmp_path, hooks_sh_script,
             repo_name='repo-test',
             package_name='pkg-test',
             is_installed=False,
@@ -46,13 +46,13 @@ class PackageBuilder:
         """Install a package somewhere locally"""
         pkg_dir = tmp_path / '{}/{}'.format(repo_name, package_name)
         (pkg_dir / 'pearl-config').mkdir(parents=True)
-        install_sh = pkg_dir / 'pearl-config/install.sh'
-        install_sh.touch()
-        install_sh.write_text(install_sh_script)
+        hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
+        hooks_sh.touch()
+        hooks_sh.write_text(hooks_sh_script)
 
         if is_installed:
             self._install_package(
-                install_sh_script,
+                hooks_sh_script,
                 repo_name=repo_name,
                 package_name=package_name,
             )
@@ -62,7 +62,7 @@ class PackageBuilder:
 
     def add_git_package(
             self,
-            install_sh_script,
+            hooks_sh_script,
             repo_name='repo-test',
             package_name='pkg-test',
             url='https://github.com/pkg',
@@ -71,7 +71,7 @@ class PackageBuilder:
 
         if is_installed:
             self._install_package(
-                install_sh_script,
+                hooks_sh_script,
                 repo_name='repo-test',
                 package_name='pkg-test',
             )
@@ -88,19 +88,19 @@ class PackageBuilder:
 
     def _install_package(
             self,
-            install_sh_script,
+            hooks_sh_script,
             repo_name='repo-test',
             package_name='pkg-test',
     ):
         pkg_dir = self.home_dir / 'packages/{}/{}'.format(repo_name, package_name)
         (pkg_dir / 'pearl-config').mkdir(parents=True)
-        install_sh = pkg_dir / 'pearl-config/install.sh'
-        install_sh.write_text(install_sh_script)
+        hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
+        hooks_sh.write_text(hooks_sh_script)
 
 
 def test_install_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     post_install() {{
         echo $PWD > {homedir}/result
         echo $PEARL_HOME >> {homedir}/result
@@ -113,7 +113,7 @@ def test_install_local_package(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
 
@@ -121,7 +121,7 @@ def test_install_local_package(tmp_path):
 
     install_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
 
-    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/install.sh').is_file()
+    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
     expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
@@ -133,14 +133,14 @@ def test_install_local_package(tmp_path):
 
 def test_install_local_package_forced(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     post_install() {{
         return 11
     }}
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
 
     pearl_env = create_pearl_env(home_dir, packages)
@@ -154,7 +154,7 @@ def test_install_local_package_forced(tmp_path):
 
 def test_install_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     post_install() {{
         if ask "Are you sure?" "Y"
         then
@@ -169,7 +169,7 @@ def test_install_local_package_no_confirm(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
 
     pearl_env = create_pearl_env(home_dir, packages)
@@ -196,7 +196,7 @@ def test_install_package_git(tmp_path):
 
 def test_install_package_raise_hook(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     post_install() {
         command-notfound
         return 0
@@ -204,7 +204,7 @@ def test_install_package_raise_hook(tmp_path):
     """
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=False)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, packages)
 
@@ -252,7 +252,7 @@ def test_install_package_already_installed(tmp_path):
 
 def test_update_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     pre_update() {{
         echo $PWD > {homedir}/result
         echo $PEARL_HOME >> {homedir}/result
@@ -274,7 +274,7 @@ def test_update_local_package(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
 
@@ -282,7 +282,7 @@ def test_update_local_package(tmp_path):
 
     update_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
 
-    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/install.sh').is_file()
+    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
 
     expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
         package.dir, home_dir, package.dir, package.vardir,
@@ -299,7 +299,7 @@ def test_update_local_package(tmp_path):
 
 def test_update_local_package_forced(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     pre_update() {{
         return 11
     }}
@@ -311,7 +311,7 @@ def test_update_local_package_forced(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
 
     pearl_env = create_pearl_env(home_dir, packages)
@@ -321,12 +321,12 @@ def test_update_local_package_forced(tmp_path):
     with pytest.raises(HookFunctionError):
         update_package(pearl_env, 'repo-test/pkg-test', args=PackageArgs(False, 0, force=False))
 
-    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/install.sh').is_file()
+    assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
 
 
 def test_update_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     pre_update() {{
         if ask "Are you sure?" "Y"
         then
@@ -354,7 +354,7 @@ def test_update_local_package_no_confirm(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
 
     pearl_env = create_pearl_env(home_dir, packages)
@@ -423,7 +423,7 @@ def test_update_package_git_url_changed(tmp_path):
 
 def test_update_package_raise_hook(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     pre_update() {{
         command-notfound
         return 0
@@ -431,7 +431,7 @@ def test_update_package_raise_hook(tmp_path):
     """
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, packages)
 
@@ -498,7 +498,7 @@ def test_emerge_package(tmp_path):
 def test_remove_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    install_sh_script = """
+    hooks_sh_script = """
     pre_remove() {{
         echo $PWD > {homedir}/result
         echo $PEARL_HOME >> {homedir}/result
@@ -511,7 +511,7 @@ def test_remove_package(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
 
@@ -531,14 +531,14 @@ def test_remove_package(tmp_path):
 def test_remove_package_forced(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    install_sh_script = """
+    hooks_sh_script = """
     pre_remove() {{
         return 11
     }}
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
 
     pearl_env = create_pearl_env(home_dir, packages)
@@ -551,7 +551,7 @@ def test_remove_package_forced(tmp_path):
 def test_remove_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    install_sh_script = """
+    hooks_sh_script = """
     pre_remove() {{
         if ask "Are you sure?" "Y"
         then
@@ -567,7 +567,7 @@ def test_remove_package_no_confirm(tmp_path):
     """.format(homedir=home_dir)
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
 
     pearl_env = create_pearl_env(home_dir, packages)
@@ -579,7 +579,7 @@ def test_remove_package_no_confirm(tmp_path):
 
 def test_remove_package_raise_hook(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    install_sh_script = """
+    hooks_sh_script = """
     pre_remove() {{
         command-notfound
         return 0
@@ -587,7 +587,7 @@ def test_remove_package_raise_hook(tmp_path):
     """
 
     builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, install_sh_script, is_installed=True)
+    builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, packages)
 

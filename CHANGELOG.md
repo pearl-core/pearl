@@ -1,5 +1,11 @@
 # Change Log #
 
+## [2.1.1][v211] - 2020-01-13 ##
+
+* Replace `install.sh` with `hooks.sh`
+  * `install.sh` will still be valid until next releases
+* Fail if no command is specified
+
 ## [2.1.0][v210] - 2020-01-12 ##
 
 * Add `create` command
@@ -239,3 +245,4 @@
 [v201]: https://github.com/pearl-core/pearl/releases/tag/2.0.1
 [v202]: https://github.com/pearl-core/pearl/releases/tag/2.0.2
 [v210]: https://github.com/pearl-core/pearl/releases/tag/2.1.0
+[v211]: https://github.com/pearl-core/pearl/releases/tag/2.1.1

@@ -283,10 +283,7 @@ brew update
 brew install bash git coreutils grep gnu-sed python
 ```
 
-Unless there is a specific use case, it is not a good option to use virtual environments such as
-`virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
-It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
-The following will install the package in your `$HOME` directory (`~/.local/`):
+The following will install the package under `/usr/local`:
 ```
 /usr/local/bin/pip3 install pearlcli
 # If the bin path is not already in $PATH:
@@ -340,7 +337,7 @@ named `pearl-config` used by Pearl to integrate the package with the Pearl envir
     │
     ├── pearl-config (optional directory)
     │   │
-    │   ├── install.sh
+    │   ├── hooks.sh
     │   ├── config.sh
     │   ├── config.bash
     │   ├── config.zsh
@@ -352,7 +349,7 @@ named `pearl-config` used by Pearl to integrate the package with the Pearl envir
 
 The files inside `pearl-config` are also **optional** scripts:
 
-- `install.sh` - contains the [hooks functions](#hook-functions) executed during the `install`, `update` and `remove` events.
+- `hooks.sh` - contains the [hooks functions](#hook-functions) executed during the `install`, `update` and `remove` events.
 - `config.sh` - will be sourced whenever a new Bash/Zsh shell is starting up.
 - `config.bash` - will be sourced whenever a new Bash shell is starting up.
 - `config.zsh` - will be sourced whenever a new Zsh shell is starting up.
@@ -368,21 +365,21 @@ The following variables can be used in any of the previous scripts:
 - `PEARL_PKGNAME`       - Pearl package name
 - `PEARL_PKGREPONAME`   - Pearl package repo name (useful to detect and interact with packages within the same repo)
 
-Additionally, the script `install.sh` can use the utility functions available in
+Additionally, the script `hooks.sh` can use the utility functions available in
 [Buava](https://github.com/fsquillace/buava) and Pearl [*utils*](lib/utils) directory that
 make easier the integration with Pearl ecosystem.
 
 Useful examples of Pearl packages can be checked in the
 [Official Pearl Hub](https://github.com/pearl-hub).
 
-### The install.sh script ###
+### The hooks.sh script ###
 #### Hook functions ####
 - `post_install`  - Called *after* an installation of the package occurs.
 - `pre_update`    - Called *before* an update of the package occurs.
 - `post_update`   - Called *after* an update of the package occurs.
 - `pre_remove`    - Called *before* a removal of the package occurs.
 
-#### An install.sh script example ####
+#### An hooks.sh script example ####
 
     post_install() {
         warn "Remember to setup your config located in: ~/.dotfile"
@@ -422,7 +419,7 @@ no longer exist).
 All these functions belong to the [Buava](https://github.com/fsquillace/buava) package
 in [`utils.sh`](https://github.com/fsquillace/buava/blob/master/lib/utils.sh)
 and to the Pearl [`utils.sh`](lib/utils/utils.sh) script. You can use them
-inside the `install.sh` to any hook function.
+inside the `hooks.sh` to any hook function.
 
 **Very important note**: All the hook functions **must** be
 [**idempotent**](https://en.wikipedia.org/wiki/Idempotence)
@@ -432,7 +429,7 @@ All buava commands are idempotent and this will help to write hook functions
 very quickly.
 
 **Note**: For OSX system, the GNU version `sed` and `grep` are automatically
-imported in `install.sh` and can be directly used if needed.
+imported in `hooks.sh` and can be directly used if needed.
 
 ## Create a Pearl package from a local directory ##
 Pearl package system will work even for local directories. This is particularly useful
@@ -458,7 +455,7 @@ in the [section](#structure-of-a-pearl-package) above.
 
 ## Define dependencies between Pearl packages ##
 Suppose you have a package `mypack` which depends on another package `mydep`,
-you can update the `mypack` `install.sh` file in this way:
+you can update the `mypack` `hooks.sh` file in this way:
 
     post_install() {
         # Install/update the dependency here:
@@ -475,7 +472,7 @@ you can update the `mypack` `install.sh` file in this way:
 
 The `PEARL_PKGREPONAME` variable will make sure to define dependencies only
 between packages of the same repository.
-To see a real example in Pearl Hub, take a look at the [Kyrat install.sh](https://github.com/pearl-hub/kyrat/blob/master/pearl-config/install.sh).
+To see a real example in Pearl Hub, take a look at the [Kyrat hooks.sh](https://github.com/pearl-hub/kyrat/blob/master/pearl-config/hooks.sh).
 
 ## Use third-party git repository not available in Pearl Hub ##
 If you want to use a third-party git repository
@@ -493,7 +490,7 @@ To see examples of Pearl packages from third-party git repos take a look at the
 You can use the `PEARL_PKGVARDIR` directory during the installation phase to install the third-party git repository.
 This is the best way to incorporate third-party project into Pearl ecosystem.
 
-Here it is an example of `install.sh` file which install the ranger file manager into the directory `${PEARL_PKGVARDIR}/ranger`:
+Here it is an example of `hooks.sh` file which install the ranger file manager into the directory `${PEARL_PKGVARDIR}/ranger`:
 
     function post_install(){
         install_or_update_git_repo https://github.com/ranger/ranger.git "${PEARL_PKGVARDIR}/ranger" master

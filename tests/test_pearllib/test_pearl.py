@@ -110,6 +110,17 @@ def test_pearl(args, expected_pack_call_counts, expected_syst_call_counts, tmp_p
         assert verify_mock.call_count == 1
 
 
+def test_pearl_no_command(tmp_path):
+    home_dir = tmp_path / 'home'
+    home_dir.mkdir(parents=True)
+    (home_dir / 'pearl.conf').touch()
+
+    pearl_home_dir = tmp_path / 'pearlhome'
+    pearl_home_dir.mkdir(parents=True)
+    with pytest.raises(SystemExit):
+        pearl(['-c', str(home_dir / 'pearl.conf')], pearl_home_dir=pearl_home_dir)
+
+
 @pytest.mark.parametrize(
     'command, func_name',
     [

@@ -22,33 +22,35 @@ def _package_operation(packages):
 
 
 def _pearl(pearl_env: PearlEnvironment, args):
-    action = args.subparser_name
-    if action == 'init':
+    command = args.command
+    if command == 'init':
         syst.init_pearl(pearl_env, args)
-    elif action == 'install':
+    elif command == 'install':
         for package in _package_operation(args.packages):
             pack.install_package(pearl_env, package, args)
-    elif action == 'update':
+    elif command == 'update':
         if not args.packages:
             syst.update_pearl(pearl_env, args)
         else:
             for package in _package_operation(args.packages):
                 pack.update_package(pearl_env, package, args)
-    elif action == 'remove':
+    elif command == 'remove':
         if not args.packages:
             syst.remove_pearl(pearl_env, args)
         else:
             for package in _package_operation(args.packages):
                 pack.remove_package(pearl_env, package, args)
-    elif action == 'emerge':
+    elif command == 'emerge':
         for package in _package_operation(args.packages):
             pack.emerge_package(pearl_env, package, args)
-    elif action == 'list':
+    elif command == 'list':
         pack.list_packages(pearl_env, args)
-    elif action == 'search':
+    elif command == 'search':
         pack.list_packages(pearl_env, args)
-    elif action == 'create':
+    elif command == 'create':
         pack.create_package(pearl_env, args)
+    else:
+        raise ValueError('No command specified. Run "pearl --help" for list of commands.')
 
 
 def pearl(sys_args: list, pearl_home_dir: Path = None):
@@ -65,7 +67,7 @@ def pearl(sys_args: list, pearl_home_dir: Path = None):
         config_filename=Path(args.config_file) if args.config_file is not None else None,
         update_repos=args.update_repos,
         verbose=args.verbose,
-        env_initialized=False if args.subparser_name == 'init' else True
+        env_initialized=False if args.command == 'init' else True
     )
 
     try:

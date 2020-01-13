@@ -14,6 +14,7 @@ from pearllib.utils import check_and_copy, ask, run_pearl_bash
 
 _DEFAULT_INPUT = 1000000 * '\n'
 
+# TODO install.sh will be deprecated in upcoming releases:
 _HOOK_HEADER_TEMPLATE = dedent("""
 PEARL_PKGDIR="{pkgdir}"
 PEARL_PKGVARDIR="{vardir}"
@@ -27,6 +28,9 @@ pre_remove() {{ :; }}
 
 INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
 [[ -f $INSTALL_SH ]] && source "$INSTALL_SH"
+
+HOOKS_SH="$PEARL_PKGDIR"/pearl-config/hooks.sh
+[[ -f $HOOKS_SH ]] && source "$HOOKS_SH"
 """)
 
 
