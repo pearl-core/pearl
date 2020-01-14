@@ -64,7 +64,7 @@ def pearl(sys_args: list, pearl_home_dir: Path = None):
 
     pearl_env = PearlEnvironment(
         home=pearl_home_dir,
-        config_filename=Path(args.config_file) if args.config_file is not None else None,
+        config_filename=args.config_file,
         update_repos=args.update_repos,
         verbose=args.verbose,
         env_initialized=False if args.command == 'init' else True

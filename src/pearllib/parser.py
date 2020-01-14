@@ -50,7 +50,7 @@ def _create_main_parser():
         help="Continue performing the action even if hooks functions fail"
     )
     parser.add_argument(
-        '-c', '--config-file', metavar='FILE', type=str,
+        '-c', '--config-file', metavar='FILE', type=Path,
         default=None,
         help="location of the pearl config path. Defaults to $HOME/.config/pearl/pearl.conf"
     )

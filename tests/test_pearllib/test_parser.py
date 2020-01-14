@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from pearllib.parser import parse_args
@@ -41,6 +43,7 @@ def test_parser_valid():
     args = parse_args(['create', 'new-pkg', 'dest-dir'])
     assert args.command == 'create'
     assert args.name == 'new-pkg'
+    assert isinstance(args.dest_dir, Path)
     assert str(args.dest_dir) == 'dest-dir'
 
     args = parse_args(['init'])
@@ -59,7 +62,8 @@ def test_parser_general_options():
     assert args.update_repos
     assert args.no_confirm
     assert args.force
-    assert args.config_file == 'pearl.conf'
+    assert isinstance(args.config_file, Path)
+    assert str(args.config_file) == 'pearl.conf'
     assert args.verbose == 2
 
 
