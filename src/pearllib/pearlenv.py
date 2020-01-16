@@ -16,13 +16,27 @@ _DEFAULT_LOCAL_REPO_NAME = 'local'
 class Package:
     def __init__(
             self, pearl_home: Path, repo_name: str,
-            name: str, url: str, description: str
+            name: str, url: str,
+            description: str = None,
+            homepage: str = None,
+            author: str = None,
+            license: str = None,
+            operating_system: tuple = None,
+            keywords: tuple = None,
+            depends: tuple = None,
     ):
         self._pearl_home = pearl_home
         self._repo_name = repo_name
         self._name = name
         self._url = url
         self._description = description
+        self._homepage = homepage
+        self._author = author
+        self._license = license
+
+        self._operating_system = tuple() if operating_system is None else operating_system
+        self._keywords = tuple() if keywords is None else keywords
+        self._depends = tuple() if depends is None else depends
 
     @property
     def repo_name(self):
@@ -43,6 +57,30 @@ class Package:
     @property
     def description(self) -> str:
         return self._description
+
+    @property
+    def homepage(self) -> str:
+        return self._homepage
+
+    @property
+    def author(self) -> str:
+        return self._author
+
+    @property
+    def license(self) -> str:
+        return self._license
+
+    @property
+    def operating_system(self) -> tuple:
+        return self._operating_system
+
+    @property
+    def keywords(self) -> tuple:
+        return self._keywords
+
+    @property
+    def depends(self) -> tuple:
+        return self._depends
 
     @property
     def dir(self) -> Path:
@@ -158,7 +196,14 @@ class PearlEnvironment:
             packages[package_name] = Package(
                 self.home,
                 repo_name, package_name,
-                package_info['url'], package_info.get('description', '')
+                package_info['url'],
+                description=package_info.get('description'),
+                homepage=package_info.get('homepage'),
+                author=package_info.get('author'),
+                license=package_info.get('license'),
+                operating_system=package_info.get('os'),
+                keywords=package_info.get('keywords'),
+                depends=package_info.get('depends'),
             )
         return PearlConf(
             repo_name,

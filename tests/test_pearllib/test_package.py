@@ -640,7 +640,26 @@ def test_list_packages(tmp_path):
             'pkg-b-test': Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr'),
         }
     }
-    list_packages(pearl_env, PackageArgs(pattern='pkg'))
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg'))
+    assert len(result) == 2
+    assert 'pkg-a-test' in [pkg.name for pkg in result]
+    assert 'pkg-b-test' in [pkg.name for pkg in result]
+
+
+def test_list_packages_match_keyword(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages/repo-test/pkg-a-test').mkdir(parents=True)
+
+    pearl_env = mock.Mock()
+    pearl_env.packages = {
+        'repo-test': {
+            'pkg-a-test': Package(home_dir, 'repo-test', 'pkg-a-test', 'url', 'descr', keywords=('pkg', 'pkg-manager')),
+            'pkg-b-test': Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr', keywords=('pkg',)),
+        }
+    }
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg-manager'))
+    assert len(result) == 1
+    assert result[0].name == 'pkg-a-test'
 
 
 def test_list_packages_not_matching(tmp_path):
@@ -654,7 +673,8 @@ def test_list_packages_not_matching(tmp_path):
             'pkg-b-test': Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr'),
         }
     }
-    list_packages(pearl_env, PackageArgs(pattern='pkg2'))
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg2'))
+    assert result == []
 
 
 def test_create_package(tmp_path):

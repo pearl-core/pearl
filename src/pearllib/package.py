@@ -255,14 +255,17 @@ def list_packages(pearl_env: PearlEnvironment, args: Namespace):
     regex = re.compile('{}'.format(pattern), flags=re.IGNORECASE)
     for _, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
-            if not regex.search(package.full_name) and not regex.search(package.description):
+            if not regex.search(package.full_name) \
+                    and not regex.search(package.description) \
+                    and all([regex.search(key) is None for key in package.keywords]):
                 continue
             if package.is_installed():
                 installed_packages.append(package)
             else:
                 uninstalled_packages.append(package)
 
-    for package in uninstalled_packages + installed_packages:
+    total_packages = uninstalled_packages + installed_packages
+    for package in total_packages:
         if args.package_only:
             template = "{reponame}/{package}"
             messenger.print(
@@ -286,6 +289,7 @@ def list_packages(pearl_env: PearlEnvironment, args: Namespace):
                 )
             )
             messenger.print("    {}".format(package.description))
+    return total_packages
 
 
 def create_package(pearl_env: PearlEnvironment, args: Namespace):
