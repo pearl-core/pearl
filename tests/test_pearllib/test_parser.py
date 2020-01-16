@@ -22,6 +22,10 @@ def test_parser_valid():
     assert args.command == 'emerge'
     assert args.packages == ['pkg1', 'pkg2']
 
+    args = parse_args(['info', 'pkg1', 'pkg2'])
+    assert args.command == 'info'
+    assert args.packages == ['pkg1', 'pkg2']
+
     args = parse_args(['search', 'patt'])
     assert args.command == 'search'
     assert args.pattern == 'patt'

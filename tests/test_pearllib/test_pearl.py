@@ -8,11 +8,12 @@ from pearllib.pearl import pearl
 _MODULE_UNDER_TEST = 'pearllib.pearl'
 
 
-def expected_pack_calls(install_pkg=0, update_pkg=0, emerge_pkg=0, remove_pkg=0, list_pkg=0, create_pkg=0):
+def expected_pack_calls(install_pkg=0, update_pkg=0, emerge_pkg=0, info_pkg=0, remove_pkg=0, list_pkg=0, create_pkg=0):
     return {
         'install_package': install_pkg,
         'update_package': update_pkg,
         'emerge_package': emerge_pkg,
+        'info_package': info_pkg,
         'remove_package': remove_pkg,
         'list_packages': list_pkg,
         'create_package': create_pkg,
@@ -48,6 +49,11 @@ def expected_syst_calls(init=0, update=0, remove=0):
         pytest.param(
             ['emerge', 'pkg1', 'pkg2', 'pkg3'],
             expected_pack_calls(emerge_pkg=3),
+            expected_syst_calls()
+        ),
+        pytest.param(
+            ['info', 'pkg1', 'pkg2', 'pkg3'],
+            expected_pack_calls(info_pkg=3),
             expected_syst_calls()
         ),
         pytest.param(
@@ -135,6 +141,10 @@ def test_pearl_no_command(tmp_path):
         pytest.param(
             'emerge',
             'emerge_package'
+        ),
+        pytest.param(
+            'info',
+            'info_package'
         ),
         pytest.param(
             'remove',

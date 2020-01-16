@@ -14,7 +14,6 @@ from pearllib.utils import check_and_copy, ask, run_pearl_bash
 
 _DEFAULT_INPUT = 1000000 * '\n'
 
-# TODO install.sh will be deprecated in upcoming releases:
 _HOOK_HEADER_TEMPLATE = dedent("""
 PEARL_PKGDIR="{pkgdir}"
 PEARL_PKGVARDIR="{vardir}"
@@ -25,9 +24,6 @@ post_install() {{ :; }}
 pre_update() {{ :; }}
 post_update() {{ :; }}
 pre_remove() {{ :; }}
-
-INSTALL_SH="$PEARL_PKGDIR"/pearl-config/install.sh
-[[ -f $INSTALL_SH ]] && source "$INSTALL_SH"
 
 HOOKS_SH="$PEARL_PKGDIR"/pearl-config/hooks.sh
 [[ -f $HOOKS_SH ]] && source "$HOOKS_SH"
@@ -78,6 +74,38 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
             return repo_packages[package_name]
 
     raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
+
+
+def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
+    """
+    Provide info about a package.
+    """
+    package = _lookup_package(pearl_env, package_name)
+    messenger.print(
+        dedent("""
+        {cyan}Name{normal}: {name}
+        {cyan}Description{normal}: {description}
+        {cyan}Homepage{normal}: {homepage}
+        {cyan}URL{normal}: {url}
+        {cyan}Author{normal}: {author}
+        {cyan}License{normal}: {license}
+        {cyan}Operating Systems{normal}: {os}
+        {cyan}Keywords{normal}: {keywords}
+        {cyan}Depends{normal}: {depends}
+        """.format(
+            cyan=Color.CYAN,
+            normal=Color.NORMAL,
+            name=package.name,
+            description=package.description,
+            homepage=package.homepage,
+            url=package.url,
+            author=package.author,
+            license=package.license,
+            os=package.operating_system,
+            keywords=package.keywords,
+            depends=package.depends,
+        ))
+    )
 
 
 def emerge_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):

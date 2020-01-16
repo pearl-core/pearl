@@ -10,6 +10,7 @@ from pearllib.pearlenv import PearlEnvironment
 from pearllib.utils import verify_runtime_deps
 
 
+# TODO verify better this function:
 def _package_operation(packages):
     captured_exception = None
     for package in packages:
@@ -43,6 +44,9 @@ def _pearl(pearl_env: PearlEnvironment, args):
     elif command == 'emerge':
         for package in _package_operation(args.packages):
             pack.emerge_package(pearl_env, package, args)
+    elif command == 'info':
+        for package in _package_operation(args.packages):
+            pack.info_package(pearl_env, package, args)
     elif command == 'list':
         pack.list_packages(pearl_env, args)
     elif command == 'search':

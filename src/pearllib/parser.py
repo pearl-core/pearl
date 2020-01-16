@@ -19,6 +19,7 @@ def parse_args(sys_args: list):
     _create_update_parser(command_parsers)
     _create_remove_parser(command_parsers)
     _create_emerge_parser(command_parsers)
+    _create_info_parser(command_parsers)
     _create_init_parser(command_parsers)
     _create_search_parser(command_parsers)
     _create_list_parser(command_parsers)
@@ -98,6 +99,16 @@ def _create_emerge_parser(command_parsers):
     parser = command_parsers.add_parser(
         'emerge',
         help='Update Pearl or install/update the packages if specified'
+    )
+    parser.add_argument(
+        'packages', metavar='[repo/]package', type=str, nargs='*'
+    )
+
+
+def _create_info_parser(command_parsers):
+    parser = command_parsers.add_parser(
+        'info',
+        help='Provide information about packages'
     )
     parser.add_argument(
         'packages', metavar='[repo/]package', type=str, nargs='*'
