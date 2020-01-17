@@ -10,12 +10,11 @@ from pearllib.pearlenv import PearlEnvironment
 from pearllib.utils import verify_runtime_deps
 
 
-# TODO verify better this function:
-def _package_operation(packages):
+def _package_operation(pearl_env, args, pack_func):
     captured_exception = None
-    for package in packages:
+    for package in args.packages:
         try:
-            yield package
+            pack_func(pearl_env, package, args)
         except PearlError as ex:
             captured_exception = ex
     if captured_exception:
@@ -27,26 +26,21 @@ def _pearl(pearl_env: PearlEnvironment, args):
     if command == 'init':
         syst.init_pearl(pearl_env, args)
     elif command == 'install':
-        for package in _package_operation(args.packages):
-            pack.install_package(pearl_env, package, args)
+        _package_operation(pearl_env, args, pack.install_package)
     elif command == 'update':
         if not args.packages:
             syst.update_pearl(pearl_env, args)
         else:
-            for package in _package_operation(args.packages):
-                pack.update_package(pearl_env, package, args)
+            _package_operation(pearl_env, args, pack.update_package)
     elif command == 'remove':
         if not args.packages:
             syst.remove_pearl(pearl_env, args)
         else:
-            for package in _package_operation(args.packages):
-                pack.remove_package(pearl_env, package, args)
+            _package_operation(pearl_env, args, pack.remove_package)
     elif command == 'emerge':
-        for package in _package_operation(args.packages):
-            pack.emerge_package(pearl_env, package, args)
+        _package_operation(pearl_env, args, pack.emerge_package)
     elif command == 'info':
-        for package in _package_operation(args.packages):
-            pack.info_package(pearl_env, package, args)
+        _package_operation(pearl_env, args, pack.info_package)
     elif command == 'list':
         pack.list_packages(pearl_env, args)
     elif command == 'search':
