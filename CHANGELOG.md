@@ -1,5 +1,10 @@
 # Change Log #
 
+## [2.2.0][v220] - 2020-01-17 ##
+
+* Add `info` command
+* Make `search` looking at keywords field
+
 ## [2.1.2][v212] - 2020-01-14 ##
 
 * Change name PyPI package from `pearcli` to `pearl`
@@ -252,3 +257,4 @@
 [v210]: https://github.com/pearl-core/pearl/releases/tag/2.1.0
 [v211]: https://github.com/pearl-core/pearl/releases/tag/2.1.1
 [v212]: https://github.com/pearl-core/pearl/releases/tag/2.1.2
+[v220]: https://github.com/pearl-core/pearl/releases/tag/2.2.0

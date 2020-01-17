@@ -84,7 +84,7 @@ start writing a Pearl package. `~/dotfiles` does not need to be an empty directo
 Additionally, the local repository in `$XDG_CONFIG_HOME/pearl/pearl.conf` will be updated with
 the new package entry called `mydotfiles`.
 
-For more information about the `pearl-config` content look at the [section](#create-your-own-pearl-package) below.
+For more information about the `pearl-config` content, look at the [section](#create-your-own-pearl-package) below.
 
 List
 ----
@@ -193,6 +193,24 @@ Are you sure to REMOVE all the Pearl packages in $PEARL_HOME folder? (N/y)
 * Removing pearl/trash-cli package
 * Removing pearl/caprica package
 ...
+```
+
+Info
+----
+- Provides detailed information about the package:
+
+```sh
+$ pearl info nerdify
+
+Name: nerdify
+Description: Make your shell nerdified
+Homepage: https://github.com/pearl-hub/nerdify
+URL: https://github.com/pearl-hub/nerdify.git
+Author: Filippo Squillace <feel.sqoox@gmail.com>
+License: None
+Operating Systems: ('linux', 'osx')
+Keywords: ('vim', 'tmux', 'ranger')
+Depends: ('fonts', 'tpm')
 ```
 
 Recommended Pearl Hub packages to install:
