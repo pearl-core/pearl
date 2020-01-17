@@ -47,6 +47,7 @@ pearl list
 
 info Install ALL pearl packages
 for package in (pearl list --package-only)
+    pearl info
     pearl --verbose --no-confirm emerge $package; or die "Error on pearl install $package"
     [ -d "$PEARL_HOME/packages/$package" ]; or die "$PEARL_HOME/packages/$package does not exist"
 end
