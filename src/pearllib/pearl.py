@@ -10,9 +10,9 @@ from pearllib.pearlenv import PearlEnvironment
 from pearllib.utils import verify_runtime_deps
 
 
-def _package_operation(pearl_env, args, pack_func):
+def _package_operation(pearl_env, packages, args, pack_func):
     captured_exception = None
-    for package in args.packages:
+    for package in packages:
         try:
             pack_func(pearl_env, package, args)
         except PearlError as ex:
@@ -26,21 +26,25 @@ def _pearl(pearl_env: PearlEnvironment, args):
     if command == 'init':
         syst.init_pearl(pearl_env, args)
     elif command == 'install':
-        _package_operation(pearl_env, args, pack.install_package)
+        package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=True)
+        _package_operation(pearl_env, package_list, args, pack.install_package)
     elif command == 'update':
         if not args.packages:
             syst.update_pearl(pearl_env, args)
         else:
-            _package_operation(pearl_env, args, pack.update_package)
+            package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=True)
+            _package_operation(pearl_env, package_list, args, pack.update_package)
     elif command == 'remove':
         if not args.packages:
             syst.remove_pearl(pearl_env, args)
         else:
-            _package_operation(pearl_env, args, pack.remove_package)
+            package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=False)
+            _package_operation(pearl_env, package_list, args, pack.remove_package)
     elif command == 'emerge':
-        _package_operation(pearl_env, args, pack.emerge_package)
+        package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=True)
+        _package_operation(pearl_env, package_list, args, pack.emerge_package)
     elif command == 'info':
-        _package_operation(pearl_env, args, pack.info_package)
+        _package_operation(pearl_env, args.packages, args, pack.info_package)
     elif command == 'list':
         pack.list_packages(pearl_env, args)
     elif command == 'search':

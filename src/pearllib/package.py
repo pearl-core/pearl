@@ -3,6 +3,7 @@ import shutil
 from argparse import Namespace
 from pathlib import Path
 from textwrap import dedent
+from typing import List
 
 import pkg_resources
 
@@ -76,14 +77,37 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
     raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
 
+def closure_dependency_tree(pearl_env: PearlEnvironment, packages: List[str], leaf_first=True) -> List[str]:
+    full_package_list = []
+    queue = list(packages)
+    while queue:
+        package_name = queue.pop(0)
+        package = _lookup_package(pearl_env, package_name)
+        if package_name not in full_package_list:
+            full_package_list.append(package_name)
+        for package_dep in package.depends:
+            if package_dep not in full_package_list:
+                queue.append(package_dep)
+    if leaf_first:
+        full_package_list.reverse()
+    return full_package_list
+
+
 def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
     """
     Provide info about a package.
     """
     package = _lookup_package(pearl_env, package_name)
+    requires = []
+    for _, pkg_info in pearl_env.packages.items():
+        for pkg_name, pkg in pkg_info.items():
+            if package_name in pkg.depends:
+                requires.append(pkg_name)
+    requires = tuple(requires)
+
     messenger.print(
         dedent("""
-        {cyan}Name{normal}: {name}
+        {cyan}Name{normal}: {full_name}
         {cyan}Description{normal}: {description}
         {cyan}Homepage{normal}: {homepage}
         {cyan}URL{normal}: {url}
@@ -91,11 +115,15 @@ def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace
         {cyan}License{normal}: {license}
         {cyan}Operating Systems{normal}: {os}
         {cyan}Keywords{normal}: {keywords}
-        {cyan}Depends{normal}: {depends}
+        {cyan}Installed{normal}: {installed}
+        {cyan}Pkg Directory{normal}: {pkg_dir}
+        {cyan}Var Directory{normal}: {var_dir}
+        {cyan}Depends on{normal}: {depends}
+        {cyan}Required by{normal}: {requires}
         """.format(
             cyan=Color.CYAN,
             normal=Color.NORMAL,
-            name=package.name,
+            full_name=package.full_name,
             description=package.description,
             homepage=package.homepage,
             url=package.url,
@@ -103,9 +131,14 @@ def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace
             license=package.license,
             os=package.operating_system,
             keywords=package.keywords,
+            installed=package.is_installed(),
+            pkg_dir=package.dir,
+            var_dir=package.vardir,
             depends=package.depends,
+            requires=requires,
         ))
     )
+    return package, requires
 
 
 def emerge_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):

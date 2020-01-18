@@ -7,7 +7,7 @@ import pytest
 from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError, \
     HookFunctionError, PackageNotInstalledError
 from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package, \
-    create_package
+    create_package, closure_dependency_tree, info_package
 from pearllib.pearlenv import Package
 
 from .utils import create_pearl_env, create_pearl_home
@@ -42,6 +42,7 @@ class PackageBuilder:
             repo_name='repo-test',
             package_name='pkg-test',
             is_installed=False,
+            depends=(),
     ):
         """Install a package somewhere locally"""
         pkg_dir = tmp_path / '{}/{}'.format(repo_name, package_name)
@@ -57,7 +58,10 @@ class PackageBuilder:
                 package_name=package_name,
             )
 
-        package = Package(self.home_dir, repo_name, package_name, str(pkg_dir), '')
+        package = Package(
+            self.home_dir, repo_name, package_name, str(pkg_dir), '',
+            depends=depends
+        )
         self._update_packages(package)
 
     def add_git_package(
@@ -67,6 +71,7 @@ class PackageBuilder:
             package_name='pkg-test',
             url='https://github.com/pkg',
             is_installed=False,
+            depends=(),
     ):
 
         if is_installed:
@@ -75,7 +80,10 @@ class PackageBuilder:
                 repo_name='repo-test',
                 package_name='pkg-test',
             )
-        package = Package(self.home_dir, repo_name, package_name, url, '')
+        package = Package(
+            self.home_dir, repo_name, package_name, url, '',
+            depends=depends
+        )
         self._update_packages(package)
 
     def build(self):
@@ -713,3 +721,102 @@ def test_create_package_pearl_config_exists(tmp_path):
                 dest_dir=dest_dir
             )
         )
+
+
+@pytest.mark.parametrize(
+    'initial_package_list, package_deps, leaf_first, expected_result',
+    [
+        pytest.param(
+            ["A"],
+            {
+                "A": [],
+            },
+            True,
+            ["A"]
+        ),
+        pytest.param(
+            ["A"],
+            {
+                "A": ["B"],
+                "B": [],
+            },
+            True,
+            ["B", "A"]
+        ),
+        pytest.param(
+            ["A", "B"],
+            {
+                "A": ["C"],
+                "B": ["C"],
+                "C": [],
+            },
+            True,
+            ["C", "B", "A"]
+        ),
+        pytest.param(
+            ["A"],
+            {
+                "A": ["B"],
+                "B": ["A"],
+            },
+            True,
+            ["B", "A"]
+        ),
+        pytest.param(
+            ["A"],
+            {
+                "A": ["B"],
+                "B": ["C"],
+                "C": [],
+            },
+            False,
+            ["A", "B", "C"]
+        ),
+    ]
+)
+def test_closure_dependency_tree(
+        tmp_path,
+        initial_package_list, package_deps, leaf_first,
+        expected_result
+):
+    home_dir = create_pearl_home(tmp_path)
+
+    builder = PackageBuilder(home_dir)
+    for package_name, depends in package_deps.items():
+        builder.add_local_package(
+            tmp_path, "",
+            package_name=package_name,
+            depends=depends
+        )
+    packages = builder.build()
+    pearl_env = create_pearl_env(home_dir, packages)
+    assert closure_dependency_tree(
+        pearl_env, initial_package_list, leaf_first=leaf_first
+    ) == expected_result
+
+
+@pytest.mark.parametrize(
+    'is_installed, expected_result',
+    [
+        pytest.param(True, ("A",)),
+        pytest.param(False, ("A",)),
+    ]
+)
+def test_info(tmp_path, is_installed, expected_result):
+    home_dir = create_pearl_home(tmp_path)
+
+    package_deps = {
+        "A": ["B"],
+        "B": []
+    }
+    builder = PackageBuilder(home_dir)
+    for package_name, depends in package_deps.items():
+        builder.add_local_package(
+            tmp_path, "",
+            package_name=package_name,
+            depends=depends,
+            is_installed=is_installed,
+        )
+    packages = builder.build()
+    pearl_env = create_pearl_env(home_dir, packages)
+    assert info_package(pearl_env, "B", None)[1] == expected_result

@@ -196,7 +196,7 @@ def test_run_pearl_bash(tmp_path):
         assert result.stdout == "{}\n{}\n{}\n{}\n".format(
             home_dir, home_dir,
             os.environ['PATH'],
-            "\x1b[1;36mTest\x1b[0m"
+            "\x1b[0;36mTest\x1b[0m"
         )
 
 

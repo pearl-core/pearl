@@ -1,5 +1,10 @@
 # Change Log #
 
+## [2.3.0][v230] - 2020-01-18 ##
+
+* Handle dependencies between packages
+* Include `Required by` in `info` command
+
 ## [2.2.0][v220] - 2020-01-17 ##
 
 * Add `info` command
@@ -258,3 +263,4 @@
 [v211]: https://github.com/pearl-core/pearl/releases/tag/2.1.1
 [v212]: https://github.com/pearl-core/pearl/releases/tag/2.1.2
 [v220]: https://github.com/pearl-core/pearl/releases/tag/2.2.0
+[v230]: https://github.com/pearl-core/pearl/releases/tag/2.3.0

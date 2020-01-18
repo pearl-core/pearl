@@ -166,10 +166,7 @@ $ pearl update
 Emerge
 ------
 Emerge is an idempotent command for either installing or updating a package
-depending whether the package is already installed or not. This command turns
-to be particularly useful for establishing dependencies between packages.
-See the section [below](#define-dependencies-between-pearl-packages)
-for more details.
+depending whether the package is already installed or not.
 
 Remove
 -------
@@ -202,7 +199,7 @@ Info
 ```sh
 $ pearl info nerdify
 
-Name: nerdify
+Name: pearl/nerdify
 Description: Make your shell nerdified
 Homepage: https://github.com/pearl-hub/nerdify
 URL: https://github.com/pearl-hub/nerdify.git
@@ -210,7 +207,11 @@ Author: Filippo Squillace <feel.sqoox@gmail.com>
 License: None
 Operating Systems: ('linux', 'osx')
 Keywords: ('vim', 'tmux', 'ranger')
-Depends: ('fonts', 'tpm')
+Installed: True
+Pkg Directory: /home/user/.local/share/pearl/packages/pearl/nerdify
+Var Directory: /home/user/.local/share/pearl/var/pearl/nerdify
+Depends on: ('fonts', 'tpm')
+Required by: ()
 ```
 
 Recommended Pearl Hub packages to install:
@@ -239,7 +240,7 @@ The Pearl dependencies are the following:
 ### Mandatory
 - [python (>=3.5)](https://www.python.org/)
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
-- [git (>=1.8)](https://git-scm.com/)
+- [git (>=1.8.5)](https://git-scm.com/)
 
 ### Optional
 The following are not mandatory dependencies but can be handy to have for the hook functions in Pearl package.
@@ -481,27 +482,6 @@ The package will be ready to be [installed](#install), [updated](#update),
 The directory content can be structured in the exact way as described
 in the [section](#structure-of-a-pearl-package) above.
 
-## Define dependencies between Pearl packages ##
-Suppose you have a package `mypack` which depends on another package `mydep`,
-you can update the `mypack` `hooks.sh` file in this way:
-
-    post_install() {
-        # Install/update the dependency here:
-        pearl emerge ${PEARL_PKGREPONAME}/mydep
-    }
-    post_update() {
-        post_install
-    }
-    pre_remove() {
-        # Uncomment below to strictly remove the dependency
-        # during the removal of the current package:
-        #pearl remove ${PEARL_PKGREPONAME}/mydep
-    }
-
-The `PEARL_PKGREPONAME` variable will make sure to define dependencies only
-between packages of the same repository.
-To see a real example in Pearl Hub, take a look at the [Kyrat hooks.sh](https://github.com/pearl-hub/kyrat/blob/master/pearl-config/hooks.sh).
-
 ## Use third-party git repository not available in Pearl Hub ##
 If you want to use a third-party git repository
 that is not available in the [Official Pearl Hub](https://github.com/pearl-hub),
@@ -641,7 +621,7 @@ Troubleshooting
     pearl-source
     
 > which reloads the configuration.
-> The use of such function is not always required but depends
+> The use of such function is not always required but depends on
 > whether the variables/functions involve the current shell where the
 > package `install`/`update` occurred (i.e. a new variable defined in `config.sh`
 > and the current shell is a bash or zsh). Alternatively, user can always
