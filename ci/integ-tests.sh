@@ -50,23 +50,19 @@ do
 done
 
 info Update ALL Pearl packages
-for package in $(get_all_packages)
-do
-    pearl --verbose --no-confirm update ${package}
-done
+pearl --verbose --no-confirm update
 
 pearl list
 
 info Remove ALL pearl packages
-for package in $(get_all_packages)
-do
-    pearl --verbose --no-confirm remove ${package}
-    if [[ -d "$PEARL_HOME/packages/pearl/$package" ]]
-    then
-        echo "$PEARL_HOME/packages/pearl/$package still exists"
-        exit 8
-    fi
-done
+# Remove only the packages for now
+echo -e "y\ny\nn\nn\n" | pearl remove
+if [[ $(ls -A "$PEARL_HOME/packages/pearl/") ]]
+then
+    echo "$PEARL_HOME/packages/pearl/ is not empty but all the Pearl packages have been removed"
+    exit 8
+fi
 
+# Remove everything now
 yes | pearl remove
 [[ ! -e ${PEARL_HOME} ]] || echo "$PEARL_HOME exists after remove it"

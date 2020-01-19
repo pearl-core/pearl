@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 
 from collections import namedtuple, OrderedDict
+from typing import Tuple
 
 from pearllib.messenger import messenger
 
@@ -79,7 +80,7 @@ class Package:
         return self._keywords
 
     @property
-    def depends(self) -> tuple:
+    def depends(self) -> Tuple[str]:
         return self._depends
 
     @property

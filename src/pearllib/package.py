@@ -8,7 +8,7 @@ from typing import List
 import pkg_resources
 
 from pearllib.exceptions import PackageNotInRepoError, PackageAlreadyInstalledError, RepoDoesNotExistError, \
-    PackageNotInstalledError, HookFunctionError
+    PackageNotInstalledError, HookFunctionError, PackageRequiredByOtherError
 from pearllib.messenger import messenger, Color
 from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import check_and_copy, ask, run_pearl_bash
@@ -29,6 +29,65 @@ pre_remove() {{ :; }}
 HOOKS_SH="$PEARL_PKGDIR"/pearl-config/hooks.sh
 [[ -f $HOOKS_SH ]] && source "$HOOKS_SH"
 """)
+
+
+def install_packages(
+        pearl_env: PearlEnvironment,
+        args: Namespace
+):
+    package_list = reversed(closure_dependency_tree(pearl_env, args.packages))
+    # Perform emerge command for all dependencies for the specified packages
+    for package_name in package_list:
+        if package_name in args.packages:
+            install_package(pearl_env, package_name, args)
+        else:
+            emerge_package(pearl_env, package_name, args)
+
+
+def update_packages(
+        pearl_env: PearlEnvironment,
+        args: Namespace
+):
+    package_list = reversed(closure_dependency_tree(pearl_env, args.packages))
+    # Perform emerge command for all dependencies for the specified packages
+    for package_name in package_list:
+        if package_name in args.packages:
+            update_package(pearl_env, package_name, args)
+        else:
+            emerge_package(pearl_env, package_name, args)
+
+
+def emerge_packages(
+        pearl_env: PearlEnvironment,
+        args: Namespace
+):
+    package_list = reversed(closure_dependency_tree(pearl_env, args.packages))
+    for package_name in package_list:
+        emerge_package(pearl_env, package_name, args)
+
+
+def remove_packages(
+        pearl_env: PearlEnvironment,
+        args: Namespace
+):
+    package_list = closure_dependency_tree(pearl_env, args.packages)
+    for package_name in package_list:
+        # TODO move required_by function somewhere else
+        # TODO test required by
+        requires = _required_by(pearl_env, package_name)
+        if requires:
+            raise PackageRequiredByOtherError(
+                'Package {} cannot be remove because is required by other packages: {}'.format(package_name, requires)
+            )
+        remove_package(pearl_env, package_name, args)
+
+
+def info_packages(
+        pearl_env: PearlEnvironment,
+        args: Namespace
+):
+    for package_name in args.packages:
+        info_package(pearl_env, package_name, args)
 
 
 def _run(
@@ -77,7 +136,48 @@ def _lookup_package(pearl_env: PearlEnvironment, package_name: str) -> Package:
     raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
 
-def closure_dependency_tree(pearl_env: PearlEnvironment, packages: List[str], leaf_first=True) -> List[str]:
+def closure_dependency_tree(
+        pearl_env: PearlEnvironment,
+        packages: List[str],
+) -> List[str]:
+    # Use set to remove duplicates
+    packages = set(packages)
+    packages_to_exclude = set()
+    for package_name1 in packages:
+        for package_name2 in packages:
+            if package_name1 == package_name2:
+                continue
+            if not _deep_depends(pearl_env, package_name1, package_name2) \
+                    and _deep_depends(pearl_env, package_name2, package_name1):
+                # Exclude packages which are already dependencies of other packages
+                packages_to_exclude.add(package_name1)
+    sorted_package_list = sorted(list(packages.difference(packages_to_exclude)))
+    return _closure_dependency_tree(pearl_env, sorted_package_list)
+
+
+def _deep_depends(
+        pearl_env: PearlEnvironment,
+        package_name1: str,
+        package_name2: str,
+) -> bool:
+    queue = [package_name1]
+    visited_packages = []
+    while queue:
+        package_name = queue.pop(0)
+        visited_packages.append(package_name)
+        if package_name == package_name2:
+            return True
+        package = _lookup_package(pearl_env, package_name)
+        for package_dep in package.depends:
+            if package_dep not in visited_packages:
+                queue.append(package_dep)
+    return False
+
+
+def _closure_dependency_tree(
+        pearl_env: PearlEnvironment,
+        packages: List[str],
+) -> List[str]:
     full_package_list = []
     queue = list(packages)
     while queue:
@@ -88,9 +188,16 @@ def closure_dependency_tree(pearl_env: PearlEnvironment, packages: List[str], le
         for package_dep in package.depends:
             if package_dep not in full_package_list:
                 queue.append(package_dep)
-    if leaf_first:
-        full_package_list.reverse()
     return full_package_list
+
+
+def _required_by(pearl_env: PearlEnvironment, package_name: str):
+    requires = []
+    for _, pkg_info in pearl_env.packages.items():
+        for pkg_name, pkg in pkg_info.items():
+            if package_name in pkg.depends:
+                requires.append(pkg_name)
+    return tuple(requires)
 
 
 def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
@@ -98,13 +205,7 @@ def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace
     Provide info about a package.
     """
     package = _lookup_package(pearl_env, package_name)
-    requires = []
-    for _, pkg_info in pearl_env.packages.items():
-        for pkg_name, pkg in pkg_info.items():
-            if package_name in pkg.depends:
-                requires.append(pkg_name)
-    requires = tuple(requires)
-
+    requires = tuple(_required_by(pearl_env, package_name))
     messenger.print(
         dedent("""
         {cyan}Name{normal}: {full_name}

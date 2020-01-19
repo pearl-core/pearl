@@ -53,17 +53,13 @@ for package in (pearl list --package-only)
 end
 
 info Update ALL Pearl packages
-for package in (get_all_packages)
-    pearl --verbose --no-confirm update $package; or die "Error on pearl update $package"
-end
+pearl --verbose --no-confirm update
 
 pearl list
 
 info Remove ALL pearl packages
-for package in (get_all_packages)
-    pearl --verbose --no-confirm remove $package; or die "Error on pearl remove $package"
-    [ -d "$PEARL_HOME/packages/$package" ]; and die "$PEARL_HOME/packages/$package still exists"
-end
+# Remove only the packages for now
+echo -e "y\ny\nn\nn\n" | pearl remove; or die "Error on removing Pearl packages"
 
 yes | pearl remove; or die "Error on pearl remove"
 [ ! -e $PEARL_HOME ]; or echo "$PEARL_HOME exists after remove it"

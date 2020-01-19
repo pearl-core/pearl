@@ -28,3 +28,8 @@ class PackageAlreadyInstalledError(PearlError):
 class PackageNotInstalledError(PearlError):
     def __init__(self, message):
         super().__init__(message, 103)
+
+
+class PackageRequiredByOtherError(PearlError):
+    def __init__(self, message):
+        super().__init__(message, 106)

@@ -7,8 +7,9 @@ import pytest
 from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError, \
     HookFunctionError, PackageNotInstalledError
 from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package, \
-    create_package, closure_dependency_tree, info_package
-from pearllib.pearlenv import Package
+    create_package, closure_dependency_tree, info_package, install_packages, update_packages, emerge_packages, \
+    remove_packages, info_packages
+from pearllib.pearlenv import Package, PearlEnvironment
 
 from .utils import create_pearl_env, create_pearl_home
 
@@ -19,7 +20,8 @@ class PackageArgs(Namespace):
     def __init__(
         self, no_confirm=False, verbose=0, force=False,
         pattern=".*", package_only=False,
-        name="", dest_dir=None
+        name="", dest_dir=None,
+        packages=()
     ):
         super().__init__()
         self.no_confirm = no_confirm
@@ -29,6 +31,7 @@ class PackageArgs(Namespace):
         self.package_only = package_only
         self.name = name
         self.dest_dir = dest_dir
+        self.packages = packages
 
 
 class PackageBuilder:
@@ -724,14 +727,13 @@ def test_create_package_pearl_config_exists(tmp_path):
 
 
 @pytest.mark.parametrize(
-    'initial_package_list, package_deps, leaf_first, expected_result',
+    'initial_package_list, package_deps, expected_result',
     [
         pytest.param(
             ["A"],
             {
                 "A": [],
             },
-            True,
             ["A"]
         ),
         pytest.param(
@@ -740,8 +742,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "A": ["B"],
                 "B": [],
             },
-            True,
-            ["B", "A"]
+            ["A", "B"]
         ),
         pytest.param(
             ["A", "B"],
@@ -750,17 +751,16 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": ["C"],
                 "C": [],
             },
-            True,
-            ["C", "B", "A"]
+            ["A", "B", "C"]
         ),
+        # Cycle
         pytest.param(
             ["A"],
             {
                 "A": ["B"],
                 "B": ["A"],
             },
-            True,
-            ["B", "A"]
+            ["A", "B"]
         ),
         pytest.param(
             ["A"],
@@ -769,14 +769,41 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": ["C"],
                 "C": [],
             },
-            False,
             ["A", "B", "C"]
+        ),
+        pytest.param(
+            ["C", "B", "A"],
+            {
+                "A": ["B"],
+                "B": ["C"],
+                "C": [],
+            },
+            ["A", "B", "C"]
+        ),
+        # Duplicates
+        pytest.param(
+            ["C", "B", "A", "A"],
+            {
+                "A": ["B"],
+                "B": ["C"],
+                "C": [],
+            },
+            ["A", "B", "C"]
+        ),
+        pytest.param(
+            ["C", "B", "A"],
+            {
+                "A": ["B"],
+                "B": [],
+                "C": [],
+            },
+            ["A", "C", "B"]
         ),
     ]
 )
 def test_closure_dependency_tree(
         tmp_path,
-        initial_package_list, package_deps, leaf_first,
+        initial_package_list, package_deps,
         expected_result
 ):
     home_dir = create_pearl_home(tmp_path)
@@ -791,7 +818,7 @@ def test_closure_dependency_tree(
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, packages)
     assert closure_dependency_tree(
-        pearl_env, initial_package_list, leaf_first=leaf_first
+        pearl_env, initial_package_list,
     ) == expected_result
 
 
@@ -820,3 +847,71 @@ def test_info(tmp_path, is_installed, expected_result):
     packages = builder.build()
     pearl_env = create_pearl_env(home_dir, packages)
     assert info_package(pearl_env, "B", None)[1] == expected_result
+
+
+def test_install_packages():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.install_package') as install_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
+        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        args = PackageArgs(packages=['pkg1', 'pkg2'])
+        install_packages(pearl_env, args)
+
+        assert closure_mock.call_count == 1
+        emerge_mock.assert_has_calls([mock.call(mock.ANY, 'deppkg1', args)])
+        install_mock.assert_has_calls([mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'pkg1', args)])
+
+
+def test_update_packages():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.update_package') as update_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
+        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        args = PackageArgs(packages=['pkg1', 'pkg2'])
+        update_packages(pearl_env, args)
+
+        assert closure_mock.call_count == 1
+        emerge_mock.assert_has_calls([mock.call(mock.ANY, 'deppkg1', args)])
+        update_mock.assert_has_calls([mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'pkg1', args)])
+
+
+def test_emerge_packages():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
+        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        args = PackageArgs(packages=['pkg1', 'pkg2'])
+        emerge_packages(pearl_env, args)
+
+        assert closure_mock.call_count == 1
+        emerge_mock.assert_has_calls([mock.call(mock.ANY, 'deppkg1', args), mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'pkg1', args)])
+
+
+def test_remove_packages():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '._required_by') as required_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
+        required_mock.return_value = []
+        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        args = PackageArgs(packages=['pkg1', 'pkg2'])
+        remove_packages(pearl_env, args)
+
+        assert closure_mock.call_count == 1
+        remove_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'deppkg1', args)])
+
+
+def test_info_packages():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.info_package') as info_mock:
+        args = PackageArgs(packages=['pkg1', 'pkg2'])
+        info_packages(pearl_env, args)
+
+        info_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args)])

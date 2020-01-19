@@ -9,7 +9,10 @@ include VERSION
 include requirements*
 include Makefile
 
-recursive-include src/pearllib/static/* *
+recursive-include src/pearllib/static/boot *
+recursive-include src/pearllib/static/buava/lib *
+recursive-include src/pearllib/static/builtins *
+recursive-include src/pearllib/static/templates *
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

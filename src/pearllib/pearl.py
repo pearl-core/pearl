@@ -10,41 +10,26 @@ from pearllib.pearlenv import PearlEnvironment
 from pearllib.utils import verify_runtime_deps
 
 
-def _package_operation(pearl_env, packages, args, pack_func):
-    captured_exception = None
-    for package in packages:
-        try:
-            pack_func(pearl_env, package, args)
-        except PearlError as ex:
-            captured_exception = ex
-    if captured_exception:
-        raise captured_exception
-
-
 def _pearl(pearl_env: PearlEnvironment, args):
     command = args.command
     if command == 'init':
         syst.init_pearl(pearl_env, args)
     elif command == 'install':
-        package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=True)
-        _package_operation(pearl_env, package_list, args, pack.install_package)
+        pack.install_packages(pearl_env, args)
     elif command == 'update':
         if not args.packages:
             syst.update_pearl(pearl_env, args)
         else:
-            package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=True)
-            _package_operation(pearl_env, package_list, args, pack.update_package)
+            pack.update_packages(pearl_env, args)
     elif command == 'remove':
         if not args.packages:
             syst.remove_pearl(pearl_env, args)
         else:
-            package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=False)
-            _package_operation(pearl_env, package_list, args, pack.remove_package)
+            pack.remove_packages(pearl_env, args)
     elif command == 'emerge':
-        package_list = pack.closure_dependency_tree(pearl_env, args.packages, leaf_first=True)
-        _package_operation(pearl_env, package_list, args, pack.emerge_package)
+        pack.emerge_packages(pearl_env, args)
     elif command == 'info':
-        _package_operation(pearl_env, args.packages, args, pack.info_package)
+        pack.info_packages(pearl_env, args)
     elif command == 'list':
         pack.list_packages(pearl_env, args)
     elif command == 'search':
