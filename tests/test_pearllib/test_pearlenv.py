@@ -5,9 +5,113 @@ import pytest
 
 from unittest import mock
 
-from pearllib.pearlenv import PearlEnvironment, Package
+from pearllib.pearlenv import PearlEnvironment, Package, PackageBuilder, OS, PackageLoader
 
 _MODULE_UNDER_TEST = 'pearllib.pearlenv'
+
+
+def pkg_info(
+        repo_name='repo1', name='pkg1',
+        url='url1', description='descr', homepage='http://pkg1',
+        author='auth1', license='GPL', os=('linux',),
+        keywords=('kw1',), depends=()
+):
+    return dict(
+        repo_name=repo_name,
+        name=name,
+        url=url,
+        description=description,
+        homepage=homepage,
+        author=author,
+        license=license,
+        os=os,
+        keywords=keywords,
+        depends=depends,
+    )
+
+
+@pytest.mark.parametrize(
+    'packages_info',
+    [
+        pytest.param({}),
+        pytest.param(
+            {
+                'repo1': {
+                    'pkg1': pkg_info()
+                }
+            },
+        ),
+        pytest.param(
+            {
+                'repo1': {
+                    'pkg1': pkg_info(depends=('repo1/pkg2',)),
+                    'pkg2': pkg_info(name='pkg2'),
+                },
+            },
+        ),
+        # Self cycle
+        pytest.param(
+            {
+                'repo1': {
+                    'pkg1': pkg_info(depends=('repo1/pkg1',)),
+                },
+            },
+        ),
+        # Cycle
+        pytest.param(
+            {
+                'repo1': {
+                    'pkg1': pkg_info(depends=('repo1/pkg2',)),
+                    'pkg2': pkg_info(name='pkg2', depends=('repo1/pkg1',)),
+                },
+            },
+        ),
+        # Common dep
+        pytest.param(
+            {
+                'repo1': {
+                    'pkg1': pkg_info(depends=('repo1/pkg3',)),
+                    'pkg2': pkg_info(name='pkg2', depends=('repo1/pkg3',)),
+                    'pkg3': pkg_info(name='pkg3'),
+                },
+            },
+        ),
+        # Different repos
+        pytest.param(
+            {
+                'repo1': {
+                    'pkg1': pkg_info(name='pkg1', depends=('repo2/pkg2',)),
+                    'pkg3': pkg_info(name='pkg3', depends=()),
+                },
+                'repo2': {
+                    'pkg2': pkg_info(name='pkg2', repo_name='repo2', depends=('repo1/pkg3',)),
+                }
+            },
+        ),
+    ]
+)
+def test_package_builder(tmp_path, packages_info):
+    builder = PackageBuilder(tmp_path)
+    actual_packages = builder.build_packages(packages_info)
+    for repo_name in packages_info.keys():
+        for pkg_name in packages_info[repo_name].keys():
+            actual_package = actual_packages[repo_name][pkg_name]
+            package_info = packages_info[repo_name][pkg_name]
+            assert package_info['name'] == actual_package.name
+            assert package_info['repo_name'] == actual_package.repo_name
+            assert '{}/{}'.format(package_info['repo_name'], package_info['name']) == actual_package.full_name
+            assert package_info['url'] == actual_package.url
+            assert package_info['description'] == actual_package.description
+            assert package_info['homepage'] == actual_package.homepage
+            assert package_info['author'] == actual_package.author
+            assert package_info['license'] == actual_package.license
+            assert package_info['os'] == tuple([o.name.lower() for o in actual_package.os])
+            assert package_info['keywords'] == actual_package.keywords
+            for pkg_dep_name in package_info['depends']:
+                assert pkg_dep_name in [dep.full_name for dep in actual_package.depends]
+
+            assert str(actual_package.dir) == str(tmp_path / 'packages/{}'.format(actual_package.full_name))
+            assert str(actual_package.vardir) == str(tmp_path / 'var/{}'.format(actual_package.full_name))
 
 
 @pytest.mark.parametrize(
@@ -99,13 +203,9 @@ def test_load_repos_init_repo(tmp_path):
     pearl_home = tmp_path / 'home'
     pearl_home.mkdir()
 
-    pearl_conf = pearl_home / 'pearl.conf'
-    pearl_conf.touch()
-
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess_mock:
-        pearl_env = PearlEnvironment(home=pearl_home, config_filename=pearl_conf)
-        repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
-        assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',)) == [repo_path / 'pearl-config/repo.conf']
+        repo_path = pearl_home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
+        assert PackageLoader._load_repos(pearl_home, ('https://github.com/pearl-hub/repo.git',)) == [repo_path / 'pearl-config/repo.conf']
 
         assert subprocess_mock.run.call_args[0][0] == ['git', 'clone', '--depth', '1', 'https://github.com/pearl-hub/repo.git', str(repo_path), '--quiet']
 
@@ -124,13 +224,9 @@ def test_load_repos_update_repo(update_repos, tmp_path):
     repo_dir = pearl_home / "repos/a10c24fd1961ce3d1b87c05cc008b593/.git"
     repo_dir.mkdir(parents=True)
 
-    pearl_conf = pearl_home / 'pearl.conf'
-    pearl_conf.touch()
-
     with mock.patch(_MODULE_UNDER_TEST + '.subprocess') as subprocess_mock:
-        pearl_env = PearlEnvironment(home=pearl_home, config_filename=pearl_conf)
-        repo_path = pearl_env.home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
-        assert pearl_env.load_repos(('https://github.com/pearl-hub/repo.git',), update_repos=update_repos) == [repo_path / 'pearl-config/repo.conf']
+        repo_path = pearl_home / 'repos/a10c24fd1961ce3d1b87c05cc008b593'
+        assert PackageLoader._load_repos(pearl_home, ('https://github.com/pearl-hub/repo.git',), update_repos=update_repos) == [repo_path / 'pearl-config/repo.conf']
         if update_repos:
             assert subprocess_mock.run.call_args[0][0] == ['git', '-C', str(repo_path), 'pull', '--quiet']
         else:

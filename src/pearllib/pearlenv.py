@@ -1,17 +1,31 @@
 import hashlib
 import os
 import subprocess
+from enum import Enum
 
 from pathlib import Path
 
 from collections import namedtuple, OrderedDict
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
+from pearllib.exceptions import PackageNotInRepoError, RepoDoesNotExistError
 from pearllib.messenger import messenger
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
 _DEFAULT_LOCAL_REPO_NAME = 'local'
+
+
+class OS(Enum):
+    LINUX = 'linux'
+    OSX = 'osx'
+
+    @staticmethod
+    def from_code(code: str) -> 'OS':
+        return OS.__members__[code.upper()]
+
+    def __str__(self):
+        return self.name
 
 
 class Package:
@@ -22,7 +36,7 @@ class Package:
             homepage: str = None,
             author: str = None,
             license: str = None,
-            operating_system: tuple = None,
+            os: tuple = None,
             keywords: tuple = None,
             depends: tuple = None,
     ):
@@ -35,7 +49,7 @@ class Package:
         self._author = author
         self._license = license
 
-        self._operating_system = tuple() if operating_system is None else operating_system
+        self._os = tuple() if os is None else os
         self._keywords = tuple() if keywords is None else keywords
         self._depends = tuple() if depends is None else depends
 
@@ -72,15 +86,15 @@ class Package:
         return self._license
 
     @property
-    def operating_system(self) -> tuple:
-        return self._operating_system
+    def os(self) -> Tuple[OS]:
+        return self._os
 
     @property
-    def keywords(self) -> tuple:
+    def keywords(self) -> Tuple[str]:
         return self._keywords
 
     @property
-    def depends(self) -> Tuple[str]:
+    def depends(self) -> Tuple['Package']:
         return self._depends
 
     @property
@@ -91,6 +105,9 @@ class Package:
     def vardir(self) -> Path:
         return self._pearl_home / 'var/{}'.format(self.full_name)
 
+    def add_depend(self, package: 'Package'):
+        self._depends = self._depends + (package,)
+
     def is_installed(self) -> bool:
         return self.dir.is_dir()
 
@@ -98,10 +115,149 @@ class Package:
         return self.url.startswith('/')
 
     def __repr__(self):
-        return self.full_name
+        return "Package({})".format(self.full_name)
 
     def __str__(self):
         return self.full_name
+
+    def __hash__(self):
+        return hash(self.full_name)
+
+    def __eq__(self, other: 'Package'):
+        return self.full_name == other.full_name
+
+
+class PackageBuilder:
+    def __init__(self, pearl_home: Path):
+        self.pearl_home = pearl_home
+
+    def build_package(
+            self,
+            repo_name: str,
+            package_name: str,
+            packages_info: Dict[str, Dict[str, Dict[str, Any]]],
+            packages: Dict[str, Dict[str, Package]]
+    ):
+        if repo_name in packages and package_name in packages[repo_name]:
+            return packages[repo_name][package_name]
+
+        package_info = dict(packages_info[repo_name][package_name])
+        os_list = tuple([OS.from_code(os) for os in package_info['os']])
+
+        package_info['os'] = os_list
+        depends = package_info['depends']
+        del package_info['depends']
+        if repo_name not in packages:
+            packages[repo_name] = {}
+        packages[repo_name][package_name] = Package(
+            self.pearl_home,
+            **package_info,
+        )
+        for package_dep_full_name in depends:
+            package_dep_repo_name, package_dep_name = package_dep_full_name.split('/')
+            self.build_package(
+                package_dep_repo_name,
+                package_dep_name,
+                packages_info,
+                packages
+            )
+            package_dep = packages[package_dep_repo_name][package_dep_name]
+            packages[repo_name][package_name].add_depend(package_dep)
+
+    def build_packages(self, packages_info: Dict[str, Dict[str, Dict[str, Any]]]):
+        packages = {}
+        for repo_name, repo_packages_info in packages_info.items():
+            for package_name, package_info in repo_packages_info.items():
+                self.build_package(repo_name, package_name, packages_info, packages)
+        return packages
+
+
+class PackageLoader:
+    def __init__(self, home: Path, config_filename: Path):
+        self.home = home
+        self.config_filename = config_filename
+
+    def load_packages(self, update_repos=False, verbose: int = 0):
+        packages = OrderedDict()
+        config_filenames = [self.config_filename]
+        while config_filenames:
+            config_filename = config_filenames.pop(0)
+            messenger.debug("Loading Pearl configuration: {}...".format(config_filename))
+            pearl_conf = self._load_conf(config_filename)
+            packages.update({
+                pearl_conf.repo_name: pearl_conf.packages
+            })
+            messenger.debug(
+                "Loaded Pearl configuration: {}. Repo name: {}, number of packages: {}".format(
+                    config_filename,
+                    pearl_conf.repo_name,
+                    len(pearl_conf.packages)
+                )
+            )
+            repo_conf_filenames = self._load_repos(self.home, pearl_conf.repos, update_repos, verbose)
+            config_filenames.extend(repo_conf_filenames)
+        return packages
+
+    @staticmethod
+    def _load_conf(config_filename: Path):
+        local_dict = {}
+        exec(config_filename.open().read(), {}, local_dict)
+        repo_name = local_dict.get('PEARL_REPO_NAME', _DEFAULT_LOCAL_REPO_NAME)
+        packages = OrderedDict()
+        for package_name, package_info in local_dict.get('PEARL_PACKAGES', {}).items():
+            packages_depends_full_name = []
+            for package_def_name in package_info.get('depends', tuple()):
+                if '/' in package_def_name:
+                    packages_depends_full_name.append(package_def_name)
+                else:
+                    packages_depends_full_name.append("{}/{}".format(repo_name, package_def_name))
+
+            packages[package_name] = dict(
+                repo_name=repo_name,
+                name=package_name,
+                url=package_info['url'],
+                description=package_info.get('description'),
+                homepage=package_info.get('homepage'),
+                author=package_info.get('author'),
+                license=package_info.get('license'),
+                os=package_info.get('os', tuple()),
+                keywords=package_info.get('keywords', tuple()),
+                depends=packages_depends_full_name,
+            )
+        return PearlConf(
+            repo_name,
+            local_dict.get('PEARL_REPOS', ()),
+            packages
+        )
+
+    @staticmethod
+    def _load_repos(home, repos: list, update_repos=False, verbose: int = 0):
+        return [PackageLoader._load_repo(home, repo, update_repos, verbose) for repo in repos]
+
+    @staticmethod
+    def _load_repo(home, repo: str, update_repos=False, verbose: int = 0):
+        m = hashlib.md5()
+        # Add \n for compatibility with previous version of Pearl
+        m.update('{}\n'.format(repo).encode())
+        md5_sum = m.hexdigest()
+        if not (home / 'repos/{}/.git'.format(md5_sum)).is_dir():
+            messenger.info('Initializing {} repository...'.format(repo))
+            clone_command = [
+                'git', 'clone', '--depth', '1', repo,
+                '{}/repos/{}'.format(home, md5_sum)
+            ]
+            if not verbose:
+                clone_command.append('--quiet')
+            subprocess.run(clone_command)
+        elif update_repos:
+            messenger.info("Updating {} repository...".format(repo))
+            # The option -C works only for git 1.8.5 https://stackoverflow.com/a/20115678
+            pull_command = ['git', '-C', '{}/repos/{}'.format(home, md5_sum), 'pull']
+            if not verbose:
+                pull_command.append('--quiet')
+            subprocess.run(pull_command)
+
+        return home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
 
 
 class PearlEnvironment:
@@ -114,7 +270,7 @@ class PearlEnvironment:
         self._config_filename = self._get_config_filename(config_filename, env_initialized)
 
         if env_initialized:
-            self._packages = self._load_packages(update_repos, verbose)
+            self._packages = self._build_packages(update_repos, verbose)
 
     @property
     def home(self) -> Path:
@@ -127,6 +283,37 @@ class PearlEnvironment:
     @property
     def packages(self):
         return self._packages
+
+    # TODO test lookup package
+    def _lookup_package_full_name(self, package_full_name: str) -> Package:
+        repo_name, short_package_name = package_full_name.split('/')
+
+        if repo_name not in self.packages:
+            raise RepoDoesNotExistError(
+                'Skipping {} as {} repository does not exist.'.format(package_full_name, repo_name))
+        if short_package_name not in self.packages[repo_name]:
+            raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_full_name))
+
+        return self.packages[repo_name][short_package_name]
+
+    def lookup_package(self, package_name: str) -> Package:
+        if '/' in package_name:
+            return self._lookup_package_full_name(package_name)
+
+        for repo_name, repo_packages in self.packages.items():
+            if package_name in repo_packages:
+                return repo_packages[package_name]
+
+        raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
+
+    # TODO test required by
+    def required_by(self, package: Package) -> Tuple[Package]:
+        requires = []
+        for _, pkg_info in self.packages.items():
+            for _, package_dep in pkg_info.items():
+                if package in package_dep.depends:
+                    requires.append(package_dep)
+        return tuple(requires)
 
     @staticmethod
     def _get_home(home: Path = None, env_initialized: bool = True) -> Path:
@@ -167,74 +354,9 @@ class PearlEnvironment:
                 raise ValueError(msg)
         return config_filename
 
-    def _load_packages(self, update_repos=False, verbose: int = 0):
-        packages = OrderedDict()
-        config_filenames = [self.config_filename]
-        while config_filenames:
-            config_filename = config_filenames.pop(0)
-            messenger.debug("Loading Pearl configuration: {}...".format(config_filename))
-            pearl_conf = self.load_conf(config_filename)
-            packages.update({
-                pearl_conf.repo_name: pearl_conf.packages
-            })
-            messenger.debug(
-                "Loaded Pearl configuration: {}. Repo name: {}, number of packages: {}".format(
-                    config_filename,
-                    pearl_conf.repo_name,
-                    len(pearl_conf.packages)
-                )
-            )
-            repo_conf_filenames = self.load_repos(pearl_conf.repos, update_repos, verbose)
-            config_filenames.extend(repo_conf_filenames)
-        return packages
+    def _build_packages(self, update_repos=False, verbose: int = 0):
+        loader = PackageLoader(self.home, self.config_filename)
+        packages_info = loader.load_packages(update_repos, verbose)
+        builder = PackageBuilder(self.home)
+        return builder.build_packages(packages_info)
 
-    def load_conf(self, config_filename: Path):
-        local_dict = {}
-        exec(config_filename.open().read(), {}, local_dict)
-        repo_name = local_dict.get('PEARL_REPO_NAME', _DEFAULT_LOCAL_REPO_NAME)
-        packages = OrderedDict()
-        for package_name, package_info in local_dict.get('PEARL_PACKAGES', {}).items():
-            packages[package_name] = Package(
-                self.home,
-                repo_name, package_name,
-                package_info['url'],
-                description=package_info.get('description'),
-                homepage=package_info.get('homepage'),
-                author=package_info.get('author'),
-                license=package_info.get('license'),
-                operating_system=package_info.get('os'),
-                keywords=package_info.get('keywords'),
-                depends=package_info.get('depends'),
-            )
-        return PearlConf(
-            repo_name,
-            local_dict.get('PEARL_REPOS', ()),
-            packages
-        )
-
-    def load_repos(self, repos: list, update_repos=False, verbose: int = 0):
-        return [self._load_repo(repo, update_repos, verbose) for repo in repos]
-
-    def _load_repo(self, repo: str, update_repos=False, verbose: int = 0):
-        m = hashlib.md5()
-        # Add \n for compatibility with previous version of Pearl
-        m.update('{}\n'.format(repo).encode())
-        md5_sum = m.hexdigest()
-        if not (self.home / 'repos/{}/.git'.format(md5_sum)).is_dir():
-            messenger.info('Initializing {} repository...'.format(repo))
-            clone_command = [
-                'git', 'clone', '--depth', '1', repo,
-                '{}/repos/{}'.format(self.home, md5_sum)
-            ]
-            if not verbose:
-                clone_command.append('--quiet')
-            subprocess.run(clone_command)
-        elif update_repos:
-            messenger.info("Updating {} repository...".format(repo))
-            # The option -C works only for git 1.8.5 https://stackoverflow.com/a/20115678
-            pull_command = ['git', '-C', '{}/repos/{}'.format(self.home, md5_sum), 'pull']
-            if not verbose:
-                pull_command.append('--quiet')
-            subprocess.run(pull_command)
-
-        return self.home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
