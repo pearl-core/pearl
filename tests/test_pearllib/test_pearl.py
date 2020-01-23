@@ -1,3 +1,4 @@
+from textwrap import dedent
 from unittest import mock
 
 import pytest
@@ -31,7 +32,7 @@ def expected_syst_calls(init=0, update=0, remove=0):
     'args, expected_pack_call_counts, expected_syst_call_counts',
     [
         pytest.param(
-            ['install', 'pkg'],
+            ['install', 'pkg1'],
             expected_pack_calls(install_pkg=1),
             expected_syst_calls()
         ),
@@ -96,7 +97,21 @@ def expected_syst_calls(init=0, update=0, remove=0):
 def test_pearl(args, expected_pack_call_counts, expected_syst_call_counts, tmp_path):
     home_dir = tmp_path / 'home'
     home_dir.mkdir(parents=True)
-    (home_dir / 'pearl.conf').touch()
+    (home_dir / 'pearl.conf').write_text(
+        dedent("""
+        PEARL_PACKAGES = {
+            "pkg1": {
+                "url": "/path"
+            },
+            "pkg2": {
+                "url": "/path"
+            },
+            "pkg3": {
+                "url": "/path"
+            },
+        }
+        """)
+    )
 
     pearl_home_dir = tmp_path / 'pearlhome'
     pearl_home_dir.mkdir(parents=True)

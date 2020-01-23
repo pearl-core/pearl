@@ -5,7 +5,9 @@ import pytest
 
 from unittest import mock
 
-from pearllib.pearlenv import PearlEnvironment, Package, PackageBuilder, OS, PackageLoader
+from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError
+from pearllib.pearlenv import PearlEnvironment, Package, PackageBuilder, PackageLoader
+from test_pearllib.utils import create_pearl_home
 
 _MODULE_UNDER_TEST = 'pearllib.pearlenv'
 
@@ -246,3 +248,97 @@ def test_package():
 
     pkg = Package(Path('/home'), 'repo', 'pkg1', '/pkg1', 'pkg1 descr')
     assert pkg.is_local()
+
+
+def test_lookup_package(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+
+    packages_info = {
+        "repo-test": {
+            "pkg-test": {
+                "repo_name": "repo-test",
+                "name": "pkg-test",
+                "url": "/blah",
+                "depends": ["repo-test/pkg-test2"]
+            },
+            "pkg-test2": {
+                "repo_name": "repo-test",
+                "name": "pkg-test2",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
+    actual_package = pearl_env.lookup_package('repo-test/pkg-test')
+    assert actual_package.full_name == 'repo-test/pkg-test'
+
+    actual_package = pearl_env.lookup_package('pkg-test')
+    assert actual_package.full_name == 'repo-test/pkg-test'
+
+
+def test_lookup_package_repo_no_exists(tmp_path):
+    with pytest.raises(RepoDoesNotExistError):
+        pearl_env = PearlEnvironment(tmp_path)
+        pearl_env.lookup_package('test/pkg-test')
+
+
+def test_lookup_package_not_in_repo(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    packages_info = {
+        "repo-test": {
+            "pkg-test": {
+                "repo_name": "repo-test",
+                "name": "pkg-test",
+                "url": "/blah",
+            },
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
+    with pytest.raises(PackageNotInRepoError):
+        pearl_env.lookup_package('repo-test/pkg-a-test')
+
+    with pytest.raises(PackageNotInRepoError):
+        pearl_env.lookup_package('pkg-a-test')
+
+
+def test_required_by(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+
+    packages_info = {
+        "repo-test": {
+            "pkg-test": {
+                "repo_name": "repo-test",
+                "name": "pkg-test",
+                "url": "/blah",
+                "depends": ["repo-test/pkg-test2"]
+            },
+            "pkg-test2": {
+                "repo_name": "repo-test",
+                "name": "pkg-test2",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
+    requires = pearl_env.required_by(
+        Package(home_dir, "repo-test", "pkg-test2", "/blah")
+    )
+    assert requires[0].full_name == 'repo-test/pkg-test'

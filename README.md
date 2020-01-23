@@ -592,7 +592,7 @@ Troubleshooting
 > **A**: This is probably because either one of the hook functions
 > is failing or the package content is corrupted. You can forcely remove the package:
 
-    $> pearl remove <packagename>
+    $> pearl --force remove <packagename>
 
 > which bypass hook functions that are failing. If that does not even work,
 > you can delete a package by simply removing its directory:

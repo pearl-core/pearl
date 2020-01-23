@@ -4,14 +4,14 @@ from unittest import mock
 
 import pytest
 
-from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageAlreadyInstalledError, \
-    HookFunctionError, PackageNotInstalledError
+from pearllib.exceptions import PackageAlreadyInstalledError, \
+    HookFunctionError, PackageNotInstalledError, PackageRequiredByOtherError
 from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package, \
     create_package, closure_dependency_tree, info_package, install_packages, update_packages, emerge_packages, \
     remove_packages, info_packages
-from pearllib.pearlenv import Package, PearlEnvironment
+from pearllib.pearlenv import Package, PearlEnvironment, PackageBuilder
 
-from .utils import create_pearl_env, create_pearl_home
+from .utils import create_pearl_env, create_pearl_home, PackageTestBuilder
 
 _MODULE_UNDER_TEST = 'pearllib.package'
 
@@ -34,81 +34,6 @@ class PackageArgs(Namespace):
         self.packages = packages
 
 
-class PackageBuilder:
-    def __init__(self, home_dir):
-        self.packages = {}
-        self.home_dir = home_dir
-
-    def add_local_package(
-            self,
-            tmp_path, hooks_sh_script,
-            repo_name='repo-test',
-            package_name='pkg-test',
-            is_installed=False,
-            depends=(),
-    ):
-        """Install a package somewhere locally"""
-        pkg_dir = tmp_path / '{}/{}'.format(repo_name, package_name)
-        (pkg_dir / 'pearl-config').mkdir(parents=True)
-        hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
-        hooks_sh.touch()
-        hooks_sh.write_text(hooks_sh_script)
-
-        if is_installed:
-            self._install_package(
-                hooks_sh_script,
-                repo_name=repo_name,
-                package_name=package_name,
-            )
-
-        package = Package(
-            self.home_dir, repo_name, package_name, str(pkg_dir), '',
-            depends=depends
-        )
-        self._update_packages(package)
-
-    def add_git_package(
-            self,
-            hooks_sh_script,
-            repo_name='repo-test',
-            package_name='pkg-test',
-            url='https://github.com/pkg',
-            is_installed=False,
-            depends=(),
-    ):
-
-        if is_installed:
-            self._install_package(
-                hooks_sh_script,
-                repo_name='repo-test',
-                package_name='pkg-test',
-            )
-        package = Package(
-            self.home_dir, repo_name, package_name, url, '',
-            depends=depends
-        )
-        self._update_packages(package)
-
-    def build(self):
-        return self.packages
-
-    def _update_packages(self, package: Package):
-        if package.repo_name not in self.packages:
-            self.packages[package.repo_name] = {}
-        self.packages[package.repo_name][package.name] = package
-
-    def _install_package(
-            self,
-            hooks_sh_script,
-            repo_name='repo-test',
-            package_name='pkg-test',
-    ):
-        pkg_dir = self.home_dir / 'packages/{}/{}'.format(repo_name, package_name)
-        (pkg_dir / 'pearl-config').mkdir(parents=True)
-        hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
-        hooks_sh.write_text(hooks_sh_script)
-
-
 def test_install_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
     hooks_sh_script = """
@@ -123,14 +48,14 @@ def test_install_local_package(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    install_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
+    install_package(pearl_env, package, PackageArgs(verbose=2))
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
@@ -150,13 +75,14 @@ def test_install_local_package_forced(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    install_package(pearl_env, 'repo-test/pkg-test', args=PackageArgs(force=True))
+    install_package(pearl_env, package, args=PackageArgs(force=True))
 
     # Because rollback did not occur:
     assert (home_dir / 'packages/repo-test/pkg-test/').exists()
@@ -179,13 +105,14 @@ def test_install_local_package_no_confirm(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    install_package(pearl_env, 'repo-test/pkg-test', PackageArgs(no_confirm=True, verbose=False))
+    install_package(pearl_env, package, PackageArgs(no_confirm=True, verbose=False))
 
     assert (home_dir / 'result').read_text() == "YES\nbanana\n"
 
@@ -193,13 +120,14 @@ def test_install_local_package_no_confirm(tmp_path):
 def test_install_package_git(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_git_package("", is_installed=False)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
-        install_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        install_package(pearl_env, package, PackageArgs())
 
         assert run_mock.call_count == 2
         assert (home_dir / 'var/repo-test/pkg-test').is_dir()
@@ -214,51 +142,31 @@ def test_install_package_raise_hook(tmp_path):
     }
     """
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with pytest.raises(HookFunctionError):
-        install_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        install_package(pearl_env, package, PackageArgs())
 
     # Because of rollback:
     assert not (home_dir / 'packages/repo-test/pkg-test').exists()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
 
-def test_install_package_repo_not_exist(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-    pearl_env = create_pearl_env(home_dir, {})
-
-    with pytest.raises(RepoDoesNotExistError):
-        install_package(pearl_env, 'test/pkg-test', PackageArgs())
-
-
-def test_install_package_package_not_exist(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-
-    builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, "", is_installed=False)
-    packages = builder.build()
-    pearl_env = create_pearl_env(home_dir, packages)
-    with pytest.raises(PackageNotInRepoError):
-        install_package(pearl_env, 'repo-test/pkg-a-test', PackageArgs())
-
-    with pytest.raises(PackageNotInRepoError):
-        install_package(pearl_env, 'pkg-a-test', PackageArgs())
-
-
 def test_install_package_already_installed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, "", is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with pytest.raises(PackageAlreadyInstalledError):
-        install_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        install_package(pearl_env, package, PackageArgs())
 
 
 def test_update_local_package(tmp_path):
@@ -284,14 +192,14 @@ def test_update_local_package(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    update_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
+    update_package(pearl_env, package, PackageArgs(verbose=2))
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
 
@@ -321,16 +229,17 @@ def test_update_local_package_forced(tmp_path):
 
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    update_package(pearl_env, 'repo-test/pkg-test', args=PackageArgs(False, 0, force=True))
+    update_package(pearl_env, package, args=PackageArgs(False, 0, force=True))
 
     with pytest.raises(HookFunctionError):
-        update_package(pearl_env, 'repo-test/pkg-test', args=PackageArgs(False, 0, force=False))
+        update_package(pearl_env, package, args=PackageArgs(False, 0, force=False))
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
 
@@ -364,13 +273,14 @@ def test_update_local_package_no_confirm(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    update_package(pearl_env, 'repo-test/pkg-test', PackageArgs(no_confirm=True, verbose=False))
+    update_package(pearl_env, package, PackageArgs(no_confirm=True, verbose=False))
 
     assert (home_dir / 'result').read_text() == "YES\nbanana\n"
     assert (home_dir / 'result2').read_text() == "NO\norange\n"
@@ -379,7 +289,7 @@ def test_update_local_package_no_confirm(tmp_path):
 def test_update_package_git_url_not_changed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_git_package("", is_installed=True)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
@@ -388,7 +298,7 @@ def test_update_package_git_url_not_changed(tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
         out_process = namedtuple('OutProcess', ['stdout'])(package.url)
         run_mock.return_value = out_process
-        update_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        update_package(pearl_env, package, PackageArgs())
 
         assert run_mock.call_count == 4
 
@@ -396,9 +306,10 @@ def test_update_package_git_url_not_changed(tmp_path):
 def test_update_package_git_url_changed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_git_package("", is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
@@ -409,7 +320,7 @@ def test_update_package_git_url_changed(tmp_path):
         run_mock.return_value = out_process
         ask_mock.return_value = False
 
-        update_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        update_package(pearl_env, package, PackageArgs())
 
         assert ask_mock.call_count == 1
         assert remove_mock.call_count == 0
@@ -424,7 +335,7 @@ def test_update_package_git_url_changed(tmp_path):
         run_mock.return_value = out_process
         ask_mock.return_value = True
 
-        update_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        update_package(pearl_env, package, PackageArgs())
 
         assert ask_mock.call_count == 1
         assert remove_mock.call_count == 1
@@ -441,67 +352,49 @@ def test_update_package_raise_hook(tmp_path):
     }}
     """
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with pytest.raises(HookFunctionError):
-        update_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
-
-
-def test_update_package_repo_not_exist(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-    pearl_env = create_pearl_env(home_dir, {})
-
-    with pytest.raises(RepoDoesNotExistError):
-        update_package(pearl_env, 'test/pkg-test', PackageArgs())
-
-
-def test_update_package_package_not_exist(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-
-    builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, "", is_installed=True)
-    packages = builder.build()
-    pearl_env = create_pearl_env(home_dir, packages)
-    with pytest.raises(PackageNotInRepoError):
-        update_package(pearl_env, 'repo-test/pkg-a-test', PackageArgs())
-
-    with pytest.raises(PackageNotInRepoError):
-        update_package(pearl_env, 'pkg-a-test', PackageArgs())
+        update_package(pearl_env, package, PackageArgs())
 
 
 def test_update_package_not_installed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, "", is_installed=False)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with pytest.raises(PackageNotInstalledError):
-        update_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        update_package(pearl_env, package, PackageArgs())
 
 
 def test_emerge_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, "", package_name='pkg-a-test', is_installed=False)
     builder.add_local_package(tmp_path, "", package_name='pkg-b-test', is_installed=True)
     packages = builder.build()
+    package_a = packages['repo-test']['pkg-a-test']
+    package_b = packages['repo-test']['pkg-b-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with mock.patch(_MODULE_UNDER_TEST + ".update_package") as update_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
-        emerge_package(pearl_env, 'repo-test/pkg-a-test', PackageArgs())
+        emerge_package(pearl_env, package_a, PackageArgs())
         assert update_mock.call_count == 0
         assert install_mock.call_count == 1
 
     with mock.patch(_MODULE_UNDER_TEST + ".update_package") as update_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
-        emerge_package(pearl_env, 'repo-test/pkg-b-test', PackageArgs())
+        emerge_package(pearl_env, package_b, PackageArgs())
         assert update_mock.call_count == 1
         assert install_mock.call_count == 0
 
@@ -521,14 +414,14 @@ def test_remove_package(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    remove_package(pearl_env, 'repo-test/pkg-test', PackageArgs(verbose=2))
+    remove_package(pearl_env, package, PackageArgs(verbose=2))
 
     assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
 
@@ -548,13 +441,14 @@ def test_remove_package_forced(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    remove_package(pearl_env, 'repo-test/pkg-test', args=PackageArgs(False, 0, force=True))
+    remove_package(pearl_env, package, args=PackageArgs(False, 0, force=True))
 
     assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
 
@@ -577,13 +471,14 @@ def test_remove_package_no_confirm(tmp_path):
     }}
     """.format(homedir=home_dir)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
 
     pearl_env = create_pearl_env(home_dir, packages)
 
-    remove_package(pearl_env, 'repo-test/pkg-test', PackageArgs(no_confirm=True, verbose=False))
+    remove_package(pearl_env, package, PackageArgs(no_confirm=True, verbose=False))
 
     assert (home_dir / 'result').read_text() == "YES\nbanana\n"
 
@@ -597,47 +492,27 @@ def test_remove_package_raise_hook(tmp_path):
     }}
     """
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with pytest.raises(HookFunctionError):
-        remove_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
-
-
-def test_remove_package_repo_not_exist(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-    pearl_env = create_pearl_env(home_dir, {})
-
-    with pytest.raises(RepoDoesNotExistError):
-        remove_package(pearl_env, 'test/pkg-test', PackageArgs())
-
-
-def test_remove_package_package_not_exist(tmp_path):
-    home_dir = create_pearl_home(tmp_path)
-
-    builder = PackageBuilder(home_dir)
-    builder.add_local_package(tmp_path, "", is_installed=True)
-    packages = builder.build()
-    pearl_env = create_pearl_env(home_dir, packages)
-    with pytest.raises(PackageNotInRepoError):
-        remove_package(pearl_env, 'repo-test/pkg-a-test', PackageArgs())
-
-    with pytest.raises(PackageNotInRepoError):
-        remove_package(pearl_env, 'pkg-a-test', PackageArgs())
+        remove_package(pearl_env, package, PackageArgs())
 
 
 def test_remove_package_not_installed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, "", is_installed=False)
     packages = builder.build()
+    package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
     with pytest.raises(PackageNotInstalledError):
-        remove_package(pearl_env, 'repo-test/pkg-test', PackageArgs())
+        remove_package(pearl_env, package, PackageArgs())
 
 
 def test_list_packages(tmp_path):
@@ -808,18 +683,23 @@ def test_closure_dependency_tree(
 ):
     home_dir = create_pearl_home(tmp_path)
 
-    builder = PackageBuilder(home_dir)
+    packages_info = {
+        'repo-test': {
+        }
+    }
     for package_name, depends in package_deps.items():
-        builder.add_local_package(
-            tmp_path, "",
-            package_name=package_name,
-            depends=depends
-        )
-    packages = builder.build()
-    pearl_env = create_pearl_env(home_dir, packages)
+        packages_info['repo-test'][package_name] = {
+            'repo_name': 'repo-test',
+            'name': package_name,
+            'url': '/sdaf',
+            'depends': ['repo-test/' + dep for dep in depends]
+        }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    init_packages = [packages['repo-test'][name] for name in initial_package_list]
     assert closure_dependency_tree(
-        pearl_env, initial_package_list,
-    ) == expected_result
+        init_packages,
+    ) == [packages['repo-test'][name] for name in expected_result]
 
 
 @pytest.mark.parametrize(
@@ -836,7 +716,7 @@ def test_info(tmp_path, is_installed, expected_result):
         "A": ["B"],
         "B": []
     }
-    builder = PackageBuilder(home_dir)
+    builder = PackageTestBuilder(home_dir)
     for package_name, depends in package_deps.items():
         builder.add_local_package(
             tmp_path, "",
@@ -845,8 +725,10 @@ def test_info(tmp_path, is_installed, expected_result):
             is_installed=is_installed,
         )
     packages = builder.build()
+    package = packages["repo-test"]["B"]
     pearl_env = create_pearl_env(home_dir, packages)
-    assert info_package(pearl_env, "B", None)[1] == expected_result
+    pearl_env.required_by.return_value = []
+    info_package(pearl_env, package, None)
 
 
 def test_install_packages():
@@ -896,15 +778,28 @@ def test_remove_packages():
     pearl_env = mock.Mock(spec=PearlEnvironment)
 
     with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '._required_by') as required_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        required_mock.return_value = []
+        pearl_env.required_by.return_value = []
         closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
         args = PackageArgs(packages=['pkg1', 'pkg2'])
         remove_packages(pearl_env, args)
 
         assert closure_mock.call_count == 1
         remove_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'deppkg1', args)])
+
+
+def test_remove_packages_required_packages():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
+        pearl_env.required_by.return_value = ['pkg2']
+        closure_mock.return_value = ['pkg1']
+        args = PackageArgs(packages=['pkg1'])
+        with pytest.raises(PackageRequiredByOtherError):
+            remove_packages(pearl_env, args)
+            assert closure_mock.call_count == 1
+            assert remove_mock.call_count == 0
 
 
 def test_info_packages():

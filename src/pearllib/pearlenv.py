@@ -142,11 +142,12 @@ class PackageBuilder:
             return packages[repo_name][package_name]
 
         package_info = dict(packages_info[repo_name][package_name])
-        os_list = tuple([OS.from_code(os) for os in package_info['os']])
+        os_list = tuple([OS.from_code(os) for os in package_info.get('os', tuple())])
 
         package_info['os'] = os_list
-        depends = package_info['depends']
-        del package_info['depends']
+        depends = package_info.get('depends', tuple())
+        if 'depends' in package_info:
+            del package_info['depends']
         if repo_name not in packages:
             packages[repo_name] = {}
         packages[repo_name][package_name] = Package(
@@ -281,10 +282,9 @@ class PearlEnvironment:
         return self._config_filename
 
     @property
-    def packages(self):
+    def packages(self) -> Dict[str, Dict[str, Package]]:
         return self._packages
 
-    # TODO test lookup package
     def _lookup_package_full_name(self, package_full_name: str) -> Package:
         repo_name, short_package_name = package_full_name.split('/')
 
@@ -306,7 +306,6 @@ class PearlEnvironment:
 
         raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
 
-    # TODO test required by
     def required_by(self, package: Package) -> Tuple[Package]:
         requires = []
         for _, pkg_info in self.packages.items():
@@ -359,4 +358,3 @@ class PearlEnvironment:
         packages_info = loader.load_packages(update_repos, verbose)
         builder = PackageBuilder(self.home)
         return builder.build_packages(packages_info)
-

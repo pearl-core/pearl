@@ -35,58 +35,57 @@ def install_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = reversed(closure_dependency_tree(pearl_env, args.packages))
+    package_list = reversed(closure_dependency_tree(args.packages))
     # Perform emerge command for all dependencies for the specified packages
-    for package_name in package_list:
-        if package_name in args.packages:
-            install_package(pearl_env, package_name, args)
+    for package in package_list:
+        if package in args.packages:
+            install_package(pearl_env, package, args)
         else:
-            emerge_package(pearl_env, package_name, args)
+            emerge_package(pearl_env, package, args)
 
 
 def update_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = reversed(closure_dependency_tree(pearl_env, args.packages))
+    package_list = reversed(closure_dependency_tree(args.packages))
     # Perform emerge command for all dependencies for the specified packages
-    for package_name in package_list:
-        if package_name in args.packages:
-            update_package(pearl_env, package_name, args)
+    for package in package_list:
+        if package in args.packages:
+            update_package(pearl_env, package, args)
         else:
-            emerge_package(pearl_env, package_name, args)
+            emerge_package(pearl_env, package, args)
 
 
 def emerge_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = reversed(closure_dependency_tree(pearl_env, args.packages))
-    for package_name in package_list:
-        emerge_package(pearl_env, package_name, args)
+    package_list = reversed(closure_dependency_tree(args.packages))
+    for package in package_list:
+        emerge_package(pearl_env, package, args)
 
 
 def remove_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = closure_dependency_tree(pearl_env, args.packages)
-    for package_name in package_list:
-        package = pearl_env.lookup_package(package_name)
+    package_list = closure_dependency_tree(args.packages)
+    for package in package_list:
         requires = pearl_env.required_by(package)
         if requires:
             raise PackageRequiredByOtherError(
-                'Package {} cannot be remove because is required by other packages: {}'.format(package_name, requires)
+                'Package {} cannot be remove because is required by other packages: {}'.format(package, requires)
             )
-        remove_package(pearl_env, package_name, args)
+        remove_package(pearl_env, package, args)
 
 
 def info_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    for package_name in args.packages:
-        info_package(pearl_env, package_name, args)
+    for package in args.packages:
+        info_package(pearl_env, package, args)
 
 
 def _run(
@@ -113,38 +112,36 @@ def _run(
     run_pearl_bash(script, pearl_env, input=input, enable_xtrace=enable_xtrace, enable_errexit=enable_errexit)
 
 
+# TODO revisit the closure deps
 def closure_dependency_tree(
-        pearl_env: PearlEnvironment,
-        package_names: List[str],
-) -> List[str]:
+        packages: List[Package],
+) -> List[Package]:
     # Use set to remove duplicates
-    package_names = set(package_names)
+    packages = set(packages)
     packages_to_exclude = set()
-    for package_name1 in package_names:
-        for package_name2 in package_names:
-            if package_name1 == package_name2:
+    for package1 in packages:
+        for package2 in packages:
+            if package1 == package2:
                 continue
-            if not _deep_depends(pearl_env, package_name1, package_name2) \
-                    and _deep_depends(pearl_env, package_name2, package_name1):
+            if not _deep_depends(package1, package2) \
+                    and _deep_depends(package2, package1):
                 # Exclude packages which are already dependencies of other packages
-                packages_to_exclude.add(package_name1)
-    sorted_package_list = sorted(list(package_names.difference(packages_to_exclude)))
-    return _closure_dependency_tree(pearl_env, sorted_package_list)
+                packages_to_exclude.add(package1)
+    sorted_package_list = sorted(list(packages.difference(packages_to_exclude)), key=lambda p: p.full_name)
+    return _closure_dependency_tree(sorted_package_list)
 
 
 def _deep_depends(
-        pearl_env: PearlEnvironment,
-        package_name1: str,
-        package_name2: str,
+        package1: Package,
+        package2: Package,
 ) -> bool:
-    queue = [package_name1]
+    queue = [package1]
     visited_packages = []
     while queue:
-        package_name = queue.pop(0)
-        visited_packages.append(package_name)
-        if package_name == package_name2:
+        package = queue.pop(0)
+        visited_packages.append(package)
+        if package == package2:
             return True
-        package = pearl_env.lookup_package(package_name)
         for package_dep in package.depends:
             if package_dep not in visited_packages:
                 queue.append(package_dep)
@@ -152,30 +149,25 @@ def _deep_depends(
 
 
 def _closure_dependency_tree(
-        pearl_env: PearlEnvironment,
-        packages: List[str],
-) -> List[str]:
+        packages: List[Package],
+) -> List[Package]:
     full_package_list = []
-    queue = [pearl_env.lookup_package(pack) for pack in packages]
+    queue = list(packages)
     while queue:
         package = queue.pop(0)
         if package not in full_package_list:
             full_package_list.append(package)
-        for package_dep_name in package.depends:
-            package_dep = pearl_env.lookup_package(package_dep_name)
+        for package_dep in package.depends:
             if package_dep not in full_package_list:
                 queue.append(package_dep)
-    return [p.full_name for p in full_package_list]
-
-# TODO Take a look at troubleshooting page
+    return full_package_list
 
 
-def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
+def info_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
     """
     Provide info about a package.
     """
-    package = pearl_env.lookup_package(package_name)
-    requires = tuple(_required_by(pearl_env, package_name))
+    requires = pearl_env.required_by(package)
     messenger.print(
         dedent("""
         {cyan}Name{normal}: {full_name}
@@ -200,35 +192,33 @@ def info_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace
             url=package.url,
             author=package.author,
             license=package.license,
-            os=package.operating_system,
+            os=tuple(o.name.lower() for o in package.os),
             keywords=package.keywords,
             installed=package.is_installed(),
             pkg_dir=package.dir,
             var_dir=package.vardir,
-            depends=package.depends,
-            requires=requires,
+            depends=tuple(d.full_name for d in package.depends),
+            requires=tuple(r.full_name for r in requires),
         ))
     )
     return package, requires
 
 
-def emerge_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
+def emerge_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
     """
     Installs or updates the Pearl package.
     This function is idempotent.
     """
-    package = pearl_env.lookup_package(package_name)
     if package.is_installed():
-        update_package(pearl_env, package_name, args=args)
+        update_package(pearl_env, package, args=args)
     else:
-        install_package(pearl_env, package_name, args=args)
+        install_package(pearl_env, package, args=args)
 
 
-def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
+def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
     """
     Installs the Pearl package.
     """
-    package = pearl_env.lookup_package(package_name)
     if package.is_installed():
         raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
 
@@ -268,17 +258,16 @@ def install_package(pearl_env: PearlEnvironment, package_name: str, args: Namesp
         else:
             args.force = True
             remove_package(
-                pearl_env, package_name,
+                pearl_env, package,
                 args=args,
             )
             raise HookFunctionError(msg) from exc
 
 
-def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
+def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
     """
     Updates the Pearl package.
     """
-    package = pearl_env.lookup_package(package_name)
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
@@ -301,8 +290,8 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
                 "Do you want to replace the package with the new repository?",
                 yes_as_default_answer=False
             ):
-                remove_package(pearl_env, package_name, args)
-                install_package(pearl_env, package_name, args)
+                remove_package(pearl_env, package, args)
+                install_package(pearl_env, package, args)
 
     hook = 'pre_update'
     try:
@@ -344,11 +333,10 @@ def update_package(pearl_env: PearlEnvironment, package_name: str, args: Namespa
         messenger.exception("{}: {}".format(msg, exc.args))
 
 
-def remove_package(pearl_env: PearlEnvironment, package_name: str, args: Namespace):
+def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
     """
     Remove the Pearl package.
     """
-    package = pearl_env.lookup_package(package_name)
     if not package.is_installed():
         raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
 
