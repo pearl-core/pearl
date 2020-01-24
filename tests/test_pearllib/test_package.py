@@ -7,8 +7,8 @@ import pytest
 from pearllib.exceptions import PackageAlreadyInstalledError, \
     HookFunctionError, PackageNotInstalledError, PackageRequiredByOtherError
 from pearllib.package import install_package, remove_package, list_packages, update_package, emerge_package, \
-    create_package, closure_dependency_tree, info_package, install_packages, update_packages, emerge_packages, \
-    remove_packages, info_packages
+    create_package, info_package, install_packages, update_packages, emerge_packages, \
+    remove_packages, info_packages, closure_dependency_tree
 from pearllib.pearlenv import Package, PearlEnvironment, PackageBuilder
 
 from .utils import create_pearl_env, create_pearl_home, PackageTestBuilder
@@ -617,7 +617,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "A": ["B"],
                 "B": [],
             },
-            ["A", "B"]
+            ["B", "A"]
         ),
         pytest.param(
             ["A", "B"],
@@ -626,7 +626,17 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": ["C"],
                 "C": [],
             },
-            ["A", "B", "C"]
+            ["C", "A", "B"]
+        ),
+        pytest.param(
+            ["B", "A", "D"],
+            {
+                "A": ["B"],
+                "B": ["C"],
+                "C": [],
+                "D": ["C"],
+            },
+            ["C", "B", "A", "D"]
         ),
         # Cycle
         pytest.param(
@@ -635,7 +645,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "A": ["B"],
                 "B": ["A"],
             },
-            ["A", "B"]
+            ["B", "A"]
         ),
         pytest.param(
             ["A"],
@@ -644,7 +654,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": ["C"],
                 "C": [],
             },
-            ["A", "B", "C"]
+            ["C", "B", "A"]
         ),
         pytest.param(
             ["C", "B", "A"],
@@ -653,7 +663,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": ["C"],
                 "C": [],
             },
-            ["A", "B", "C"]
+            ["C", "B", "A"]
         ),
         # Duplicates
         pytest.param(
@@ -663,7 +673,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": ["C"],
                 "C": [],
             },
-            ["A", "B", "C"]
+            ["C", "B", "A"]
         ),
         pytest.param(
             ["C", "B", "A"],
@@ -672,7 +682,7 @@ def test_create_package_pearl_config_exists(tmp_path):
                 "B": [],
                 "C": [],
             },
-            ["A", "C", "B"]
+            ["C", "B", "A"]
         ),
     ]
 )
@@ -737,7 +747,7 @@ def test_install_packages():
     with mock.patch(_MODULE_UNDER_TEST + '.install_package') as install_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
         args = PackageArgs(packages=['pkg1', 'pkg2'])
         install_packages(pearl_env, args)
 
@@ -752,7 +762,7 @@ def test_update_packages():
     with mock.patch(_MODULE_UNDER_TEST + '.update_package') as update_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
         args = PackageArgs(packages=['pkg1', 'pkg2'])
         update_packages(pearl_env, args)
 
@@ -766,7 +776,7 @@ def test_emerge_packages():
 
     with mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
         args = PackageArgs(packages=['pkg1', 'pkg2'])
         emerge_packages(pearl_env, args)
 
@@ -780,12 +790,12 @@ def test_remove_packages():
     with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
         pearl_env.required_by.return_value = []
-        closure_mock.return_value = ['pkg1', 'pkg2', 'deppkg1']
+        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
         args = PackageArgs(packages=['pkg1', 'pkg2'])
         remove_packages(pearl_env, args)
 
         assert closure_mock.call_count == 1
-        remove_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'deppkg1', args)])
+        remove_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args)])
 
 
 def test_remove_packages_required_packages():
@@ -793,7 +803,28 @@ def test_remove_packages_required_packages():
 
     with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        pearl_env.required_by.return_value = ['pkg2']
+        def required_side_effect(pkg):
+            if pkg == 'deppkg1':
+                return ['pkg1']
+            return []
+        pearl_env.required_by.side_effect = required_side_effect
+        closure_mock.return_value = ['deppkg1', 'pkg1']
+        args = PackageArgs(packages=['pkg1'])
+        remove_packages(pearl_env, args)
+        assert closure_mock.call_count == 1
+        assert remove_mock.call_count == 1
+
+
+def test_remove_packages_required_packages_raise():
+    pearl_env = mock.Mock(spec=PearlEnvironment)
+
+    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
+            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
+        def required_side_effect(pkg):
+            if pkg == 'pkg1':
+                return ['reqpkg1']
+            return []
+        pearl_env.required_by.side_effect = required_side_effect
         closure_mock.return_value = ['pkg1']
         args = PackageArgs(packages=['pkg1'])
         with pytest.raises(PackageRequiredByOtherError):

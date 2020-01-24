@@ -57,7 +57,8 @@ pearl list
 info Remove ALL pearl packages
 # Remove only the packages for now
 echo -e "y\ny\nn\nn\n" | pearl remove
-if [[ $(ls -A "$PEARL_HOME/packages/pearl/") ]]
+# Double brackets do not work in ZSH when checking for empty directory
+if [ "$(ls -A "$PEARL_HOME/packages/pearl/")" ]
 then
     echo "$PEARL_HOME/packages/pearl/ is not empty but all the Pearl packages have been removed"
     exit 8

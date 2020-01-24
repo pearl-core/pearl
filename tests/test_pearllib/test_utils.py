@@ -190,7 +190,7 @@ def test_run_pearl_bash(tmp_path):
             '/usr/local/opt/gnu-sed/libexec/gnubin:'
             '/usr/local/opt/grep/libexec/gnubin:'
             '/usr/local/opt/coreutils/libexec/gnubin:' + os.environ['PATH'],
-            "\x1b[1;36mTest\x1b[0m"
+            "\x1b[0;36mTest\x1b[0m"
         )
     elif platform.system() == 'Linux':
         assert result.stdout == "{}\n{}\n{}\n{}\n".format(

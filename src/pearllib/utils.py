@@ -1,9 +1,11 @@
 import subprocess
 import shutil
+from collections import OrderedDict
 
 from pathlib import Path
 
 from textwrap import dedent
+from typing import Sequence, Any
 
 import pkg_resources
 
@@ -182,3 +184,31 @@ def unapply(line: str, filename: str):
         writeable_content = f.read().replace(line + '\n', '').replace(line, "")
     with path.open("w") as f:
         f.write(writeable_content)
+
+
+class OrderedSet:
+    def __init__(self, sequence: Sequence = ()):
+        self._set = OrderedDict()
+        self.update(sequence)
+
+    def add(self, obj: Any):
+        self._set[obj] = obj
+
+    def update(self, sequence: Sequence):
+        for el in sequence:
+            self.add(el)
+
+    def __str__(self):
+        return str(list(self._set.keys()))
+
+    def __repr__(self):
+        return repr(list(self._set.keys()))
+
+    def __iter__(self):
+        return iter(self._set)
+
+    def __hash__(self):
+        return hash(self._set)
+
+    def __eq__(self, other):
+        return self._set == other

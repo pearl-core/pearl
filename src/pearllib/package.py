@@ -3,7 +3,7 @@ import shutil
 from argparse import Namespace
 from pathlib import Path
 from textwrap import dedent
-from typing import List
+from typing import Sequence, Set
 
 import pkg_resources
 
@@ -11,7 +11,7 @@ from pearllib.exceptions import PackageAlreadyInstalledError, \
     PackageNotInstalledError, HookFunctionError, PackageRequiredByOtherError
 from pearllib.messenger import messenger, Color
 from pearllib.pearlenv import PearlEnvironment, Package
-from pearllib.utils import check_and_copy, ask, run_pearl_bash
+from pearllib.utils import check_and_copy, ask, run_pearl_bash, OrderedSet
 
 _DEFAULT_INPUT = 1000000 * '\n'
 
@@ -35,7 +35,7 @@ def install_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = reversed(closure_dependency_tree(args.packages))
+    package_list = closure_dependency_tree(args.packages)
     # Perform emerge command for all dependencies for the specified packages
     for package in package_list:
         if package in args.packages:
@@ -48,7 +48,7 @@ def update_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = reversed(closure_dependency_tree(args.packages))
+    package_list = closure_dependency_tree(args.packages)
     # Perform emerge command for all dependencies for the specified packages
     for package in package_list:
         if package in args.packages:
@@ -61,7 +61,7 @@ def emerge_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = reversed(closure_dependency_tree(args.packages))
+    package_list = closure_dependency_tree(args.packages)
     for package in package_list:
         emerge_package(pearl_env, package, args)
 
@@ -70,12 +70,17 @@ def remove_packages(
         pearl_env: PearlEnvironment,
         args: Namespace
 ):
-    package_list = closure_dependency_tree(args.packages)
+    package_list = list(closure_dependency_tree(args.packages))
+    package_list.reverse()
     for package in package_list:
+        if package not in args.packages:
+            continue
         requires = pearl_env.required_by(package)
-        if requires:
+        if set(requires).difference(args.packages):
             raise PackageRequiredByOtherError(
-                'Package {} cannot be remove because is required by other packages: {}'.format(package, requires)
+                'Package {} cannot be removed because is required by other packages: {}'.format(
+                    package, [str(r) for r in requires]
+                )
             )
         remove_package(pearl_env, package, args)
 
@@ -112,55 +117,28 @@ def _run(
     run_pearl_bash(script, pearl_env, input=input, enable_xtrace=enable_xtrace, enable_errexit=enable_errexit)
 
 
-# TODO revisit the closure deps
 def closure_dependency_tree(
-        packages: List[Package],
-) -> List[Package]:
-    # Use set to remove duplicates
-    packages = set(packages)
-    packages_to_exclude = set()
-    for package1 in packages:
-        for package2 in packages:
-            if package1 == package2:
-                continue
-            if not _deep_depends(package1, package2) \
-                    and _deep_depends(package2, package1):
-                # Exclude packages which are already dependencies of other packages
-                packages_to_exclude.add(package1)
-    sorted_package_list = sorted(list(packages.difference(packages_to_exclude)), key=lambda p: p.full_name)
-    return _closure_dependency_tree(sorted_package_list)
-
-
-def _deep_depends(
-        package1: Package,
-        package2: Package,
-) -> bool:
-    queue = [package1]
-    visited_packages = []
-    while queue:
-        package = queue.pop(0)
-        visited_packages.append(package)
-        if package == package2:
-            return True
-        for package_dep in package.depends:
-            if package_dep not in visited_packages:
-                queue.append(package_dep)
-    return False
+        packages: Sequence[Package],
+) -> Sequence:
+    visited = set()
+    return list(_closure_dependency_tree(OrderedSet(packages), visited))
 
 
 def _closure_dependency_tree(
-        packages: List[Package],
-) -> List[Package]:
-    full_package_list = []
-    queue = list(packages)
-    while queue:
-        package = queue.pop(0)
-        if package not in full_package_list:
-            full_package_list.append(package)
-        for package_dep in package.depends:
-            if package_dep not in full_package_list:
-                queue.append(package_dep)
-    return full_package_list
+        packages: OrderedSet,
+        visited: Set,
+) -> OrderedSet:
+    accumulator = OrderedSet()
+    for package in packages:
+        visited.add(package)
+        accumulator.update(
+            _closure_dependency_tree(
+                OrderedSet([d for d in package.depends if d not in visited]),
+                visited
+            )
+        )
+        accumulator.add(package)
+    return accumulator
 
 
 def info_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):

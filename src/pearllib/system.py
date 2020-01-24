@@ -6,7 +6,7 @@ import pkg_resources
 import shutil
 
 from pearllib.messenger import messenger, Color
-from pearllib.package import remove_package, update_package, closure_dependency_tree
+from pearllib.package import update_packages, remove_packages
 from pearllib.pearlenv import PearlEnvironment
 from pearllib.utils import apply, ask, unapply
 
@@ -128,9 +128,9 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
             package_list = []
             for _, package in repo_packages.items():
                 if package.is_installed():
-                    package_list.append(package.full_name)
-            for package_name in closure_dependency_tree(pearl_env, package_list):
-                remove_package(pearl_env, package_name, args=args)
+                    package_list.append(package)
+            args.packages = package_list
+            remove_packages(pearl_env, args=args)
 
     if ask(
         "Are you sure to REMOVE all the Pearl hooks?",
@@ -210,6 +210,6 @@ def update_pearl(pearl_env: PearlEnvironment, args: Namespace):
     for repo_name, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
             if package.is_installed():
-                package_list.append(package.full_name)
-    for package_name in closure_dependency_tree(pearl_env, package_list):
-        update_package(pearl_env, package_name, args=args)
+                package_list.append(package)
+    args.packages = package_list
+    update_packages(pearl_env, args=args)

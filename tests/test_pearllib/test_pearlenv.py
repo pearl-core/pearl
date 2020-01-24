@@ -283,8 +283,13 @@ def test_lookup_package(tmp_path):
 
 
 def test_lookup_package_repo_no_exists(tmp_path):
+    home_dir = (tmp_path / 'home')
+    home_dir.mkdir(parents=True)
+    (tmp_path / 'config').mkdir(parents=True)
+    conffile = (tmp_path / 'config/pearl.conf')
+    conffile.touch()
     with pytest.raises(RepoDoesNotExistError):
-        pearl_env = PearlEnvironment(tmp_path)
+        pearl_env = PearlEnvironment(home_dir, conffile)
         pearl_env.lookup_package('test/pkg-test')
 
 

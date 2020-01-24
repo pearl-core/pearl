@@ -1,8 +1,10 @@
 # Change Log #
 
-## [2.3.0][v230] - 2020-01-18 ##
+## [2.3.0][v230] - 2020-01-25 ##
 
 * Handle dependencies between packages
+  * During `install`, `update` and `emerge` packages dependencies will be included as well.
+  * During `remove` only packages not required by others can be removed.
 * Include `Required by` in `info` command
 
 ## [2.2.0][v220] - 2020-01-17 ##
