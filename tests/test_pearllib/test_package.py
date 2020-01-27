@@ -719,7 +719,7 @@ def test_closure_dependency_tree(
         pytest.param(False, ("A",)),
     ]
 )
-def test_info(tmp_path, is_installed, expected_result):
+def test_info_package(tmp_path, is_installed, expected_result):
     home_dir = create_pearl_home(tmp_path)
 
     package_deps = {
@@ -741,103 +741,244 @@ def test_info(tmp_path, is_installed, expected_result):
     info_package(pearl_env, package, None)
 
 
-def test_install_packages():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
+def test_install_packages(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+
+    packages_info = {
+        "repo-test": {
+            "pkg1": {
+                "repo_name": "repo-test",
+                "name": "pkg1",
+                "url": "/blah",
+                "depends": ["repo-test/deppkg1"]
+            },
+            "pkg2": {
+                "repo_name": "repo-test",
+                "name": "pkg2",
+                "url": "/blah",
+                "depends": []
+            },
+            "deppkg1": {
+                "repo_name": "repo-test",
+                "name": "deppkg1",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
 
     with mock.patch(_MODULE_UNDER_TEST + '.install_package') as install_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
-        args = PackageArgs(packages=['pkg1', 'pkg2'])
+            mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock:
+        args = PackageArgs(packages=[packages['repo-test']['pkg1'], packages['repo-test']['pkg2']])
         install_packages(pearl_env, args)
 
-        assert closure_mock.call_count == 1
-        emerge_mock.assert_has_calls([mock.call(mock.ANY, 'deppkg1', args)])
-        install_mock.assert_has_calls([mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'pkg1', args)])
+        emerge_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['deppkg1'], args)])
+        install_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['pkg1'], args), mock.call(mock.ANY, packages['repo-test']['pkg2'], args)])
 
 
-def test_update_packages():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
+def test_update_packages(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+
+    packages_info = {
+        "repo-test": {
+            "pkg1": {
+                "repo_name": "repo-test",
+                "name": "pkg1",
+                "url": "/blah",
+                "depends": ["repo-test/deppkg1"]
+            },
+            "pkg2": {
+                "repo_name": "repo-test",
+                "name": "pkg2",
+                "url": "/blah",
+                "depends": []
+            },
+            "deppkg1": {
+                "repo_name": "repo-test",
+                "name": "deppkg1",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
 
     with mock.patch(_MODULE_UNDER_TEST + '.update_package') as update_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
-        args = PackageArgs(packages=['pkg1', 'pkg2'])
+            mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock:
+        args = PackageArgs(packages=[packages['repo-test']['pkg1'], packages['repo-test']['pkg2']])
         update_packages(pearl_env, args)
 
-        assert closure_mock.call_count == 1
-        emerge_mock.assert_has_calls([mock.call(mock.ANY, 'deppkg1', args)])
-        update_mock.assert_has_calls([mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'pkg1', args)])
+        emerge_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['deppkg1'], args)])
+        update_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['pkg1'], args), mock.call(mock.ANY, packages['repo-test']['pkg2'], args)])
 
 
-def test_emerge_packages():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
+def test_emerge_packages(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
 
-    with mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
-        args = PackageArgs(packages=['pkg1', 'pkg2'])
+    packages_info = {
+        "repo-test": {
+            "pkg1": {
+                "repo_name": "repo-test",
+                "name": "pkg1",
+                "url": "/blah",
+                "depends": ["repo-test/deppkg1"]
+            },
+            "pkg2": {
+                "repo_name": "repo-test",
+                "name": "pkg2",
+                "url": "/blah",
+                "depends": []
+            },
+            "deppkg1": {
+                "repo_name": "repo-test",
+                "name": "deppkg1",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
+
+    with mock.patch(_MODULE_UNDER_TEST + '.emerge_package') as emerge_mock:
+        args = PackageArgs(packages=[packages['repo-test']['pkg1'], packages['repo-test']['pkg2']])
         emerge_packages(pearl_env, args)
 
-        assert closure_mock.call_count == 1
-        emerge_mock.assert_has_calls([mock.call(mock.ANY, 'deppkg1', args), mock.call(mock.ANY, 'pkg2', args), mock.call(mock.ANY, 'pkg1', args)])
+        emerge_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['deppkg1'], args), mock.call(mock.ANY, packages['repo-test']['pkg1'], args), mock.call(mock.ANY, packages['repo-test']['pkg2'], args)])
 
 
-def test_remove_packages():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
+def test_remove_packages(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
 
-    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        pearl_env.required_by.return_value = []
-        closure_mock.return_value = ['deppkg1', 'pkg2', 'pkg1']
-        args = PackageArgs(packages=['pkg1', 'pkg2'])
+    packages_info = {
+        "repo-test": {
+            "pkg1": {
+                "repo_name": "repo-test",
+                "name": "pkg1",
+                "url": "/blah",
+                "depends": ["repo-test/deppkg1"]
+            },
+            "pkg2": {
+                "repo_name": "repo-test",
+                "name": "pkg2",
+                "url": "/blah",
+                "depends": []
+            },
+            "deppkg1": {
+                "repo_name": "repo-test",
+                "name": "deppkg1",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
+    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock:
+        args = PackageArgs(packages=[packages['repo-test']['pkg1'], packages['repo-test']['pkg2']])
         remove_packages(pearl_env, args)
 
-        assert closure_mock.call_count == 1
-        remove_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args)])
+        remove_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['pkg2'], args), mock.call(mock.ANY, packages['repo-test']['pkg1'], args)])
 
 
-def test_remove_packages_required_packages():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
+@pytest.mark.parametrize(
+    'required_package_installed, expected_remove_calls',
+    [
+        pytest.param(True, 0),
+        pytest.param(False, 1),
+    ]
+)
+def test_remove_packages_required_installed_packages_raise(tmp_path, required_package_installed, expected_remove_calls):
+    home_dir = create_pearl_home(tmp_path)
+    if required_package_installed:
+        (home_dir / 'packages/repo-test/pkg1').mkdir(parents=True)
 
-    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        def required_side_effect(pkg):
-            if pkg == 'deppkg1':
-                return ['pkg1']
-            return []
-        pearl_env.required_by.side_effect = required_side_effect
-        closure_mock.return_value = ['deppkg1', 'pkg1']
-        args = PackageArgs(packages=['pkg1'])
-        remove_packages(pearl_env, args)
-        assert closure_mock.call_count == 1
-        assert remove_mock.call_count == 1
-
-
-def test_remove_packages_required_packages_raise():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
-
-    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock, \
-            mock.patch(_MODULE_UNDER_TEST + '.closure_dependency_tree') as closure_mock:
-        def required_side_effect(pkg):
-            if pkg == 'pkg1':
-                return ['reqpkg1']
-            return []
-        pearl_env.required_by.side_effect = required_side_effect
-        closure_mock.return_value = ['pkg1']
-        args = PackageArgs(packages=['pkg1'])
-        with pytest.raises(PackageRequiredByOtherError):
+    packages_info = {
+        "repo-test": {
+            "pkg1": {
+                "repo_name": "repo-test",
+                "name": "pkg1",
+                "url": "/blah",
+                "depends": ["repo-test/deppkg1"]
+            },
+            "deppkg1": {
+                "repo_name": "repo-test",
+                "name": "deppkg1",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
+    with mock.patch(_MODULE_UNDER_TEST + '.remove_package') as remove_mock:
+        args = PackageArgs(packages=[packages['repo-test']['deppkg1']])
+        if required_package_installed:
+            with pytest.raises(PackageRequiredByOtherError):
+                remove_packages(pearl_env, args)
+        else:
             remove_packages(pearl_env, args)
-            assert closure_mock.call_count == 1
-            assert remove_mock.call_count == 0
+
+        assert remove_mock.call_count == expected_remove_calls
 
 
-def test_info_packages():
-    pearl_env = mock.Mock(spec=PearlEnvironment)
+def test_info_packages(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+
+    packages_info = {
+        "repo-test": {
+            "pkg1": {
+                "repo_name": "repo-test",
+                "name": "pkg1",
+                "url": "/blah",
+                "depends": ["repo-test/deppkg1"]
+            },
+            "pkg2": {
+                "repo_name": "repo-test",
+                "name": "pkg2",
+                "url": "/blah",
+                "depends": []
+            },
+            "deppkg1": {
+                "repo_name": "repo-test",
+                "name": "deppkg1",
+                "url": "/blah",
+                "depends": []
+            }
+        }
+    }
+    builder = PackageBuilder(home_dir)
+    packages = builder.build_packages(packages_info)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+    pearl_env._packages = packages
 
     with mock.patch(_MODULE_UNDER_TEST + '.info_package') as info_mock:
-        args = PackageArgs(packages=['pkg1', 'pkg2'])
+        args = PackageArgs(packages=[packages['repo-test']['pkg1'], packages['repo-test']['pkg2']])
         info_packages(pearl_env, args)
 
-        info_mock.assert_has_calls([mock.call(mock.ANY, 'pkg1', args), mock.call(mock.ANY, 'pkg2', args)])
+        info_mock.assert_has_calls([mock.call(mock.ANY, packages['repo-test']['pkg1'], args), mock.call(mock.ANY, packages['repo-test']['pkg2'], args)])

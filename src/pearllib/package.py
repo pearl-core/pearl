@@ -75,11 +75,12 @@ def remove_packages(
     for package in package_list:
         if package not in args.packages:
             continue
-        requires = pearl_env.required_by(package)
-        if set(requires).difference(args.packages):
+        requires = [r for r in pearl_env.required_by(package) if r.is_installed()]
+        remaining_requires = set(requires).difference(args.packages)
+        if remaining_requires:
             raise PackageRequiredByOtherError(
                 'Package {} cannot be removed because is required by other packages: {}'.format(
-                    package, [str(r) for r in requires]
+                    package, [str(r) for r in remaining_requires]
                 )
             )
         remove_package(pearl_env, package, args)

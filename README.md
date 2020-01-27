@@ -46,31 +46,15 @@ The main advantages on using Pearl are:
 - Automatic bootstrap of the package content whenever shells or editors get started.
 - Access to a wide range of existing packages via the [OPH (Official Pearl Hub)](https://github.com/pearl-hub).
 - Allows to create your own shareable package repository.
+- [Comparison](#comparison-with-alternative-solutions) with alternative solutions
 - Stable codebase with 100+ unit tests and exhaustive integration tests via [Travis](https://travis-ci.org/pearl-core/pearl) for Linux and OSX.
 - Small number of [dependencies](#dependencies) needed in order to ensure compatibility with most of the systems.
-
-Comparison with similar solution: Ansible
------------------------------------------
-You could achieve something similar from what Pearl provide by using
-[Ansible](https://www.ansible.com/). Ansible is a powerful software for IT
-automation which can be widely used for many use cases.
-Despite of this, Ansible has few drawbacks when using it for lightweight forms of automation:
-
-- Pearl uses bash for writing simple scripts for automation:
-  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard and tedious to achieve this in Ansible);
-  - bash is a powerful, accessible and well-known language;
-- Ansible requires way more dependencies than Pearl;
-- Ansible requires knowledge about how Ansible Playbooks works;
-- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and [variables](#structure-of-a-pearl-package) which heavily simplify construction of scripts for automation;
-- Pearl makes easier to remove packages and restore the system to an initial state;
 
 Quickstart
 ==========
 The Pearl command allows to: `create`, `list`, `search`, `install`, `update`, `emerge`,
 `remove` the Pearl packages defined according to the configuration located in
 `$XDG_CONFIG_HOME/pearl/pearl.conf` (defaults to `~/.config/pearl/pearl.conf`)
-
-![quickstart](https://raw.githubusercontent.com/pearl-core/resources/master/pearl-opt3.gif)
 
 Create
 ------
@@ -570,6 +554,59 @@ In order to use the new repository (i.e. "https://github.com/myrepo/pearl-repo.g
 update the `pearl.conf` file by adding the following line:
 
     PEARL_REPOS += ("https://github.com/myrepo/pearl-repo.git")
+    
+Comparison with alternative solutions
+=====================================
+We are going to compare Pearl with other solutions according to the following properties:
+
+**Modular**
+
+Ability of the tool to split configurations and/or programs into different modules.
+Its importance is because in case configs are broken you can still manage other modules which you are more confident they works.
+For instance, if your `vim` config does not work you are still able to manage all other dotfiles because they are independent from each other.
+Obviously, Pearl, by design, allows modularization through packages.
+              
+**General purpose**
+
+Tools can be either `general` (manage any kind of programs) or `dotfiles-specific` (limited to dotfiles only).
+
+**Simple**
+Indicates how easy is to setup and use the tool. Between all tools, [Ansible](https://www.ansible.com/)
+is the one which has a steep learning curve. Ansible is a powerful software for IT
+automation which can be widely used for many use cases.
+Despite of this, Ansible has few drawbacks when using it for lightweight forms of automation compared to Pearl:
+
+- Pearl uses bash for writing simple scripts for automation:
+  - it makes easier the integration with other programs in the system (without existing Playbooks may be hard and tedious to achieve this in Ansible);
+  - bash is a powerful, accessible and well-known language;
+- Ansible requires way more dependencies than Pearl;
+- Ansible requires knowledge about how Ansible Playbooks works;
+- Pearl uses built-in [functions](https://github.com/fsquillace/buava/blob/master/README.md#table-of-buava-functions) and [variables](#structure-of-a-pearl-package) which heavily simplify construction of scripts for automation;
+- Pearl makes easier to remove packages and restore the system to an initial state;
+
+**Diversity**
+
+Indicates whether the tool handles diverse management for configurations/programs when dealing with different heterogeneous machines.
+There are multiple ways to handle diversity through Pearl:
+
+- one way is to create just one package and write bash functions which handle specific logic for each machine.
+- Alternatively, you can create a base package containing common functionality and use a package specific for each machine.
+This is possible thanks to the ability to define dependencies between packages.
+
+**Portable**
+
+Ability of the tools to be used in multiple platforms. Pearl can be used on both Linux and OSX.
+
+Comparison
+----------
+
+|                 | Pearl | Ansible | yadm | vcsh | homesick |
+| --------------- | ----- | ------- | ---- | ---- | -------- |
+| Modular         | Yes   | Yes     | No   | Yes  | Yes      |
+| General purpose | Yes   | Yes     | No   | No   | No       |
+| Diversity       | Yes   | Yes     | Yes  | Yes  | Yes      |
+| Simple          | Yes   | No      | Yes  | Yes  | Yes      |
+| Portable        | Yes   | Yes     | Yes  | Yes  | Yes      |
 
 Troubleshooting
 ===============
