@@ -52,21 +52,22 @@ The main advantages on using Pearl are:
 
 Quickstart
 ==========
-The Pearl command allows to: `create`, `list`, `search`, `install`, `update`, `emerge`,
-`remove` the Pearl packages defined according to the configuration located in
-`$XDG_CONFIG_HOME/pearl/pearl.conf` (defaults to `~/.config/pearl/pearl.conf`)
+There are two main use cases for Pearl which will be explained here below:
 
-Create custom package
+Use case 1: Create custom package
 ---------------------
-The following example create a Pearl package containing dotfiles (i.e. a `git` dotfile).
+The following example creates a Pearl package containing dotfiles. In this example we are going to create a very simple
+dotfile for `git`.
 
 ```sh
 $> pearl create mydotfiles ~/dotfiles
 ```
 This will create a directory `pearl-config` in `~/dotfiles` containing all the templates to help you
 start writing a Pearl package. `~/dotfiles` does not need to be an empty directory.
-Additionally, the local repository in `$XDG_CONFIG_HOME/pearl/pearl.conf` will be updated with
-the new package entry called `mydotfiles`. This will tell to Pearl where to look for the package:
+
+Additionally, the local repository in `$XDG_CONFIG_HOME/pearl/pearl.conf` (defaults to `~/.config/pearl/pearl.conf`)
+will be updated with the new package entry called `mydotfiles`.
+This tells to Pearl where to look for the package:
 
 ```sh
 $> cat ~/.config/pearl/pearl.conf
@@ -121,10 +122,10 @@ $> cat ~/.config/pearl/pearl.conf
 PEARL_PACKAGES["mydotfiles"] = {"url": "https://github.com/pearluser/mydotfiles.git"}
 ```
 
-There is way more things you can do with Pearl!
+There are way more things you can do with Pearl!
 For more details about the `pearl-config` content, look at the [section](#create-your-own-pearl-package) below.
 
-Use Pearl Hub repository
+Use case 2: Use Pearl Hub repository
 ------------------------
 You can just use existing packages from the Pearl Hub repository.
 It contains a big list of packages about dotfiles, programs and plugins for many known applications.
@@ -247,9 +248,9 @@ $> brew install bash git coreutils grep gnu-sed python
 
 The following will install the package under `/usr/local`:
 ```
-$> /usr/local/bin/pip3 install pearl
 $> # If the bin path is not already in $PATH:
 $> export PATH="/usr/local/bin:$PATH"
+$> pip3 install pearl
 ```
 
 Pearl command will be located in `/usr/local/bin/pearl`
@@ -290,8 +291,7 @@ In other words, update the `PEARL_PACKAGES` dictionary with a new entry containi
 name of the package (i.e. `mydotfiles`),
 the git url (i.e. `https://github.com/user/mydotfiles.git`) and an optional description.
 
-***That's it!*** The package will be ready to be [installed](#install),
-[updated](#update), [emerged](#emerge) and [removed](#remove) via the Pearl system.
+***That's it!*** The package will be ready to be managed by the Pearl system.
 
 ## Structure of a Pearl package ##
 Your own git repository can contain an **optional** directory
@@ -430,8 +430,7 @@ PEARL_PACKAGES = {
 
 The directory path must be an absolute path.
 
-The package will be ready to be [installed](#install), [updated](#update),
-[emerged](#emerge) and [removed](#remove) via the Pearl system.
+The package will be ready to be managed by the Pearl system.
 
 The directory content can be structured in the exact way as described
 in the [section](#structure-of-a-pearl-package) above.

@@ -1,5 +1,10 @@
 # Change Log #
 
+## [2.3.1][v231] - 2020-01-29 ##
+
+* Fix bug when removing packages
+* Refactor README.md
+
 ## [2.3.0][v230] - 2020-01-25 ##
 
 * Handle dependencies between packages
@@ -266,3 +271,4 @@
 [v212]: https://github.com/pearl-core/pearl/releases/tag/2.1.2
 [v220]: https://github.com/pearl-core/pearl/releases/tag/2.2.0
 [v230]: https://github.com/pearl-core/pearl/releases/tag/2.3.0
+[v231]: https://github.com/pearl-core/pearl/releases/tag/2.3.1
