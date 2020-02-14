@@ -41,17 +41,25 @@ class Package:
             depends: tuple = None,
     ):
         self._pearl_home = pearl_home
-        self._repo_name = repo_name
-        self._name = name
-        self._url = url
-        self._description = description
-        self._homepage = homepage
-        self._author = author
-        self._license = license
 
-        self._os = tuple() if os is None else os
-        self._keywords = tuple() if keywords is None else keywords
-        self._depends = tuple() if depends is None else depends
+        self._repo_name = repo_name
+        if not repo_name:
+            raise ValueError("repository name is mandatory field")
+        self._name = name
+        if not name:
+            raise ValueError("package name is mandatory field")
+        self._url = url
+        if not url:
+            raise ValueError("package url is mandatory field")
+
+        self._description = description or str(None)
+        self._homepage = homepage or str(None)
+        self._author = author or str(None)
+        self._license = license or str(None)
+
+        self._os = os or tuple()
+        self._keywords = keywords or tuple()
+        self._depends = depends or tuple()
 
     @property
     def repo_name(self):

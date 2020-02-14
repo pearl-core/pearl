@@ -250,6 +250,26 @@ def test_package():
     assert pkg.is_local()
 
 
+def test_package_default_values():
+    pkg = Package(Path('/home'), 'repo', 'pkg', 'https://pkg.com')
+    assert pkg.description == "None"
+    assert pkg.homepage == "None"
+    assert pkg.author == "None"
+    assert pkg.license == "None"
+    assert pkg.os == ()
+    assert pkg.depends == ()
+    assert pkg.keywords == ()
+
+
+def test_package_raise_missing_values():
+    with pytest.raises(ValueError):
+        Package(Path('/home'), None, 'pkg', 'url')
+    with pytest.raises(ValueError):
+        Package(Path('/home'), 'repo', None, 'url')
+    with pytest.raises(ValueError):
+        Package(Path('/home'), 'repo', 'pkg', None)
+
+
 def test_lookup_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
