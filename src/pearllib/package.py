@@ -8,7 +8,7 @@ from typing import Sequence, Set
 import pkg_resources
 
 from pearllib.exceptions import PackageAlreadyInstalledError, \
-    PackageNotInstalledError, HookFunctionError, PackageRequiredByOtherError
+    PackageNotInstalledError, HookFunctionError, PackageRequiredByOtherError, PackageCreateError
 from pearllib.messenger import messenger, Color
 from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import check_and_copy, ask, run_pearl_bash, OrderedSet
@@ -233,7 +233,11 @@ def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespa
     except Exception as exc:
         msg = "Error while performing {} hook function. Rolling back...".format(hook)
         if args.force:
-            messenger.exception("{}: {}".format(msg, exc.args))
+            message = "{}: {}".format(msg, exc.args)
+            if args.verbose:
+                messenger.exception(message)
+            else:
+                messenger.error(message)
         else:
             args.force = True
             remove_package(
@@ -284,7 +288,11 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
             raise HookFunctionError(msg) from exc
-        messenger.exception("{}: {}".format(msg, exc.args))
+        message = "{}: {}".format(msg, exc.args)
+        if args.verbose:
+            messenger.exception(message)
+        else:
+            messenger.error(message)
 
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
@@ -309,7 +317,11 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
             raise HookFunctionError(msg) from exc
-        messenger.exception("{}: {}".format(msg, exc.args))
+        message = "{}: {}".format(msg, exc.args)
+        if args.verbose:
+            messenger.exception(message)
+        else:
+            messenger.error(message)
 
 
 def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
@@ -339,7 +351,11 @@ def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
         msg = "Error while performing {} hook function".format(hook)
         if not args.force:
             raise HookFunctionError(msg) from exc
-        messenger.exception("{}: {}".format(msg, exc.args))
+        message = "{}: {}".format(msg, exc.args)
+        if args.verbose:
+            messenger.exception(message)
+        else:
+            messenger.error(message)
 
     shutil.rmtree(str(package.dir))
 
@@ -399,7 +415,7 @@ def create_package(pearl_env: PearlEnvironment, args: Namespace):
     pearl_config_template = static / 'templates/pearl-config.template'
     dest_pearl_config = args.dest_dir / 'pearl-config'
     if dest_pearl_config.exists():
-        raise RuntimeError('The pearl-config directory already exists in {}'.format(args.dest_dir))
+        raise PackageCreateError('The pearl-config directory already exists in {}'.format(args.dest_dir))
     shutil.copytree(str(pearl_config_template), str(dest_pearl_config))
 
     messenger.info('Updating {} to add package in local repository...'.format(pearl_env.config_filename))
