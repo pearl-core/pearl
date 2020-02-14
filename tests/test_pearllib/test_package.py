@@ -1,4 +1,3 @@
-from argparse import Namespace
 from collections import namedtuple
 from unittest import mock
 
@@ -11,27 +10,9 @@ from pearllib.package import install_package, remove_package, list_packages, upd
     remove_packages, info_packages, closure_dependency_tree
 from pearllib.pearlenv import Package, PearlEnvironment, PackageBuilder
 
-from .utils import create_pearl_env, create_pearl_home, PackageTestBuilder
+from .utils import create_pearl_env, create_pearl_home, PackageTestBuilder, PackageArgs
 
 _MODULE_UNDER_TEST = 'pearllib.package'
-
-
-class PackageArgs(Namespace):
-    def __init__(
-        self, no_confirm=False, verbose=0, force=False,
-        pattern=".*", package_only=False,
-        name="", dest_dir=None,
-        packages=()
-    ):
-        super().__init__()
-        self.no_confirm = no_confirm
-        self.verbose = verbose
-        self.force = force
-        self.pattern = pattern
-        self.package_only = package_only
-        self.name = name
-        self.dest_dir = dest_dir
-        self.packages = packages
 
 
 def test_install_local_package(tmp_path):

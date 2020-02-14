@@ -8,7 +8,7 @@ from pathlib import Path
 from collections import namedtuple, OrderedDict
 from typing import Tuple, Dict, Any
 
-from pearllib.exceptions import PackageNotInRepoError, RepoDoesNotExistError
+from pearllib.exceptions import PackageNotInRepoError, RepoDoesNotExistError, PackageNotInstalledError
 from pearllib.messenger import messenger
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
@@ -298,9 +298,9 @@ class PearlEnvironment:
 
         if repo_name not in self.packages:
             raise RepoDoesNotExistError(
-                'Skipping {} as {} repository does not exist.'.format(package_full_name, repo_name))
+                '{} repository does not exist.'.format(repo_name))
         if short_package_name not in self.packages[repo_name]:
-            raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_full_name))
+            raise PackageNotInRepoError('{} package is not in any repositories.'.format(package_full_name))
 
         return self.packages[repo_name][short_package_name]
 
@@ -312,7 +312,23 @@ class PearlEnvironment:
             if package_name in repo_packages:
                 return repo_packages[package_name]
 
-        raise PackageNotInRepoError('Skipping {} is not in the repositories.'.format(package_name))
+        raise PackageNotInRepoError('{} package is not in any repositories.'.format(package_name))
+
+    def infer_package(self, package_name: str) -> Package:
+        """Builds a package by looking at the file structure."""
+        if '/' in package_name:
+            repo_name, short_package_name = package_name.split('/')
+            package = Package(self.home, repo_name, short_package_name, "None")
+            if package.is_installed():
+                return package
+        else:
+            packages_path = self.home / 'packages'
+            for repo_path in packages_path.iterdir():
+                repo_name = repo_path.name
+                package = Package(self.home, repo_name, package_name, "None")
+                if package.is_installed():
+                    return package
+        raise PackageNotInstalledError('{} package has not been installed.'.format(package_name))
 
     def required_by(self, package: Package) -> Tuple[Package]:
         requires = []

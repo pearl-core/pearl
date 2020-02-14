@@ -1,13 +1,14 @@
 from enum import Enum
 from pathlib import Path
+from typing import List
 
 import pearllib.package as pack
 import pearllib.system as syst
-from pearllib.exceptions import PearlError
+from pearllib.exceptions import PearlError, RepoDoesNotExistError, PackageNotInRepoError
 from pearllib.messenger import messenger
 from pearllib.parser import parse_args
 
-from pearllib.pearlenv import PearlEnvironment
+from pearllib.pearlenv import PearlEnvironment, Package
 from pearllib.utils import verify_runtime_deps
 
 
@@ -30,10 +31,25 @@ class PearlCommand(Enum):
         return self.name
 
 
+def _extract_packages(pearl_env: PearlEnvironment, command: PearlCommand, args) -> List[Package]:
+    try:
+        return [pearl_env.lookup_package(package_name) for package_name in args.packages]
+    except (RepoDoesNotExistError, PackageNotInRepoError):
+        if command != PearlCommand.REMOVE:
+            raise
+
+        if args.force:
+            # The user can still be able to remove a package even if package does not exist in any repository.
+            return [pearl_env.infer_package(package_name) for package_name in args.packages]
+        else:
+            messenger.info("To remove the package, use option --force.")
+            raise
+
+
 def _pearl(pearl_env: PearlEnvironment, args):
     command = PearlCommand.from_string(args.command)
     if hasattr(args, 'packages'):
-        args.packages = [pearl_env.lookup_package(package_name) for package_name in args.packages]
+        args.packages = _extract_packages(pearl_env, command, args)
 
     if command == PearlCommand.INIT:
         syst.init_pearl(pearl_env, args)

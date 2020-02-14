@@ -199,7 +199,7 @@ def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespa
     Installs the Pearl package.
     """
     if package.is_installed():
-        raise PackageAlreadyInstalledError('Skipping {} is already installed.'.format(package))
+        raise PackageAlreadyInstalledError('{} package is already installed.'.format(package))
 
     messenger.print(
         '{cyan}* {normal}Installing {pkg} package'.format(
@@ -252,7 +252,7 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
     Updates the Pearl package.
     """
     if not package.is_installed():
-        raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
+        raise PackageNotInstalledError('{} package has not been installed.'.format(package))
 
     messenger.print(
         '{cyan}* {normal}Updating {pkg} package'.format(
@@ -329,7 +329,7 @@ def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
     Remove the Pearl package.
     """
     if not package.is_installed():
-        raise PackageNotInstalledError('Skipping {} as it has not been installed.'.format(package))
+        raise PackageNotInstalledError('{} package has not been installed.'.format(package))
 
     messenger.print(
         '{cyan}* {normal}Removing {pkg} package'.format(

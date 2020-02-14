@@ -5,7 +5,7 @@ import pytest
 
 from unittest import mock
 
-from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError
+from pearllib.exceptions import RepoDoesNotExistError, PackageNotInRepoError, PackageNotInstalledError
 from pearllib.pearlenv import PearlEnvironment, Package, PackageBuilder, PackageLoader
 from test_pearllib.utils import create_pearl_home
 
@@ -336,6 +336,27 @@ def test_lookup_package_not_in_repo(tmp_path):
 
     with pytest.raises(PackageNotInRepoError):
         pearl_env.lookup_package('pkg-a-test')
+
+
+def test_infer_package(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages').mkdir(parents=True)
+    pearl_env = PearlEnvironment(
+        home_dir, env_initialized=False
+    )
+
+    with pytest.raises(PackageNotInstalledError):
+        pearl_env.infer_package('repo-test/pkg-test')
+    with pytest.raises(PackageNotInstalledError):
+        pearl_env.infer_package('pkg-test')
+
+    (home_dir / 'packages/repo-test/pkg-test').mkdir(parents=True)
+
+    actual_package = pearl_env.infer_package('repo-test/pkg-test')
+    assert actual_package.full_name == 'repo-test/pkg-test'
+
+    actual_package = pearl_env.infer_package('pkg-test')
+    assert actual_package.full_name == 'repo-test/pkg-test'
 
 
 def test_required_by(tmp_path):

@@ -1,6 +1,25 @@
+from argparse import Namespace
 from unittest import mock
 
 from pearllib.pearlenv import PearlEnvironment, Package
+
+
+class PackageArgs(Namespace):
+    def __init__(
+            self, no_confirm=False, verbose=0, force=False,
+            pattern=".*", package_only=False,
+            name="", dest_dir=None,
+            packages=()
+    ):
+        super().__init__()
+        self.no_confirm = no_confirm
+        self.verbose = verbose
+        self.force = force
+        self.pattern = pattern
+        self.package_only = package_only
+        self.name = name
+        self.dest_dir = dest_dir
+        self.packages = packages
 
 
 def create_pearl_home(tmp_path):
