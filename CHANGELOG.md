@@ -1,5 +1,11 @@
 # Change Log #
 
+## [2.3.2][v232] - 2020-02-15 ##
+
+* Show traceback only on unexpected exception
+  * To see traceback about pearl error, use the `-v` option
+* Add ability to remove packages even when they do not exist in repository anymore
+
 ## [2.3.1][v231] - 2020-01-29 ##
 
 * Fix bug when removing packages
@@ -272,3 +278,4 @@
 [v220]: https://github.com/pearl-core/pearl/releases/tag/2.2.0
 [v230]: https://github.com/pearl-core/pearl/releases/tag/2.3.0
 [v231]: https://github.com/pearl-core/pearl/releases/tag/2.3.1
+[v232]: https://github.com/pearl-core/pearl/releases/tag/2.3.2
