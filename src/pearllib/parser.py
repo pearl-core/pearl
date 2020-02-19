@@ -30,11 +30,7 @@ def parse_args(sys_args: list):
 
 
 def _create_main_parser():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        description=textwrap.dedent("""
-        Pearl: Because only in the best shells you will find a Pearl...
-        """))
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         '-u', '--update-repos',
         action='store_true',

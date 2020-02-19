@@ -1,18 +1,16 @@
 Pearl
 =====
 
-Because only in the best Shells you will find a Pearl...
-
 <h1 align="center">
     <a href="https://github.com/pearl-core/pearl"><img
         alt="Pearl"
-        width=300px
+        width=250px
         src="https://rawgit.com/pearl-core/logo/master/pearl.png"></a>
 </h1>
 
-|Project Status|Communication|
-|:-----------:|:-----------:|
-|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+|Project Status|Donation|Communication|
+|:-----------:|:--------:|:-----------:|
+|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) [![PyPi downloads](https://img.shields.io/pypi/dm/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 **Table of Contents**
 - [Description](#description)
@@ -23,8 +21,11 @@ Because only in the best Shells you will find a Pearl...
   - [OSX](#osx)
 - [Create your own Pearl package](#create-your-own-pearl-package)
 - [Create your own Pearl repository](#create-your-own-pearl-repository)
+- [Comparison with alternative solutions](#comparison-with-alternative-solutions)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
+- [Donating](#donating)
+- [Authors](#authors)
 
 Description
 ===========
@@ -676,3 +677,16 @@ You could help improving Pearl and the [OPH](https://github.com/pearl-hub) in th
 - [Reporting Bugs](CONTRIBUTING.md#reporting-bugs)
 - [Suggesting Enhancements](CONTRIBUTING.md#suggesting-enhancements)
 - [Writing Code](CONTRIBUTING.md#your-first-code-contribution)
+
+Donating
+========
+To sustain the project please consider funding by donations through
+the [GitHub Sponsors page](https://github.com/sponsors/fsquillace/).
+
+Authors
+=======
+Pearl was originally created by [Filippo Squillace (feel.sqoox@gmail.com)](https://github.com/fsquillace).
+
+Here is a list of [**really appreciated contributors**](https://github.com/pearl-core/pearl/graphs/contributors)!
+
+[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/0)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/0)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/1)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/1)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/2)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/2)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/3)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/3)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/4)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/4)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/5)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/5)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/6)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/6)[![](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/images/7)](https://sourcerer.io/fame/fsquillace/pearl-core/pearl/links/7)
