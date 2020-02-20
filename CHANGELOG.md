@@ -1,5 +1,11 @@
 # Change Log #
 
+## [2.3.3][v233] - 2020-02-20 ##
+
+* Add FUNDING file
+* Add new sections in README
+* Add PyPi badges in README
+
 ## [2.3.2][v232] - 2020-02-15 ##
 
 * Show traceback only on unexpected exception
@@ -279,3 +285,4 @@
 [v230]: https://github.com/pearl-core/pearl/releases/tag/2.3.0
 [v231]: https://github.com/pearl-core/pearl/releases/tag/2.3.1
 [v232]: https://github.com/pearl-core/pearl/releases/tag/2.3.2
+[v233]: https://github.com/pearl-core/pearl/releases/tag/2.3.3
