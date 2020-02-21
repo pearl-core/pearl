@@ -406,11 +406,36 @@ very quickly.
 imported in `hooks.sh` and can be directly used if needed.
 
 ### The package.conf file
-`package.conf` is meant to contain metadata about the package. To simplify the creation of packages, this file
-is completely optional. It contains name of package, description, author, os compatibility, license and more.
-In case you include such information, they may be used to populate the repository file `repo.conf` so
-that searching for packages will be easier.
+`package.conf` is located in `pearl-config` directory and is meant to contain package metadata.
+To simplify the creation of new packages, this file is completely optional.
+This file may contain name of the package, description, author, os compatibility, license and more.
 It can be also used to establish dependencies between packages.
+
+Please **note** that `package.conf` is only meant to encapsulate package information within the package itself
+but they are not directly consumed by the Pearl program. In fact, Pearl only reads from the `pearl.conf` file which is
+where the metadata information can be also stored.
+
+To give a better idea, take a look at the Pearl Hub
+[repo.conf](https://github.com/pearl-hub/repo-v2/blob/master/pearl-config/repo.conf).
+The [repo-builder](https://github.com/pearl-core/repo-builder/) is the script responsible to periodically
+extract the `package.conf` metadata from each package and update the Pearl Hub `repo.conf`.
+
+For a local package you can manually include such information directly in the `pearl.conf` file. This is an example of
+package defined in `pearl.conf` which depends on the `pearl/cmd` package:
+
+```python
+PEARL_PACKAGES = {
+    'mydotfiles': {
+        "url": '/home/user/my/folder/dotfiles/',
+        "description": "This package contains dotfiles",
+        "author": "David Smith <dsmith@abc.com>",
+        "depends": (
+            "pearl/cmd",
+        )
+    },
+}
+```
+
 If you do not need such features for your package, just ignore this file.
 
 ## Create a Pearl package from a local directory ##

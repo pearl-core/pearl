@@ -2,7 +2,6 @@ import argparse
 from pathlib import Path
 
 import pkg_resources
-import textwrap
 
 
 def parse_args(sys_args: list):
