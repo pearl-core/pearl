@@ -1,7 +1,6 @@
 import hashlib
 import os
 import subprocess
-from enum import Enum
 
 from pathlib import Path
 
@@ -10,129 +9,11 @@ from typing import Tuple, Dict, Any
 
 from pearllib.exceptions import PackageNotInRepoError, RepoDoesNotExistError, PackageNotInstalledError
 from pearllib.messenger import messenger
+from pearllib.models import Package, OS
 
 PearlConf = namedtuple('PearlConf', ['repo_name', 'repos', 'packages'])
 
 _DEFAULT_LOCAL_REPO_NAME = 'local'
-
-
-class OS(Enum):
-    LINUX = 'linux'
-    OSX = 'osx'
-
-    @staticmethod
-    def from_code(code: str) -> 'OS':
-        return OS.__members__[code.upper()]
-
-    def __str__(self):
-        return self.name
-
-
-class Package:
-    def __init__(
-            self, pearl_home: Path, repo_name: str,
-            name: str, url: str,
-            description: str = None,
-            homepage: str = None,
-            author: str = None,
-            license: str = None,
-            os: tuple = None,
-            keywords: tuple = None,
-            depends: tuple = None,
-    ):
-        self._pearl_home = pearl_home
-
-        self._repo_name = repo_name
-        if not repo_name:
-            raise ValueError("repository name is mandatory field")
-        self._name = name
-        if not name:
-            raise ValueError("package name is mandatory field")
-        self._url = url
-        if not url:
-            raise ValueError("package url is mandatory field")
-
-        self._description = description or str(None)
-        self._homepage = homepage or str(None)
-        self._author = author or str(None)
-        self._license = license or str(None)
-
-        self._os = os or tuple()
-        self._keywords = keywords or tuple()
-        self._depends = depends or tuple()
-
-    @property
-    def repo_name(self):
-        return self._repo_name
-
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def full_name(self) -> str:
-        return '{}/{}'.format(self.repo_name, self.name)
-
-    @property
-    def url(self) -> str:
-        return self._url
-
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def homepage(self) -> str:
-        return self._homepage
-
-    @property
-    def author(self) -> str:
-        return self._author
-
-    @property
-    def license(self) -> str:
-        return self._license
-
-    @property
-    def os(self) -> Tuple[OS]:
-        return self._os
-
-    @property
-    def keywords(self) -> Tuple[str]:
-        return self._keywords
-
-    @property
-    def depends(self) -> Tuple['Package']:
-        return self._depends
-
-    @property
-    def dir(self) -> Path:
-        return self._pearl_home / 'packages/{}'.format(self.full_name)
-
-    @property
-    def vardir(self) -> Path:
-        return self._pearl_home / 'var/{}'.format(self.full_name)
-
-    def add_depend(self, package: 'Package'):
-        self._depends = self._depends + (package,)
-
-    def is_installed(self) -> bool:
-        return self.dir.is_dir()
-
-    def is_local(self) -> bool:
-        return self.url.startswith('/')
-
-    def __repr__(self):
-        return "Package({})".format(self.full_name)
-
-    def __str__(self):
-        return self.full_name
-
-    def __hash__(self):
-        return hash(self.full_name)
-
-    def __eq__(self, other: 'Package'):
-        return self.full_name == other.full_name
 
 
 class PackageBuilder:
