@@ -51,6 +51,7 @@ def run_pearl_bash(
     )
     return run_bash(script, capture_stdout=capture_stdout, capture_stderr=capture_stderr, check=check, input=input)
 
+
 def run_bash(
         script: str,
         capture_stdout: bool = False, capture_stderr: bool = False,

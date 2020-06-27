@@ -118,36 +118,37 @@ class Package:
 
         Returns
         -------
-        If the package is local (non git repo) such information cannot be retrieved, therefore the function
-        return "package URL" if package is local, otherwise None.
-
-        IF the package is not local (a git repo), the function return the "package directory URL"
+        If the package is not local (a git repo), the function return the "package directory URL"
         using "git config" command.
+
+        Raises
+        ------
+        If package is not a git repo the git command will fail.
         """
-        package_dir_url = None
-        if self._is_dir_local():
-            if self.is_local():
-                # If both dir and URL are local there is not need to remove and install the package
-                package_dir_url = self.url
-        else:
-            # This information is always computed given that it can change over the time
-            # (i.e. when replacing URL repo from local to git and vice versa)
-            package_dir_url = run_bash(
-                "git -C {} config remote.origin.url".format(self.dir),
-                check=False, capture_stdout=True
-            ).stdout.strip()
+        # This information is always computed given that it can change over the time
+        # (i.e. when replacing URL repo from local to git and vice versa)
+        package_dir_url = run_bash(
+            "git -C {} config remote.origin.url".format(self.dir),
+            check=False, capture_stdout=True
+        ).stdout.strip()
         return package_dir_url
 
     def has_url_changed(self):
+        if self.is_local():
+            # If package source comes from a local directory assume that the url did not change
+            return False
+        if not self._is_dir_git_repo():
+            # If the existing package dir is not a git repo and the package source is not local, it must have changed
+            return True
         return self._dir_url != self.url
 
-    def _is_dir_local(self) -> bool:
+    def _is_dir_git_repo(self) -> bool:
         # This information is always computed given that it can change over the time
         # (i.e. when replacing URL repo from local to git and vice versa)
         return run_bash(
             "git -C {} rev-parse --is-inside-work-tree".format(self.dir),
             capture_stdout=True, capture_stderr=True, check=False
-        ).stdout.strip() != "true"
+        ).stdout.strip() == "true"
 
     def is_local(self) -> bool:
         return self.url.startswith('/')
