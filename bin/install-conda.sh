@@ -7,15 +7,15 @@ cd /tmp
 # https://docs.conda.io/en/latest/miniconda_hashes.html
 if [[ $(uname) == "Linux" ]]
 then
-    MINICONDA_HASH="bfe34e1fa28d6d75a7ad05fd02fa5472275673d5f5621b77380898dee1be15d2"
+    MINICONDA_HASH="bb2e3cedd2e78a8bb6872ab3ab5b1266a90f8c7004a22d8dc2ea5effeb6a439a"
     MACHINE="Linux"
 else
-    MINICONDA_HASH="5cf91dde8f6024061c8b9239a1b4c34380238297adbdb9ef2061eb9d1a7f69bc"
+    MINICONDA_HASH="ccc1bded923a790cd61cd17c83c3dcc374dc0415cfa7fb1f71e6a2438236543d"
     MACHINE="MacOSX"
 fi
 
-MINICONDA_VERSION="4.7.12.1"
-MINICONDA_FILE="Miniconda3-${MINICONDA_VERSION}-${MACHINE}-x86_64.sh"
+MINICONDA_VERSION="4.8.3"
+MINICONDA_FILE="Miniconda3-py37_${MINICONDA_VERSION}-${MACHINE}-x86_64.sh"
 CONDA_DIR="${HOME}/miniconda3"
 
 
