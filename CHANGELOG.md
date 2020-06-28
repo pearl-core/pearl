@@ -1,5 +1,9 @@
 # Change Log #
 
+## [2.3.4][v234] - 2020-06-28 ##
+
+* Fix when URL change local/git package
+
 ## [2.3.3][v233] - 2020-02-20 ##
 
 * Add FUNDING file
@@ -286,3 +290,4 @@
 [v231]: https://github.com/pearl-core/pearl/releases/tag/2.3.1
 [v232]: https://github.com/pearl-core/pearl/releases/tag/2.3.2
 [v233]: https://github.com/pearl-core/pearl/releases/tag/2.3.3
+[v234]: https://github.com/pearl-core/pearl/releases/tag/2.3.4

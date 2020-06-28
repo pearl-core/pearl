@@ -109,7 +109,7 @@ class Package:
         return self.dir.is_dir()
 
     @property
-    def _dir_url(self) -> Optional[str]:
+    def _dir_url(self) -> str:
         """
         This function allows to understand whether a package URL has changed over the time. There are two URLs:
         - The "package URL" - is loaded by looking at the pearl configuration file (pearl.conf)
@@ -133,7 +133,7 @@ class Package:
         ).stdout.strip()
         return package_dir_url
 
-    def has_url_changed(self):
+    def has_url_changed(self) -> bool:
         if self.is_local():
             # If package source comes from a local directory assume that the url did not change
             return False
