@@ -1,3 +1,4 @@
+import subprocess
 from argparse import Namespace
 from unittest import mock
 
@@ -76,15 +77,19 @@ class PackageTestBuilder:
             repo_name='repo-test',
             package_name='pkg-test',
             url='https://github.com/pkg',
+            git_url=None,
             is_installed=False,
             depends=(),
     ):
 
         if is_installed:
+            if git_url is None:
+                git_url = url
             self._install_package(
                 hooks_sh_script,
                 repo_name='repo-test',
                 package_name='pkg-test',
+                git_url=git_url
             )
         package = Package(
             self.home_dir, repo_name, package_name, url, '',
@@ -105,8 +110,18 @@ class PackageTestBuilder:
             hooks_sh_script,
             repo_name='repo-test',
             package_name='pkg-test',
+            git_url=None
     ):
         pkg_dir = self.home_dir / 'packages/{}/{}'.format(repo_name, package_name)
         (pkg_dir / 'pearl-config').mkdir(parents=True)
+
         hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
         hooks_sh.write_text(hooks_sh_script)
+
+        if git_url is not None:
+            subprocess.run(
+                ['git', '-C', str(pkg_dir), 'init'],
+            )
+            subprocess.run(
+                ['git', '-C', str(pkg_dir), 'remote', 'add', 'origin', git_url],
+            )

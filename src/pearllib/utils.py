@@ -1,16 +1,14 @@
-import subprocess
-import shutil
-from collections import OrderedDict
-
-from pathlib import Path
-
-from textwrap import dedent
-from typing import Sequence, Any
 
 import pkg_resources
+import subprocess
+import shutil
+
+from collections import OrderedDict
+from pathlib import Path
+from typing import Sequence, Any
+from textwrap import dedent
 
 from pearllib.messenger import messenger
-from pearllib.pearlenv import PearlEnvironment
 
 _BASH_SCRIPT_HEADER_TEMPLATE = dedent("""
 set -o pipefail
@@ -29,23 +27,8 @@ osx_update_path
 """)
 
 
-def run_bash(
-        script: str,
-        capture_stdout: bool = False, capture_stderr: bool = False,
-        check: bool = True, input: str = None
-):
-    return subprocess.run(
-        ['/usr/bin/env', 'bash', '-c', script],
-        check=check,
-        stdout=subprocess.PIPE if capture_stdout else None,
-        stderr=subprocess.PIPE if capture_stderr else None,
-        universal_newlines=True,
-        input=input,
-    )
-
-
 def run_pearl_bash(
-        script: str, pearl_env: PearlEnvironment,
+        script: str, pearl_env,
         capture_stdout: bool = False, capture_stderr: bool = False,
         check: bool = True,
         input: str = None,
@@ -67,6 +50,21 @@ def run_pearl_bash(
         script=script,
     )
     return run_bash(script, capture_stdout=capture_stdout, capture_stderr=capture_stderr, check=check, input=input)
+
+
+def run_bash(
+        script: str,
+        capture_stdout: bool = False, capture_stderr: bool = False,
+        check: bool = True, input: str = None
+):
+    return subprocess.run(
+        ['/usr/bin/env', 'bash', '-c', script],
+        check=check,
+        stdout=subprocess.PIPE if capture_stdout else None,
+        stderr=subprocess.PIPE if capture_stderr else None,
+        universal_newlines=True,
+        input=input,
+    )
 
 
 def verify_git_dep():

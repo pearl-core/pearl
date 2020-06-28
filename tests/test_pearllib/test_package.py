@@ -1,4 +1,3 @@
-from collections import namedtuple
 from unittest import mock
 
 import pytest
@@ -54,7 +53,7 @@ def test_install_local_package_forced(tmp_path):
     post_install() {{
         return 11
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
@@ -208,7 +207,7 @@ def test_update_local_package_forced(tmp_path):
         return 12
     }}
 
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -276,52 +275,36 @@ def test_update_package_git_url_not_changed(tmp_path):
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
-        out_process = namedtuple('OutProcess', ['stdout'])(package.url)
-        run_mock.return_value = out_process
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash"), \
+            mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
+            mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
         update_package(pearl_env, package, PackageArgs())
 
-        assert run_mock.call_count == 4
+        assert remove_mock.call_count == 0
+        assert install_mock.call_count == 0
 
 
 def test_update_package_git_url_changed(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
     builder = PackageTestBuilder(home_dir)
-    builder.add_git_package("", is_installed=True)
+    builder.add_git_package(
+        "",
+        is_installed=True,
+        url='https://github.com/new-pkg',
+        git_url='https://github.com/pkg',
+    )
     packages = builder.build()
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
-            mock.patch(_MODULE_UNDER_TEST + ".ask") as ask_mock, \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash"), \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
-        out_process = namedtuple('OutProcess', ['stdout'])('https://github.com/package')
-        run_mock.return_value = out_process
-        ask_mock.return_value = False
-
         update_package(pearl_env, package, PackageArgs())
 
-        assert ask_mock.call_count == 1
-        assert remove_mock.call_count == 0
-        assert install_mock.call_count == 0
-        assert run_mock.call_count == 4
-
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
-            mock.patch(_MODULE_UNDER_TEST + ".ask") as ask_mock, \
-            mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
-            mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
-        out_process = namedtuple('OutProcess', ['stdout'])('https://github.com/package')
-        run_mock.return_value = out_process
-        ask_mock.return_value = True
-
-        update_package(pearl_env, package, PackageArgs())
-
-        assert ask_mock.call_count == 1
         assert remove_mock.call_count == 1
         assert install_mock.call_count == 1
-        assert run_mock.call_count == 4
 
 
 def test_update_package_raise_hook(tmp_path):
@@ -420,7 +403,7 @@ def test_remove_package_forced(tmp_path):
     pre_remove() {{
         return 11
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)

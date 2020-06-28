@@ -11,7 +11,8 @@ from pearllib.exceptions import PackageAlreadyInstalledError, \
     PackageNotInstalledError, HookFunctionError, PackageRequiredByOtherError, PackageCreateError
 from pearllib.messenger import messenger, Color
 from pearllib.pearlenv import PearlEnvironment, Package
-from pearllib.utils import check_and_copy, ask, run_pearl_bash, OrderedSet
+from pearllib.utils import check_and_copy, OrderedSet
+from pearllib.utils import run_pearl_bash
 
 _DEFAULT_INPUT = 1000000 * '\n'
 
@@ -261,20 +262,14 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
             pkg=package,
         )
     )
-    if not package.is_local():
-        existing_package_url = run_pearl_bash(
-            "git -C {} config remote.origin.url".format(package.dir), pearl_env, capture_stdout=True
-        ).stdout.strip()
-        if existing_package_url != package.url:
-            messenger.info("The Git URL for {} has changed from {} to {}".format(
-                package.full_name, existing_package_url, package.url
-            ))
-            if ask(
-                "Do you want to replace the package with the new repository?",
-                yes_as_default_answer=False
-            ):
-                remove_package(pearl_env, package, args)
-                install_package(pearl_env, package, args)
+
+    if package.has_url_changed():
+        messenger.info("The package URL for {} has changed to {}".format(
+            package.full_name, package.url
+        ))
+        messenger.info("Replacing the package with the new repository...")
+        remove_package(pearl_env, package, args)
+        install_package(pearl_env, package, args)
 
     hook = 'pre_update'
     try:

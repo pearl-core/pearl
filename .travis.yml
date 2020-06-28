@@ -91,8 +91,11 @@ install:
   - PATH=${HOME}/miniconda3/envs/pearl/bin/wrappers/:$PATH
 
 script:
+  - python --version
+  - /usr/bin/env python --version
   - git --version
   - bash --version
+  - /usr/bin/env bash --version
   - zsh --version
   - fish --version
   - make lint
