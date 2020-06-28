@@ -1,6 +1,6 @@
 from enum import Enum
 from pathlib import Path
-from typing import Tuple, Optional
+from typing import Tuple
 
 from pearllib.utils import run_bash
 
