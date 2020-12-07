@@ -491,9 +491,41 @@ def test_list_packages(tmp_path):
         }
     }
     result = list_packages(pearl_env, PackageArgs(pattern='pkg'))
-    assert len(result) == 2
-    assert 'pkg-a-test' in [pkg.name for pkg in result]
-    assert 'pkg-b-test' in [pkg.name for pkg in result]
+    assert ['pkg-b-test', 'pkg-a-test'] == [pkg.name for pkg in result]
+
+
+def test_list_packages_installed_only(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages/repo-test/pkg-a-test').mkdir(parents=True)
+
+    pearl_env = mock.Mock()
+    pearl_env.packages = {
+        'repo-test': {
+            'pkg-a-test': Package(home_dir, 'repo-test', 'pkg-a-test', 'url', 'descr'),
+            'pkg-b-test': Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr'),
+        }
+    }
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg', installed_only=True))
+    assert ['pkg-a-test'] == [pkg.name for pkg in result]
+
+
+def test_list_packages_dependency_tree(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages/repo-test/pkg-a-test').mkdir(parents=True)
+
+    pearl_env = mock.Mock()
+    pkg_a = Package(home_dir, 'repo-test', 'pkg-a-test', 'url', 'descr')
+    pkg_b = Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr', depends=(pkg_a,))
+    pkg_c = Package(home_dir, 'repo-test', 'pkg-c-test', 'url', 'descr', depends=(pkg_b,))
+    pearl_env.packages = {
+        'repo-test': {
+            'pkg-a-test': pkg_a,
+            'pkg-b-test': pkg_b,
+            'pkg-c-test': pkg_c,
+        }
+    }
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg', dependency_tree=True))
+    assert ['pkg-a-test', 'pkg-b-test', 'pkg-c-test'] == [pkg.name for pkg in result]
 
 
 def test_list_packages_match_keyword(tmp_path):
@@ -508,8 +540,7 @@ def test_list_packages_match_keyword(tmp_path):
         }
     }
     result = list_packages(pearl_env, PackageArgs(pattern='pkg-manager'))
-    assert len(result) == 1
-    assert result[0].name == 'pkg-a-test'
+    assert ['pkg-a-test'] == [pkg.name for pkg in result]
 
 
 def test_list_packages_not_matching(tmp_path):
