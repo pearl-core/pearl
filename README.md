@@ -697,6 +697,17 @@ Error on executing 'post_install' hook. Rolling back...
 > you can attempt to install the package again once the hook function gets
 > fixed.
 
+## Debugging config files
+
+> Q: How do I debug `config.*` files when running the corresponding program (i.e. `emacs`, `vim`, `bash`, `zsh`, `fish`)?
+
+> A: Set the environment variable `PEARL_DEBUG` before running the program. For example, to check the `config.vim` files run
+> when starting up `vim` program:
+
+```sh
+PEARL_DEBUG=1 vim
+```
+
 Contributing
 ============
 

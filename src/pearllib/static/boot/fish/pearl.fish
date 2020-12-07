@@ -19,6 +19,9 @@ for pkgfullname in (pearl list --dependency-tree --package-only --installed-only
     set PEARL_PKGNAME "$pkgname"
 
     if [ -e $PEARL_PKGDIR/pearl-config/config.fish ]
+        if [ $PEARL_DEBUG ]
+            echo "Running $PEARL_PKGDIR/pearl-config/config.fish..."
+        end
         source $PEARL_PKGDIR/pearl-config/config.fish
     end
     set -e PEARL_PKGDIR

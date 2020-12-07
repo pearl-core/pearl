@@ -7,6 +7,9 @@ if isdirectory($PEARL_HOME)
     for pkg_name in split(package_list, "\n")
         let config_path = $PEARL_HOME."/packages/".pkg_name."/pearl-config/config.vim"
         if filereadable(config_path)
+            if $PEARL_DEBUG
+              echo "Running".config_path."..."
+            endif
             let pkg_short_name = substitute(pkg_name, "^.*\/", "", "")
             let repo_name = substitute(pkg_name, "\/.*$", "", "")
             let $PEARL_PKGVARDIR = $PEARL_HOME.'/var/'.pkg_name

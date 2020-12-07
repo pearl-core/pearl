@@ -21,12 +21,21 @@ do
     PEARL_PKGREPONAME=${reponame}
 
     if [[ -e ${PEARL_PKGDIR}/pearl-config/config.sh ]]; then
+        if [[ -n ${PEARL_DEBUG} ]]; then
+            echo "Running ${PEARL_PKGDIR}/pearl-config/config.sh..."
+        fi
         source ${PEARL_PKGDIR}/pearl-config/config.sh
     fi
     if [[ -n "$BASH" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.bash ]]; then
+        if [[ -n ${PEARL_DEBUG} ]]; then
+            echo "Running ${PEARL_PKGDIR}/pearl-config/config.bash..."
+        fi
         source ${PEARL_PKGDIR}/pearl-config/config.bash
     fi
     if [[ -n "$ZSH_NAME" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.zsh ]]; then
+        if [[ -n ${PEARL_DEBUG} ]]; then
+            echo "Running ${PEARL_PKGDIR}/pearl-config/config.zsh..."
+        fi
         source ${PEARL_PKGDIR}/pearl-config/config.zsh
     fi
     unset PEARL_PKGDIR PEARL_PKGVARDIR PEARL_PKGNAME PEARL_PKGREPONAME
