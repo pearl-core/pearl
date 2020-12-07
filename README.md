@@ -324,6 +324,9 @@ The files inside `pearl-config` are also **optional** script/configuration files
 - `config.el` - will be sourced whenever Emacs editor is starting up.
 - `package.conf` - contains optional metadata information (name, author, description, keywords, etc) about the package that are useful when indexing the package in a repository list.
 
+The order in which the `config.*` files are sourced among multiple installed packages depends on the closure dependency tree,
+in other words, if package `A` depends on package `B` and both have `config.vim` files, the parent package `B` config file will be sourced first.
+
 The following variables can be used in any of the previous scripts:
 
 - `PEARL_HOME`          - Pearl location (`$XDG_DATA_HOME/pearl` which by default is `$HOME/.local/share/pearl`)

@@ -10,40 +10,29 @@ then
 fi
 
 ################################# MAIN ##############################
-# In ZSH 5.0.0 double square brackets do not work for checking empty directories
-if [ "$(ls -A ${PEARL_HOME}/packages)" ]; then
-    # Do not use ls command for listing the directories as gives few troubles
-    for repopath in "${PEARL_HOME}/packages"/*
-    do
-        reponame="${repopath/*\//}"
-        # In ZSH 5.0.0 double square brackets do not work for checking empty directories
-        [ "$(ls -A ${PEARL_HOME}/packages/${reponame})" ] || continue
+for pkgfullname in $(pearl list --dependency-tree --package-only --installed-only)
+do
+    pkgname="${pkgfullname/*\//}"
+    reponame="${pkgfullname/\/*/}"
 
-        # Do not use ls command for listing the directories as gives few troubles
-        for pkgpath in "${PEARL_HOME}/packages/${reponame}"/*
-        do
-            pkgname="${pkgpath/*\//}"
+    PEARL_PKGDIR=${PEARL_HOME}/packages/${reponame}/${pkgname}
+    PEARL_PKGVARDIR=${PEARL_HOME}/var/${reponame}/${pkgname}
+    PEARL_PKGNAME=${pkgname}
+    PEARL_PKGREPONAME=${reponame}
 
-            PEARL_PKGDIR=${PEARL_HOME}/packages/${reponame}/${pkgname}
-            PEARL_PKGVARDIR=${PEARL_HOME}/var/${reponame}/${pkgname}
-            PEARL_PKGNAME=${pkgname}
-            PEARL_PKGREPONAME=${reponame}
-
-            if [[ -e ${PEARL_PKGDIR}/pearl-config/config.sh ]]; then
-                source ${PEARL_PKGDIR}/pearl-config/config.sh
-            fi
-            if [[ -n "$BASH" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.bash ]]; then
-                source ${PEARL_PKGDIR}/pearl-config/config.bash
-            fi
-            if [[ -n "$ZSH_NAME" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.zsh ]]; then
-                source ${PEARL_PKGDIR}/pearl-config/config.zsh
-            fi
-            unset PEARL_PKGDIR PEARL_PKGVARDIR PEARL_PKGNAME PEARL_PKGREPONAME
-        done
-    done
-
-    unset repopath reponame pkgpath pkgname
-fi
+    if [[ -e ${PEARL_PKGDIR}/pearl-config/config.sh ]]; then
+        source ${PEARL_PKGDIR}/pearl-config/config.sh
+    fi
+    if [[ -n "$BASH" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.bash ]]; then
+        source ${PEARL_PKGDIR}/pearl-config/config.bash
+    fi
+    if [[ -n "$ZSH_NAME" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.zsh ]]; then
+        source ${PEARL_PKGDIR}/pearl-config/config.zsh
+    fi
+    unset PEARL_PKGDIR PEARL_PKGVARDIR PEARL_PKGNAME PEARL_PKGREPONAME
+    unset reponame pkgname
+done
+unset pkgfullname
 
 function pearl-source() {
     source "${PEARL_HOME}/boot/sh/pearl.sh"

@@ -143,6 +143,16 @@ def _create_list_parser(command_parsers):
         action='store_true',
         help="List the package names only"
     )
+    parser.add_argument(
+        '-t', '--dependency-tree',
+        action='store_true',
+        help="Sort packages by dependency tree order"
+    )
+    parser.add_argument(
+        '-i', '--installed-only',
+        action='store_true',
+        help="Show only installed packages"
+    )
 
 
 def _create_create_parser(command_parsers):

@@ -10,23 +10,21 @@ if not contains $PEARL_HOME/bin $PATH
 end
 
 ################################# MAIN ##############################
-for reponame in $PEARL_HOME/packages/*
-    set reponame (basename $reponame)
-    for pkgname in $PEARL_HOME/packages/$reponame/*
-        set pkgname (basename $pkgname)
-        set PEARL_PKGDIR "$PEARL_HOME/packages/$reponame/$pkgname"
-        set PEARL_PKGVARDIR "$PEARL_HOME/var/$reponame/$pkgname"
-        set PEARL_PKGREPONAME "$reponame"
-        set PEARL_PKGNAME "$pkgname"
+for pkgfullname in (pearl list --dependency-tree --package-only --installed-only)
+    set reponame (dirname $pkgfullname)
+    set pkgname (basename $pkgfullname)
+    set PEARL_PKGDIR "$PEARL_HOME/packages/$reponame/$pkgname"
+    set PEARL_PKGVARDIR "$PEARL_HOME/var/$reponame/$pkgname"
+    set PEARL_PKGREPONAME "$reponame"
+    set PEARL_PKGNAME "$pkgname"
 
-        if [ -e $PEARL_PKGDIR/pearl-config/config.fish ]
-            source $PEARL_PKGDIR/pearl-config/config.fish
-        end
-        set -e PEARL_PKGDIR
-        set -e PEARL_PKGVARDIR
-        set -e PEARL_PKGNAME
-        set -e PEARL_PKGREPONAME
+    if [ -e $PEARL_PKGDIR/pearl-config/config.fish ]
+        source $PEARL_PKGDIR/pearl-config/config.fish
     end
+    set -e PEARL_PKGDIR
+    set -e PEARL_PKGVARDIR
+    set -e PEARL_PKGNAME
+    set -e PEARL_PKGREPONAME
 end
 
 function pearl-source

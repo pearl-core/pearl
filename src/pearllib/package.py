@@ -355,10 +355,7 @@ def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
     shutil.rmtree(str(package.dir))
 
 
-def list_packages(pearl_env: PearlEnvironment, args: Namespace):
-    """
-    Lists or searches Pearl packages.
-    """
+def _list_packages(pearl_env: PearlEnvironment, args: Namespace):
     uninstalled_packages = []
     installed_packages = []
     pattern = args.pattern if hasattr(args, 'pattern') else ".*"
@@ -373,8 +370,19 @@ def list_packages(pearl_env: PearlEnvironment, args: Namespace):
                 installed_packages.append(package)
             else:
                 uninstalled_packages.append(package)
+    if args.installed_only:
+        return installed_packages
+    return uninstalled_packages + installed_packages
 
-    total_packages = uninstalled_packages + installed_packages
+
+def list_packages(pearl_env: PearlEnvironment, args: Namespace):
+    """
+    Lists or searches Pearl packages.
+    """
+    total_packages = _list_packages(pearl_env, args)
+    if args.dependency_tree:
+        total_packages = list(closure_dependency_tree(total_packages))
+
     for package in total_packages:
         if args.package_only:
             template = "{reponame}/{package}"
