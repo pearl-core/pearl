@@ -43,4 +43,7 @@
     )
 )
 
-(if (and (getenv "PEARL_HOME") (file-readable-p (getenv "PEARL_HOME"))) (pearl-main) )
+(if (and (getenv "PEARL_HOME") (file-readable-p (getenv "PEARL_HOME")) (executable-find "pearl") )
+  (pearl-main)
+  (message "Pearl error: Could not load pearl package config files. `pearl` executable not found. Please update the PATH variable first.")
+)

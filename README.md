@@ -223,14 +223,17 @@ Assuming all Pearl [dependencies](#dependencies) are properly installed
 in the system, to install Pearl you can use the `pip` command.
 Unless there is a specific use case, it is not a good option to use virtual environments such as
 `virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
-It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
-The following will install the package in your `$HOME` directory (`~/.local/`):
+It is recommended to use the system-wide `pip` which is generally located in `/usr/bin/pip`.
+The following commands will install the package in your `$HOME` directory (`~/.local/`):
 ```
 $> /usr/bin/pip install --user pearl
-$> export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Pearl command will be located in `~/.local/bin/pearl`
+`pearl` command path location **must** be under `PATH` variable. For instance, to add it to bash shell:
+```
+$> echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
+$> source $HOME/.bashrc
+```
 
 To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
 ```
@@ -249,12 +252,14 @@ $> brew install bash git coreutils grep gnu-sed python
 
 The following will install the package under `/usr/local`:
 ```
-$> # If the bin path is not already in $PATH:
-$> export PATH="/usr/local/bin:$PATH"
 $> pip3 install pearl
 ```
 
-Pearl command will be located in `/usr/local/bin/pearl`
+`pearl` command **must** be under PATH variable. For instance, to add it to bash shell:
+```
+$> echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.bashrc
+$> source $HOME/.bashrc
+```
 
 To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
 ```
@@ -707,6 +712,18 @@ Error on executing 'post_install' hook. Rolling back...
 ```sh
 PEARL_DEBUG=1 vim
 ```
+
+## Pearl executable not found
+
+> Q: Why do I get this message when opening shells (bash, zsh, fish) or editors (vim, emacs):
+
+```
+Pearl error: Could not load pearl package config files. `pearl` executable not found. Please update the PATH variable first."
+```
+
+> A: This is because `pearl` executable is required for properly sourcing the pearl package `config.*` files.
+> Make sure to add the path location to the `PATH` in your
+> favorite shell config file (i.e. `~/.bashrc`, `~/.zshrc`, `~/.config/fish/config`).
 
 Contributing
 ============
