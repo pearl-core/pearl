@@ -39,6 +39,12 @@ pearl init
 [[ -d "$PEARL_ROOT" ]] || { echo "$PEARL_ROOT does not exist"; exit 3; }
 [[ -d "$PEARL_HOME" ]] || { echo "$PEARL_HOME does not exist"; exit 4; }
 
+info "Creating local pearl package"
+pearl create test $HOME/test
+pearl search test
+pearl info test
+
+info "Listing all pearl packages"
 pearl list
 
 info Install ALL pearl packages
