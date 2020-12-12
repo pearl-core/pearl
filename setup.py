@@ -10,7 +10,7 @@ with open('VERSION') as version_file:
     version = version_file.read().strip()
 
 with open('requirements-dev.in') as test_requirements_file:
-    test_requirements = [line.strip() for line in test_requirements_file.readlines()]
+    dev_requirements = [line.strip() for line in test_requirements_file.readlines() if not line.startswith("#")]
 
 data_files = []
 
@@ -67,7 +67,7 @@ setup(
     test_suite='tests',
     # “optional” dependencies
     extras_require={
-        'dev': test_requirements
+        'dev': dev_requirements
     },
     # Alternatively, use tests_requires to use the setup.py command "test".
     # tests_require=test_requirements,

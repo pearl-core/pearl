@@ -5,4 +5,5 @@ pytest
 Sphinx
 tox
 twine
-watchdog
+# Newer version of watchdog require python >=3.6
+watchdog==0.10.6
