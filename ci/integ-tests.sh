@@ -51,12 +51,12 @@ info Install ALL pearl packages
 for package in $(pearl list --package-only)
 do
     pearl info
-    pearl --verbose --no-confirm emerge ${package}
+    pearl -vv --no-confirm emerge ${package}
     [[ -d "$PEARL_HOME/packages/$package" ]] || { echo "$PEARL_HOME/packages/$package does not exist"; exit 6; }
 done
 
 info Update ALL Pearl packages
-pearl --verbose --no-confirm update
+pearl -vv --no-confirm update
 
 pearl list
 
@@ -72,4 +72,6 @@ fi
 
 # Remove everything now
 yes | pearl remove
+# Remove the created package
+rm -rf $HOME/test
 [[ ! -e ${PEARL_HOME} ]] || echo "$PEARL_HOME exists after remove it"

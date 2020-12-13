@@ -192,7 +192,7 @@ def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespa
         quiet = "false" if args.verbose else "true"
         script = dedent(
             f"""
-            install_git_repo {package.dir} {package.url} "" {quiet}
+            install_git_repo {package.url} {package.dir} "" {quiet}
             """
         )
         run_pearl_bash(script, pearl_env, input=_DEFAULT_INPUT if args.no_confirm else None)

@@ -106,6 +106,7 @@ def test_install_package_git(tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
         install_package(pearl_env, package, PackageArgs())
 
+        # TODO improve test
         assert run_mock.call_count == 2
         assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 

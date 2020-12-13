@@ -43,17 +43,22 @@ source $HOME/.config/fish/config.fish; or die "Error on sourcing config.fish"
 [ -e $PEARL_ROOT ]; or die "$PEARL_ROOT does not exist"
 [ -e $PEARL_HOME ]; or die "$PEARL_HOME does not exist"
 
+info "Creating local pearl package"
+pearl create test $HOME/test
+pearl search test
+pearl info test
+
 pearl list
 
 info Install ALL pearl packages
 for package in (pearl list --package-only)
     pearl info
-    pearl --verbose --no-confirm emerge $package; or die "Error on pearl install $package"
+    pearl -vv --no-confirm emerge $package; or die "Error on pearl install $package"
     [ -d "$PEARL_HOME/packages/$package" ]; or die "$PEARL_HOME/packages/$package does not exist"
 end
 
 info Update ALL Pearl packages
-pearl --verbose --no-confirm update
+pearl -vv --no-confirm update
 
 pearl list
 
@@ -62,4 +67,6 @@ info Remove ALL pearl packages
 echo -e "y\ny\nn\nn\n" | pearl remove; or die "Error on removing Pearl packages"
 
 yes | pearl remove; or die "Error on pearl remove"
+# Remove the created package
+rm -rf $HOME/test
 [ ! -e $PEARL_HOME ]; or echo "$PEARL_HOME exists after remove it"
