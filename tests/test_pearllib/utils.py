@@ -55,7 +55,7 @@ class PackageTestBuilder:
             depends=(),
     ):
         """Install a package somewhere locally"""
-        pkg_dir = tmp_path / '{}/{}'.format(repo_name, package_name)
+        pkg_dir = tmp_path / f'{repo_name}/{package_name}'
         (pkg_dir / 'pearl-config').mkdir(parents=True)
         hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
         hooks_sh.touch()
@@ -115,7 +115,7 @@ class PackageTestBuilder:
             package_name='pkg-test',
             git_url=None
     ):
-        pkg_dir = self.home_dir / 'packages/{}/{}'.format(repo_name, package_name)
+        pkg_dir = self.home_dir / f'packages/{repo_name}/{package_name}'
         (pkg_dir / 'pearl-config').mkdir(parents=True)
 
         hooks_sh = pkg_dir / 'pearl-config/hooks.sh'

@@ -43,7 +43,7 @@ def run_pearl_bash(
     )
     script_template = '{bashheader}\nset -x\n{script}' if enable_xtrace else '{bashheader}\n{script}'
     if enable_errexit:
-        script_template = 'set -e\n{}'.format(script_template)
+        script_template = f'set -e\n{script_template}'
 
     script = script_template.format(
         bashheader=bash_header,
@@ -77,9 +77,7 @@ def verify_git_dep():
 
     if git_version < git_version_min:
         messenger.warn(
-            "Pearl might not work properly since git is too old: {} < {}".format(
-                git_version, git_version_min
-            )
+            f"Pearl might not work properly since git is too old: {git_version} < {git_version_min}"
         )
         return False
 
@@ -100,9 +98,7 @@ def verify_bash_dep():
         return False
     elif bash_version < bash_version_min:
         messenger.warn(
-            "Warn: Pearl might not work properly since bash is too old: {} < {}".format(
-                bash_version, bash_version_min
-            )
+            f"Warn: Pearl might not work properly since bash is too old: {bash_version} < {bash_version_min}"
         )
         return False
     return True
@@ -118,7 +114,7 @@ def check_and_copy(src_dir: Path, dst_dir: Path):
     Checks if src_dir exists and removes the dst_dir content before copying.
     """
     if not src_dir.is_dir():
-        raise NotADirectoryError('{} is not a directory'.format(src_dir))
+        raise NotADirectoryError(f'{src_dir} is not a directory')
     shutil.rmtree(str(dst_dir))
     shutil.copytree(str(src_dir), str(dst_dir))
 
@@ -140,7 +136,7 @@ def ask(prompt: str, yes_as_default_answer: bool = False, no_confirm: bool = Fal
 
     answer = None
     while answer not in ['Y', 'N']:
-        answer = input(messenger.info('{} ({}/{})'.format(prompt, default_answer, other_answer))).upper()
+        answer = input(messenger.info(f'{prompt} ({default_answer}/{other_answer})')).upper()
         if not answer:
             answer = default_answer
 
@@ -164,7 +160,7 @@ def apply(line: str, filename: str):
         content = f.read()
         if line not in content.split('\n'):
             f.seek(0)
-            f.write("{}\n{}".format(line, content))
+            f.write(f"{line}\n{content}")
 
 
 def unapply(line: str, filename: str):

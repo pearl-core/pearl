@@ -56,7 +56,7 @@ def _create_main_parser():
              "-vv shows bash xtrace during the hook function execution."
     )
     version = pkg_resources.require("pearl")[0].version
-    parser.add_argument('--version', '-V', action='version', version='%(prog)s {}'.format(version))
+    parser.add_argument('--version', '-V', action='version', version=f'%(prog)s {version}')
     return parser
 
 

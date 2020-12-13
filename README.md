@@ -183,7 +183,7 @@ Before installing Pearl be sure that all dependencies are properly installed in 
 The Pearl dependencies are the following:
 
 ### Mandatory
-- [python (>=3.5)](https://www.python.org/)
+- [python (>=3.6)](https://www.python.org/)
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8.5)](https://git-scm.com/)
 

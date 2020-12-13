@@ -185,19 +185,10 @@ def test_run_pearl_bash(tmp_path):
     assert result.stderr == ''
 
     if platform.system() == 'Darwin':
-        assert result.stdout == "{}\n{}\n{}\n{}\n".format(
-            home_dir, home_dir,
-            '/usr/local/opt/gnu-sed/libexec/gnubin:'
-            '/usr/local/opt/grep/libexec/gnubin:'
-            '/usr/local/opt/coreutils/libexec/gnubin:' + os.environ['PATH'],
-            "\x1b[0;36mTest\x1b[0m"
-        )
+        assert result.stdout == f"{home_dir}\n{home_dir}\n/usr/local/opt/gnu-sed/libexec/gnubin:/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/coreutils/libexec/gnubin:{os.environ['PATH']}\n\x1b[0;36mTest\x1b[0m\n"
+
     elif platform.system() == 'Linux':
-        assert result.stdout == "{}\n{}\n{}\n{}\n".format(
-            home_dir, home_dir,
-            os.environ['PATH'],
-            "\x1b[0;36mTest\x1b[0m"
-        )
+        assert result.stdout == f"{home_dir}\n{home_dir}\n{os.environ['PATH']}\n\x1b[0;36mTest\x1b[0m\n"
 
 
 def test_run_pearl_bash_enable_xtrace(tmp_path):

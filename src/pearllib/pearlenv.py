@@ -72,17 +72,13 @@ class PackageLoader:
         config_filenames = [self.config_filename]
         while config_filenames:
             config_filename = config_filenames.pop(0)
-            messenger.debug("Loading Pearl configuration: {}...".format(config_filename))
+            messenger.debug(f"Loading Pearl configuration: {config_filename}...")
             pearl_conf = self._load_conf(config_filename)
             packages.update({
                 pearl_conf.repo_name: pearl_conf.packages
             })
             messenger.debug(
-                "Loaded Pearl configuration: {}. Repo name: {}, number of packages: {}".format(
-                    config_filename,
-                    pearl_conf.repo_name,
-                    len(pearl_conf.packages)
-                )
+                f"Loaded Pearl configuration: {config_filename}. Repo name: {pearl_conf.repo_name}, number of packages: {len(pearl_conf.packages)}"
             )
             repo_conf_filenames = self._load_repos(self.home, pearl_conf.repos, update_repos, verbose)
             config_filenames.extend(repo_conf_filenames)
@@ -100,7 +96,7 @@ class PackageLoader:
                 if '/' in package_def_name:
                     packages_depends_full_name.append(package_def_name)
                 else:
-                    packages_depends_full_name.append("{}/{}".format(repo_name, package_def_name))
+                    packages_depends_full_name.append(f"{repo_name}/{package_def_name}")
 
             packages[package_name] = dict(
                 repo_name=repo_name,
@@ -128,26 +124,26 @@ class PackageLoader:
     def _load_repo(home, repo: str, update_repos=False, verbose: int = 0):
         m = hashlib.md5()
         # Add \n for compatibility with previous version of Pearl
-        m.update('{}\n'.format(repo).encode())
+        m.update(f'{repo}\n'.encode())
         md5_sum = m.hexdigest()
-        if not (home / 'repos/{}/.git'.format(md5_sum)).is_dir():
-            messenger.info('Initializing {} repository...'.format(repo))
+        if not (home / f'repos/{md5_sum}/.git').is_dir():
+            messenger.info(f'Initializing {repo} repository...')
             clone_command = [
                 'git', 'clone', '--depth', '1', repo,
-                '{}/repos/{}'.format(home, md5_sum)
+                f'{home}/repos/{md5_sum}'
             ]
             if not verbose:
                 clone_command.append('--quiet')
             subprocess.run(clone_command)
         elif update_repos:
-            messenger.info("Updating {} repository...".format(repo))
+            messenger.info(f"Updating {repo} repository...")
             # The option -C works only for git 1.8.5 https://stackoverflow.com/a/20115678
-            pull_command = ['git', '-C', '{}/repos/{}'.format(home, md5_sum), 'pull']
+            pull_command = ['git', '-C', f'{home}/repos/{md5_sum}', 'pull']
             if not verbose:
                 pull_command.append('--quiet')
             subprocess.run(pull_command)
 
-        return home / 'repos/{}/pearl-config/repo.conf'.format(md5_sum)
+        return home / f'repos/{md5_sum}/pearl-config/repo.conf'
 
 
 class PearlEnvironment:
@@ -179,9 +175,9 @@ class PearlEnvironment:
 
         if repo_name not in self.packages:
             raise RepoDoesNotExistError(
-                '{} repository does not exist.'.format(repo_name))
+                f'{repo_name} repository does not exist.')
         if short_package_name not in self.packages[repo_name]:
-            raise PackageNotInRepoError('{} package is not in any repositories.'.format(package_full_name))
+            raise PackageNotInRepoError(f'{package_full_name} package is not in any repositories.')
 
         return self.packages[repo_name][short_package_name]
 
@@ -193,7 +189,7 @@ class PearlEnvironment:
             if package_name in repo_packages:
                 return repo_packages[package_name]
 
-        raise PackageNotInRepoError('{} package is not in any repositories.'.format(package_name))
+        raise PackageNotInRepoError(f'{package_name} package is not in any repositories.')
 
     def infer_package(self, package_name: str) -> Package:
         """Builds a package by looking at the file structure."""
@@ -209,7 +205,7 @@ class PearlEnvironment:
                 package = Package(self.home, repo_name, package_name, "None")
                 if package.is_installed():
                     return package
-        raise PackageNotInstalledError('{} package has not been installed.'.format(package_name))
+        raise PackageNotInstalledError(f'{package_name} package has not been installed.')
 
     def required_by(self, package: Package) -> Tuple[Package]:
         requires = []
@@ -222,15 +218,15 @@ class PearlEnvironment:
     @staticmethod
     def _get_home(home: Path = None, env_initialized: bool = True) -> Path:
         if home is None:
-            xdg_data_home = os.environ.get('XDG_DATA_HOME', '{}/.local/share'.format(os.environ['HOME']))
-            default_home = '{}/pearl'.format(xdg_data_home)
+            xdg_data_home = os.environ.get('XDG_DATA_HOME', f"{os.environ['HOME']}/.local/share")
+            default_home = f'{xdg_data_home}/pearl'
             home = Path(default_home)
 
-        messenger.debug("Found Pearl home: {}".format(home))
+        messenger.debug(f"Found Pearl home: {home}")
 
         if env_initialized:
             if home.exists() and not home.is_dir():
-                msg = 'Error: The value in environment variable PEARL_HOME is not a directory: {}.'.format(home)
+                msg = f'Error: The value in environment variable PEARL_HOME is not a directory: {home}.'
                 messenger.warn(msg)
                 raise ValueError(msg)
             elif not home.exists():
@@ -243,13 +239,13 @@ class PearlEnvironment:
     @staticmethod
     def _get_config_filename(config_filename: Path = None, env_initialized: bool = True) -> Path:
         if config_filename is None:
-            xdg_config_home = os.environ.get('XDG_CONFIG_HOME', '{}/.config'.format(os.environ['HOME']))
-            config_home = Path('{}/pearl'.format(xdg_config_home))
+            xdg_config_home = os.environ.get('XDG_CONFIG_HOME', f"{os.environ['HOME']}/.config")
+            config_home = Path(f'{xdg_config_home}/pearl')
             config_filename = config_home / 'pearl.conf'
 
         if env_initialized:
             if config_filename.exists() and not config_filename.is_file():
-                msg = 'Error: The configuration in {} is not a file.'.format(config_filename)
+                msg = f'Error: The configuration in {config_filename} is not a file.'
                 messenger.warn(msg)
                 raise ValueError(msg)
             elif not config_filename.exists():

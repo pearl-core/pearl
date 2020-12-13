@@ -16,17 +16,17 @@ _MODULE_UNDER_TEST = 'pearllib.package'
 
 def test_install_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     post_install() {{
-        echo $PWD > {homedir}/result
-        echo $PEARL_HOME >> {homedir}/result
-        echo $PEARL_PKGDIR >> {homedir}/result
-        echo $PEARL_PKGVARDIR >> {homedir}/result
-        echo $PEARL_PKGNAME >> {homedir}/result
-        echo $PEARL_PKGREPONAME >> {homedir}/result
+        echo $PWD > {home_dir}/result
+        echo $PEARL_HOME >> {home_dir}/result
+        echo $PEARL_PKGDIR >> {home_dir}/result
+        echo $PEARL_PKGVARDIR >> {home_dir}/result
+        echo $PEARL_PKGNAME >> {home_dir}/result
+        echo $PEARL_PKGREPONAME >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
@@ -40,10 +40,7 @@ def test_install_local_package(tmp_path):
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir, package.dir, package.vardir,
-        package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result').read_text() == expected_result
 
 
@@ -71,19 +68,19 @@ def test_install_local_package_forced(tmp_path):
 
 def test_install_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     post_install() {{
         if ask "Are you sure?" "Y"
         then
-            echo "YES" > {homedir}/result
+            echo "YES" > {home_dir}/result
         else
-            echo "NO" > {homedir}/result
+            echo "NO" > {home_dir}/result
         fi
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result
+        echo "$choice" >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
@@ -151,26 +148,26 @@ def test_install_package_already_installed(tmp_path):
 
 def test_update_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_update() {{
-        echo $PWD > {homedir}/result
-        echo $PEARL_HOME >> {homedir}/result
-        echo $PEARL_PKGDIR >> {homedir}/result
-        echo $PEARL_PKGVARDIR >> {homedir}/result
-        echo $PEARL_PKGNAME >> {homedir}/result
-        echo $PEARL_PKGREPONAME >> {homedir}/result
+        echo $PWD > {home_dir}/result
+        echo $PEARL_HOME >> {home_dir}/result
+        echo $PEARL_PKGDIR >> {home_dir}/result
+        echo $PEARL_PKGVARDIR >> {home_dir}/result
+        echo $PEARL_PKGNAME >> {home_dir}/result
+        echo $PEARL_PKGREPONAME >> {home_dir}/result
         return 0
     }}
     post_update() {{
-        echo $PWD > {homedir}/result2
-        echo $PEARL_HOME >> {homedir}/result2
-        echo $PEARL_PKGDIR >> {homedir}/result2
-        echo $PEARL_PKGVARDIR >> {homedir}/result2
-        echo $PEARL_PKGNAME >> {homedir}/result2
-        echo $PEARL_PKGREPONAME >> {homedir}/result2
+        echo $PWD > {home_dir}/result2
+        echo $PEARL_HOME >> {home_dir}/result2
+        echo $PEARL_PKGDIR >> {home_dir}/result2
+        echo $PEARL_PKGVARDIR >> {home_dir}/result2
+        echo $PEARL_PKGNAME >> {home_dir}/result2
+        echo $PEARL_PKGREPONAME >> {home_dir}/result2
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -183,16 +180,10 @@ def test_update_local_package(tmp_path):
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir, package.dir, package.vardir,
-        package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result').read_text() == expected_result
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir, package.dir, package.vardir,
-        package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result2').read_text() == expected_result
 
 
@@ -226,32 +217,32 @@ def test_update_local_package_forced(tmp_path):
 
 def test_update_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_update() {{
         if ask "Are you sure?" "Y"
         then
-            echo "YES" > {homedir}/result
+            echo "YES" > {home_dir}/result
         else
-            echo "NO" > {homedir}/result
+            echo "NO" > {home_dir}/result
         fi
 
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result
+        echo "$choice" >> {home_dir}/result
         return 0
     }}
     post_update() {{
         if ask "Are you sure?" "N"
         then
-            echo "YES" > {homedir}/result2
+            echo "YES" > {home_dir}/result2
         else
-            echo "NO" > {homedir}/result2
+            echo "NO" > {home_dir}/result2
         fi
 
         local choice=$(choose "What?" "orange" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result2
+        echo "$choice" >> {home_dir}/result2
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -366,17 +357,17 @@ def test_emerge_package(tmp_path):
 def test_remove_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_remove() {{
-        echo $PWD > {homedir}/result
-        echo $PEARL_HOME >> {homedir}/result
-        echo $PEARL_PKGDIR >> {homedir}/result
-        echo $PEARL_PKGVARDIR >> {homedir}/result
-        echo $PEARL_PKGNAME >> {homedir}/result
-        echo $PEARL_PKGREPONAME >> {homedir}/result
+        echo $PWD > {home_dir}/result
+        echo $PEARL_HOME >> {home_dir}/result
+        echo $PEARL_PKGDIR >> {home_dir}/result
+        echo $PEARL_PKGVARDIR >> {home_dir}/result
+        echo $PEARL_PKGNAME >> {home_dir}/result
+        echo $PEARL_PKGREPONAME >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -389,10 +380,7 @@ def test_remove_package(tmp_path):
 
     assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir,
-        package.dir, package.vardir, package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result').read_text() == expected_result
 
 
@@ -420,20 +408,20 @@ def test_remove_package_forced(tmp_path):
 def test_remove_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_remove() {{
         if ask "Are you sure?" "Y"
         then
-            echo "YES" > {homedir}/result
+            echo "YES" > {home_dir}/result
         else
-            echo "NO" > {homedir}/result
+            echo "NO" > {home_dir}/result
         fi
 
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result
+        echo "$choice" >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -575,7 +563,7 @@ def test_create_package(tmp_path):
     )
 
     assert (dest_dir / 'pearl-config').exists()
-    assert config_file.read_text() == 'PEARL_PACKAGES["mypkg"] = {{"url": "{}"}}\n'.format(dest_dir)
+    assert config_file.read_text() == f'PEARL_PACKAGES["mypkg"] = {{"url": "{dest_dir}"}}\n'
 
 
 def test_create_package_pearl_config_exists(tmp_path):

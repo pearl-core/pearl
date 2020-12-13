@@ -39,14 +39,11 @@ def test_init(tmp_path):
 
         assert (pearl_env.home / 'boot').is_symlink()
 
-        assert (tmp_path / 'home/.bashrc').read_text() == "source {}/boot/sh/pearl.sh\n".format(
-            pearl_env.home)
-        assert (tmp_path / 'home/.zshrc').read_text() == "source {}/boot/sh/pearl.sh\n".format(
-            pearl_env.home)
-        assert (tmp_path / 'home/.config/fish/config.fish').read_text() == "source {}/boot/fish/pearl.fish\n".format(
-            pearl_env.home)
-        assert (tmp_path / 'home/.vimrc').read_text() == "source {}/boot/vim/pearl.vim\n".format(pearl_env.home)
-        assert (tmp_path / 'home/.emacs').read_text() == "(load-file \"{}/boot/emacs/pearl.el\")\n".format(pearl_env.home)
+        assert (tmp_path / 'home/.bashrc').read_text() == f"source {pearl_env.home}/boot/sh/pearl.sh\n"
+        assert (tmp_path / 'home/.zshrc').read_text() == f"source {pearl_env.home}/boot/sh/pearl.sh\n"
+        assert (tmp_path / 'home/.config/fish/config.fish').read_text() == f"source {pearl_env.home}/boot/fish/pearl.fish\n"
+        assert (tmp_path / 'home/.vimrc').read_text() == f"source {pearl_env.home}/boot/vim/pearl.vim\n"
+        assert (tmp_path / 'home/.emacs').read_text() == f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")\n"
 
 
 def test_remove(tmp_path):
@@ -57,19 +54,19 @@ def test_remove(tmp_path):
     pearl_env.home.mkdir(parents=True)
 
     (tmp_path / 'home/.bashrc').write_text(
-        "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/sh/pearl.sh\n"
     )
     (tmp_path / 'home/.zshrc').write_text(
-        "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/sh/pearl.sh\n"
     )
     (tmp_path / 'home/.config/fish/config.fish').write_text(
-        "source {}/boot/fish/pearl.fish\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/fish/pearl.fish\n"
     )
     (tmp_path / 'home/.vimrc').write_text(
-        "source {}/boot/vim/pearl.vim\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/vim/pearl.vim\n"
     )
     (tmp_path / 'home/.emacs').write_text(
-        "(load-file \"{}/boot/emacs/pearl.el\")\n".format(pearl_env.home)
+        f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")\n"
     )
 
     pearl_env.packages = {}
@@ -99,19 +96,19 @@ def test_remove_no_confirm(tmp_path):
     pearl_env.home.mkdir(parents=True)
 
     (tmp_path / 'home/.bashrc').write_text(
-        "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/sh/pearl.sh\n"
     )
     (tmp_path / 'home/.zshrc').write_text(
-        "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/sh/pearl.sh\n"
     )
     (tmp_path / 'home/.config/fish/config.fish').write_text(
-        "source {}/boot/fish/pearl.fish\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/fish/pearl.fish\n"
     )
     (tmp_path / 'home/.vimrc').write_text(
-        "source {}/boot/vim/pearl.vim\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/vim/pearl.vim\n"
     )
     (tmp_path / 'home/.emacs').write_text(
-        "(load-file \"{}/boot/emacs/pearl.el\")\n".format(pearl_env.home)
+        f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")\n"
     )
 
     pearl_env.packages = {}
@@ -125,15 +122,15 @@ def test_remove_no_confirm(tmp_path):
         assert pearl_env.home.exists()
 
         assert (tmp_path / 'home/.bashrc').read_text() == \
-            "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/sh/pearl.sh\n"
         assert (tmp_path / 'home/.zshrc').read_text() == \
-            "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/sh/pearl.sh\n"
         assert (tmp_path / 'home/.config/fish/config.fish').read_text() == \
-            "source {}/boot/fish/pearl.fish\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/fish/pearl.fish\n"
         assert (tmp_path / 'home/.vimrc').read_text() == \
-            "source {}/boot/vim/pearl.vim\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/vim/pearl.vim\n"
         assert (tmp_path / 'home/.emacs').read_text() == \
-            "(load-file \"{}/boot/emacs/pearl.el\")\n".format(pearl_env.home)
+            f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")\n"
 
 
 def test_remove_no_answer(tmp_path):
@@ -144,19 +141,19 @@ def test_remove_no_answer(tmp_path):
     pearl_env.home.mkdir(parents=True)
 
     (tmp_path / 'home/.bashrc').write_text(
-        "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/sh/pearl.sh\n"
     )
     (tmp_path / 'home/.zshrc').write_text(
-        "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/sh/pearl.sh\n"
     )
     (tmp_path / 'home/.config/fish/config.fish').write_text(
-        "source {}/boot/fish/pearl.fish\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/fish/pearl.fish\n"
     )
     (tmp_path / 'home/.vimrc').write_text(
-        "source {}/boot/vim/pearl.vim\n".format(pearl_env.home)
+        f"source {pearl_env.home}/boot/vim/pearl.vim\n"
     )
     (tmp_path / 'home/.emacs').write_text(
-        "(load-file \"{}/boot/emacs/pearl.el\")\n".format(pearl_env.home)
+        f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")\n"
     )
 
     pearl_env.packages = {}
@@ -172,12 +169,12 @@ def test_remove_no_answer(tmp_path):
         assert pearl_env.home.exists()
 
         assert (tmp_path / 'home/.bashrc').read_text() == \
-            "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/sh/pearl.sh\n"
         assert (tmp_path / 'home/.zshrc').read_text() == \
-            "source {}/boot/sh/pearl.sh\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/sh/pearl.sh\n"
         assert (tmp_path / 'home/.config/fish/config.fish').read_text() == \
-            "source {}/boot/fish/pearl.fish\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/fish/pearl.fish\n"
         assert (tmp_path / 'home/.vimrc').read_text() == \
-            "source {}/boot/vim/pearl.vim\n".format(pearl_env.home)
+            f"source {pearl_env.home}/boot/vim/pearl.vim\n"
         assert (tmp_path / 'home/.emacs').read_text() == \
-            "(load-file \"{}/boot/emacs/pearl.el\")\n".format(pearl_env.home)
+            f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")\n"

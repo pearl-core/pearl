@@ -2,7 +2,7 @@
 
 set -e
 
-if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON_VERSION" == "3.5" && "$TRAVIS_BRANCH" == "master" ]]
+if [[ "$TRAVIS_OS_NAME" == "osx" && "$PYTHON_VERSION" == "3.6" && "$TRAVIS_BRANCH" == "master" ]]
 then
     export TWINE_USER="__token__"
 
