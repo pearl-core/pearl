@@ -10,7 +10,7 @@ with open('VERSION') as version_file:
     version = version_file.read().strip()
 
 with open('requirements-dev.in') as test_requirements_file:
-    test_requirements = [line.strip() for line in test_requirements_file.readlines()]
+    dev_requirements = [line.strip() for line in test_requirements_file.readlines() if not line.startswith("#")]
 
 data_files = []
 
@@ -37,8 +37,6 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -61,13 +59,13 @@ setup(
     scripts=['bin/pearl'],
 
     # Dependency related arguments:
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     setup_requires=[],
     install_requires=requirements,
     test_suite='tests',
     # “optional” dependencies
     extras_require={
-        'dev': test_requirements
+        'dev': dev_requirements
     },
     # Alternatively, use tests_requires to use the setup.py command "test".
     # tests_require=test_requirements,

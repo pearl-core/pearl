@@ -13,6 +13,16 @@ set -x PEARL_ROOT $argv[1]
 set -x PEARL_HOME "$HOME/.local/share/pearl"
 set -x PATH $PEARL_ROOT/bin $PATH
 
+# Disabling vim since it hangs on OSX
+# https://stackoverflow.com/questions/46432027/bash-kill-vim-when-vim-warning-output-not-to-a-terminal
+mkdir -p $HOME/bin
+set -x PATH $HOME/bin $PATH
+echo > $HOME/bin/vim "\
+#!/bin/sh
+echo vim_mock \$@
+exit"
+chmod +x $HOME/bin/vim
+
 function pearl_remove_home --on-process-exit %self
     rm -fr $PEARL_HOME
 end
@@ -43,17 +53,22 @@ source $HOME/.config/fish/config.fish; or die "Error on sourcing config.fish"
 [ -e $PEARL_ROOT ]; or die "$PEARL_ROOT does not exist"
 [ -e $PEARL_HOME ]; or die "$PEARL_HOME does not exist"
 
+info "Creating local pearl package"
+pearl create test $HOME/test
+pearl search test
+pearl info test
+
 pearl list
 
 info Install ALL pearl packages
 for package in (pearl list --package-only)
-    pearl info
-    pearl --verbose --no-confirm emerge $package; or die "Error on pearl install $package"
+    pearl info $package
+    pearl -vv --no-confirm emerge $package; or die "Error on pearl install $package"
     [ -d "$PEARL_HOME/packages/$package" ]; or die "$PEARL_HOME/packages/$package does not exist"
 end
 
 info Update ALL Pearl packages
-pearl --verbose --no-confirm update
+pearl -vv --no-confirm update
 
 pearl list
 
@@ -62,4 +77,6 @@ info Remove ALL pearl packages
 echo -e "y\ny\nn\nn\n" | pearl remove; or die "Error on removing Pearl packages"
 
 yes | pearl remove; or die "Error on pearl remove"
+# Remove the created package
+rm -rf $HOME/test
 [ ! -e $PEARL_HOME ]; or echo "$PEARL_HOME exists after remove it"

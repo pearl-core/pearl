@@ -183,7 +183,7 @@ Before installing Pearl be sure that all dependencies are properly installed in 
 The Pearl dependencies are the following:
 
 ### Mandatory
-- [python (>=3.5)](https://www.python.org/)
+- [python (>=3.6)](https://www.python.org/)
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8.5)](https://git-scm.com/)
 
@@ -223,14 +223,17 @@ Assuming all Pearl [dependencies](#dependencies) are properly installed
 in the system, to install Pearl you can use the `pip` command.
 Unless there is a specific use case, it is not a good option to use virtual environments such as
 `virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
-It is recommended to use the system-wide `pip` which is generally locate in `/usr/bin/pip`.
-The following will install the package in your `$HOME` directory (`~/.local/`):
+It is recommended to use the system-wide `pip` which is generally located in `/usr/bin/pip`.
+The following commands will install the package in your `$HOME` directory (`~/.local/`):
 ```
 $> /usr/bin/pip install --user pearl
-$> export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Pearl command will be located in `~/.local/bin/pearl`
+`pearl` command path location **must** be under `PATH` variable. For instance, to add it to bash shell:
+```
+$> echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
+$> source $HOME/.bashrc
+```
 
 To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
 ```
@@ -249,12 +252,14 @@ $> brew install bash git coreutils grep gnu-sed python
 
 The following will install the package under `/usr/local`:
 ```
-$> # If the bin path is not already in $PATH:
-$> export PATH="/usr/local/bin:$PATH"
 $> pip3 install pearl
 ```
 
-Pearl command will be located in `/usr/local/bin/pearl`
+`pearl` command **must** be under PATH variable. For instance, to add it to bash shell:
+```
+$> echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.bashrc
+$> source $HOME/.bashrc
+```
 
 To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
 ```
@@ -323,6 +328,9 @@ The files inside `pearl-config` are also **optional** script/configuration files
 - `config.vim` - will be executed whenever Vim editor is starting up.
 - `config.el` - will be sourced whenever Emacs editor is starting up.
 - `package.conf` - contains optional metadata information (name, author, description, keywords, etc) about the package that are useful when indexing the package in a repository list.
+
+The order in which the `config.*` files are sourced among multiple installed packages depends on the closure dependency tree,
+in other words, if package `A` depends on package `B` and both have `config.vim` files, the parent package `B` config file will be sourced first.
 
 The following variables can be used in any of the previous scripts:
 
@@ -693,6 +701,29 @@ Error on executing 'post_install' hook. Rolling back...
 > Pearl will attempt to roll back and force a removal of the package. In this way
 > you can attempt to install the package again once the hook function gets
 > fixed.
+
+## Debugging config files
+
+> Q: How do I debug `config.*` files when running the corresponding program (i.e. `emacs`, `vim`, `bash`, `zsh`, `fish`)?
+
+> A: Set the environment variable `PEARL_DEBUG` before running the program. For example, to check the `config.vim` files run
+> when starting up `vim` program:
+
+```sh
+PEARL_DEBUG=1 vim
+```
+
+## Pearl executable not found
+
+> Q: Why do I get this message when opening shells (bash, zsh, fish) or editors (vim, emacs):
+
+```
+Pearl error: Could not load pearl package config files. `pearl` executable not found. Please update the PATH variable first."
+```
+
+> A: This is because `pearl` executable is required for properly sourcing the pearl package `config.*` files.
+> Make sure to add the path location to the `PATH` in your
+> favorite shell config file (i.e. `~/.bashrc`, `~/.zshrc`, `~/.config/fish/config`).
 
 Contributing
 ============

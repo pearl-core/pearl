@@ -101,7 +101,7 @@ def pearl(sys_args: list, pearl_home_dir: Path = None):
     except PearlError as ex:
         message = ex.args[0] if ex.args else None
         if args.verbose:
-            messenger.exception('Pearl error: {}'.format(message))
+            messenger.exception(f'Pearl error: {message}')
         else:
             messenger.error(message)
         exit(ex.exit_status)

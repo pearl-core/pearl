@@ -1,5 +1,12 @@
 # Change Log #
 
+## [2.3.5][v235] - 2020-12-14 ##
+
+* Source `config.*` files according to dependency tree order
+* Deprecate support for Python 3.5
+* Add `PEARL_DEBUG` environment variable
+* Fix integ tests for OSX
+
 ## [2.3.4][v234] - 2020-06-28 ##
 
 * Fix when URL change local/git package
@@ -291,3 +298,4 @@
 [v232]: https://github.com/pearl-core/pearl/releases/tag/2.3.2
 [v233]: https://github.com/pearl-core/pearl/releases/tag/2.3.3
 [v234]: https://github.com/pearl-core/pearl/releases/tag/2.3.4
+[v235]: https://github.com/pearl-core/pearl/releases/tag/2.3.5

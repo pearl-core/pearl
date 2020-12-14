@@ -16,17 +16,17 @@ _MODULE_UNDER_TEST = 'pearllib.package'
 
 def test_install_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     post_install() {{
-        echo $PWD > {homedir}/result
-        echo $PEARL_HOME >> {homedir}/result
-        echo $PEARL_PKGDIR >> {homedir}/result
-        echo $PEARL_PKGVARDIR >> {homedir}/result
-        echo $PEARL_PKGNAME >> {homedir}/result
-        echo $PEARL_PKGREPONAME >> {homedir}/result
+        echo $PWD > {home_dir}/result
+        echo $PEARL_HOME >> {home_dir}/result
+        echo $PEARL_PKGDIR >> {home_dir}/result
+        echo $PEARL_PKGVARDIR >> {home_dir}/result
+        echo $PEARL_PKGNAME >> {home_dir}/result
+        echo $PEARL_PKGREPONAME >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
@@ -40,10 +40,7 @@ def test_install_local_package(tmp_path):
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
     assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir, package.dir, package.vardir,
-        package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result').read_text() == expected_result
 
 
@@ -71,19 +68,19 @@ def test_install_local_package_forced(tmp_path):
 
 def test_install_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     post_install() {{
         if ask "Are you sure?" "Y"
         then
-            echo "YES" > {homedir}/result
+            echo "YES" > {home_dir}/result
         else
-            echo "NO" > {homedir}/result
+            echo "NO" > {home_dir}/result
         fi
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result
+        echo "$choice" >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=False)
@@ -109,6 +106,11 @@ def test_install_package_git(tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
         install_package(pearl_env, package, PackageArgs())
 
+        expected_calls = [
+            mock.call(f'\ninstall_git_repo https://github.com/pkg {tmp_path}/home/packages/repo-test/pkg-test "" true\n', pearl_env, input=None),
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None)
+        ]
+        run_mock.assert_has_calls(expected_calls)
         assert run_mock.call_count == 2
         assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
@@ -151,26 +153,26 @@ def test_install_package_already_installed(tmp_path):
 
 def test_update_local_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_update() {{
-        echo $PWD > {homedir}/result
-        echo $PEARL_HOME >> {homedir}/result
-        echo $PEARL_PKGDIR >> {homedir}/result
-        echo $PEARL_PKGVARDIR >> {homedir}/result
-        echo $PEARL_PKGNAME >> {homedir}/result
-        echo $PEARL_PKGREPONAME >> {homedir}/result
+        echo $PWD > {home_dir}/result
+        echo $PEARL_HOME >> {home_dir}/result
+        echo $PEARL_PKGDIR >> {home_dir}/result
+        echo $PEARL_PKGVARDIR >> {home_dir}/result
+        echo $PEARL_PKGNAME >> {home_dir}/result
+        echo $PEARL_PKGREPONAME >> {home_dir}/result
         return 0
     }}
     post_update() {{
-        echo $PWD > {homedir}/result2
-        echo $PEARL_HOME >> {homedir}/result2
-        echo $PEARL_PKGDIR >> {homedir}/result2
-        echo $PEARL_PKGVARDIR >> {homedir}/result2
-        echo $PEARL_PKGNAME >> {homedir}/result2
-        echo $PEARL_PKGREPONAME >> {homedir}/result2
+        echo $PWD > {home_dir}/result2
+        echo $PEARL_HOME >> {home_dir}/result2
+        echo $PEARL_PKGDIR >> {home_dir}/result2
+        echo $PEARL_PKGVARDIR >> {home_dir}/result2
+        echo $PEARL_PKGNAME >> {home_dir}/result2
+        echo $PEARL_PKGREPONAME >> {home_dir}/result2
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -183,16 +185,10 @@ def test_update_local_package(tmp_path):
 
     assert (home_dir / 'packages/repo-test/pkg-test/pearl-config/hooks.sh').is_file()
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir, package.dir, package.vardir,
-        package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result').read_text() == expected_result
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir, package.dir, package.vardir,
-        package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result2').read_text() == expected_result
 
 
@@ -226,32 +222,32 @@ def test_update_local_package_forced(tmp_path):
 
 def test_update_local_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_update() {{
         if ask "Are you sure?" "Y"
         then
-            echo "YES" > {homedir}/result
+            echo "YES" > {home_dir}/result
         else
-            echo "NO" > {homedir}/result
+            echo "NO" > {home_dir}/result
         fi
 
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result
+        echo "$choice" >> {home_dir}/result
         return 0
     }}
     post_update() {{
         if ask "Are you sure?" "N"
         then
-            echo "YES" > {homedir}/result2
+            echo "YES" > {home_dir}/result2
         else
-            echo "NO" > {homedir}/result2
+            echo "NO" > {home_dir}/result2
         fi
 
         local choice=$(choose "What?" "orange" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result2
+        echo "$choice" >> {home_dir}/result2
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -275,10 +271,17 @@ def test_update_package_git_url_not_changed(tmp_path):
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash"), \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
         update_package(pearl_env, package, PackageArgs())
+
+        expected_calls = [
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None),
+            mock.call(f'\nupdate_git_repo {tmp_path}/home/packages/repo-test/pkg-test "" true\n', pearl_env, input=None),
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None)
+        ]
+        run_mock.assert_has_calls(expected_calls)
 
         assert remove_mock.call_count == 0
         assert install_mock.call_count == 0
@@ -298,11 +301,17 @@ def test_update_package_git_url_changed(tmp_path):
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash"), \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
         update_package(pearl_env, package, PackageArgs())
 
+        expected_calls = [
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None),
+            mock.call(f'\nupdate_git_repo {tmp_path}/home/packages/repo-test/pkg-test "" true\n', pearl_env, input=None),
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None)
+        ]
+        run_mock.assert_has_calls(expected_calls)
         assert remove_mock.call_count == 1
         assert install_mock.call_count == 1
 
@@ -366,17 +375,17 @@ def test_emerge_package(tmp_path):
 def test_remove_package(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_remove() {{
-        echo $PWD > {homedir}/result
-        echo $PEARL_HOME >> {homedir}/result
-        echo $PEARL_PKGDIR >> {homedir}/result
-        echo $PEARL_PKGVARDIR >> {homedir}/result
-        echo $PEARL_PKGNAME >> {homedir}/result
-        echo $PEARL_PKGREPONAME >> {homedir}/result
+        echo $PWD > {home_dir}/result
+        echo $PEARL_HOME >> {home_dir}/result
+        echo $PEARL_PKGDIR >> {home_dir}/result
+        echo $PEARL_PKGVARDIR >> {home_dir}/result
+        echo $PEARL_PKGNAME >> {home_dir}/result
+        echo $PEARL_PKGREPONAME >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -389,10 +398,7 @@ def test_remove_package(tmp_path):
 
     assert not (home_dir / 'packages/repo-test/pkg-test/').exists()
 
-    expected_result = """{}\n{}\n{}\n{}\n{}\n{}\n""".format(
-        package.dir, home_dir,
-        package.dir, package.vardir, package.name, package.repo_name
-    )
+    expected_result = f"""{package.dir}\n{home_dir}\n{package.dir}\n{package.vardir}\n{package.name}\n{package.repo_name}\n"""
     assert (home_dir / 'result').read_text() == expected_result
 
 
@@ -420,20 +426,20 @@ def test_remove_package_forced(tmp_path):
 def test_remove_package_no_confirm(tmp_path):
     home_dir = create_pearl_home(tmp_path)
 
-    hooks_sh_script = """
+    hooks_sh_script = f"""
     pre_remove() {{
         if ask "Are you sure?" "Y"
         then
-            echo "YES" > {homedir}/result
+            echo "YES" > {home_dir}/result
         else
-            echo "NO" > {homedir}/result
+            echo "NO" > {home_dir}/result
         fi
 
         local choice=$(choose "What?" "banana" "apple" "banana" "orange")
-        echo "$choice" >> {homedir}/result
+        echo "$choice" >> {home_dir}/result
         return 0
     }}
-    """.format(homedir=home_dir)
+    """
 
     builder = PackageTestBuilder(home_dir)
     builder.add_local_package(tmp_path, hooks_sh_script, is_installed=True)
@@ -491,9 +497,41 @@ def test_list_packages(tmp_path):
         }
     }
     result = list_packages(pearl_env, PackageArgs(pattern='pkg'))
-    assert len(result) == 2
-    assert 'pkg-a-test' in [pkg.name for pkg in result]
-    assert 'pkg-b-test' in [pkg.name for pkg in result]
+    assert ['pkg-b-test', 'pkg-a-test'] == [pkg.name for pkg in result]
+
+
+def test_list_packages_installed_only(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages/repo-test/pkg-a-test').mkdir(parents=True)
+
+    pearl_env = mock.Mock()
+    pearl_env.packages = {
+        'repo-test': {
+            'pkg-a-test': Package(home_dir, 'repo-test', 'pkg-a-test', 'url', 'descr'),
+            'pkg-b-test': Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr'),
+        }
+    }
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg', installed_only=True))
+    assert ['pkg-a-test'] == [pkg.name for pkg in result]
+
+
+def test_list_packages_dependency_tree(tmp_path):
+    home_dir = create_pearl_home(tmp_path)
+    (home_dir / 'packages/repo-test/pkg-a-test').mkdir(parents=True)
+
+    pearl_env = mock.Mock()
+    pkg_a = Package(home_dir, 'repo-test', 'pkg-a-test', 'url', 'descr')
+    pkg_b = Package(home_dir, 'repo-test', 'pkg-b-test', 'url', 'descr', depends=(pkg_a,))
+    pkg_c = Package(home_dir, 'repo-test', 'pkg-c-test', 'url', 'descr', depends=(pkg_b,))
+    pearl_env.packages = {
+        'repo-test': {
+            'pkg-a-test': pkg_a,
+            'pkg-b-test': pkg_b,
+            'pkg-c-test': pkg_c,
+        }
+    }
+    result = list_packages(pearl_env, PackageArgs(pattern='pkg', dependency_tree=True))
+    assert ['pkg-a-test', 'pkg-b-test', 'pkg-c-test'] == [pkg.name for pkg in result]
 
 
 def test_list_packages_match_keyword(tmp_path):
@@ -508,8 +546,7 @@ def test_list_packages_match_keyword(tmp_path):
         }
     }
     result = list_packages(pearl_env, PackageArgs(pattern='pkg-manager'))
-    assert len(result) == 1
-    assert result[0].name == 'pkg-a-test'
+    assert ['pkg-a-test'] == [pkg.name for pkg in result]
 
 
 def test_list_packages_not_matching(tmp_path):
@@ -544,7 +581,7 @@ def test_create_package(tmp_path):
     )
 
     assert (dest_dir / 'pearl-config').exists()
-    assert config_file.read_text() == 'PEARL_PACKAGES["mypkg"] = {{"url": "{}"}}\n'.format(dest_dir)
+    assert config_file.read_text() == f'PEARL_PACKAGES["mypkg"] = {{"url": "{dest_dir}"}}\n'
 
 
 def test_create_package_pearl_config_exists(tmp_path):

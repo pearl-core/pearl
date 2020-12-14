@@ -18,11 +18,11 @@ def test_link_to_path(tmp_path):
     (home_dir / 'bin').mkdir()
     pearl_env = create_pearl_env(home_dir, {})
 
-    script = """
-    echo "Content" > {tmppath}/binary
-    link_to_path "{tmppath}/binary"
+    script = f"""
+    echo "Content" > {tmp_path}/binary
+    link_to_path "{tmp_path}/binary"
     cat $PEARL_HOME/bin/binary
-    """.format(tmppath=tmp_path)
+    """
 
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, check=False)
     assert result.stdout == "Content\n"
@@ -34,11 +34,11 @@ def test_link_to_path_new_executable_name(tmp_path):
     (home_dir / 'bin').mkdir()
     pearl_env = create_pearl_env(home_dir, {})
 
-    script = """
-    echo "Content" > {tmppath}/binary
-    link_to_path "{tmppath}/binary" "new_binary"
+    script = f"""
+    echo "Content" > {tmp_path}/binary
+    link_to_path "{tmp_path}/binary" "new_binary"
     cat $PEARL_HOME/bin/new_binary
-    """.format(tmppath=tmp_path)
+    """
 
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, check=False)
     assert result.stdout == "Content\n"
@@ -67,9 +67,9 @@ def test_unlink_from_path(tmp_path):
 
     assert (home_dir / 'bin/binary').exists()
 
-    script = """
-    unlink_from_path "{tmppath}/binary"
-    """.format(tmppath=tmp_path)
+    script = f"""
+    unlink_from_path "{tmp_path}/binary"
+    """
 
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, check=False)
 
@@ -88,9 +88,9 @@ def test_unlink_from_path_new_executable_name(tmp_path):
 
     assert (home_dir / 'bin/new_binary').exists()
 
-    script = """
-    unlink_from_path "{tmppath}/binary" "new_binary"
-    """.format(tmppath=tmp_path)
+    script = f"""
+    unlink_from_path "{tmp_path}/binary" "new_binary"
+    """
 
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, check=False)
 

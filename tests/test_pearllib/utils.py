@@ -8,7 +8,8 @@ from pearllib.pearlenv import PearlEnvironment, Package
 class PackageArgs(Namespace):
     def __init__(
             self, no_confirm=False, verbose=0, force=False,
-            pattern=".*", package_only=False,
+            pattern=".*", package_only=False, installed_only=False,
+            dependency_tree=False,
             name="", dest_dir=None,
             packages=()
     ):
@@ -18,6 +19,8 @@ class PackageArgs(Namespace):
         self.force = force
         self.pattern = pattern
         self.package_only = package_only
+        self.installed_only = installed_only
+        self.dependency_tree = dependency_tree
         self.name = name
         self.dest_dir = dest_dir
         self.packages = packages
@@ -52,7 +55,7 @@ class PackageTestBuilder:
             depends=(),
     ):
         """Install a package somewhere locally"""
-        pkg_dir = tmp_path / '{}/{}'.format(repo_name, package_name)
+        pkg_dir = tmp_path / f'{repo_name}/{package_name}'
         (pkg_dir / 'pearl-config').mkdir(parents=True)
         hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
         hooks_sh.touch()
@@ -112,7 +115,7 @@ class PackageTestBuilder:
             package_name='pkg-test',
             git_url=None
     ):
-        pkg_dir = self.home_dir / 'packages/{}/{}'.format(repo_name, package_name)
+        pkg_dir = self.home_dir / f'packages/{repo_name}/{package_name}'
         (pkg_dir / 'pearl-config').mkdir(parents=True)
 
         hooks_sh = pkg_dir / 'pearl-config/hooks.sh'

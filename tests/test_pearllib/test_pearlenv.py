@@ -102,7 +102,7 @@ def test_package_builder(tmp_path, packages_info):
             package_info = packages_info[repo_name][pkg_name]
             assert package_info['name'] == actual_package.name
             assert package_info['repo_name'] == actual_package.repo_name
-            assert '{}/{}'.format(package_info['repo_name'], package_info['name']) == actual_package.full_name
+            assert f"{package_info['repo_name']}/{package_info['name']}" == actual_package.full_name
             assert package_info['url'] == actual_package.url
             assert package_info['description'] == actual_package.description
             assert package_info['homepage'] == actual_package.homepage
@@ -113,8 +113,8 @@ def test_package_builder(tmp_path, packages_info):
             for pkg_dep_name in package_info['depends']:
                 assert pkg_dep_name in [dep.full_name for dep in actual_package.depends]
 
-            assert str(actual_package.dir) == str(tmp_path / 'packages/{}'.format(actual_package.full_name))
-            assert str(actual_package.vardir) == str(tmp_path / 'var/{}'.format(actual_package.full_name))
+            assert str(actual_package.dir) == str(tmp_path / f'packages/{actual_package.full_name}')
+            assert str(actual_package.vardir) == str(tmp_path / f'var/{actual_package.full_name}')
 
 
 @pytest.mark.parametrize(
@@ -164,7 +164,7 @@ def test_pearl_env_home_not_directory(tmp_path):
 
 def test_config_filename():
     assert PearlEnvironment._get_config_filename(Path('/myhome2/pearl.conf'), False) == Path('/myhome2/pearl.conf')
-    assert PearlEnvironment._get_config_filename(None, False) == Path('{}/.config/pearl/pearl.conf'.format(os.environ['HOME']))
+    assert PearlEnvironment._get_config_filename(None, False) == Path(f"{os.environ['HOME']}/.config/pearl/pearl.conf")
 
 
 def test_config_filename_does_not_exist():

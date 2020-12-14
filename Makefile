@@ -108,7 +108,7 @@ install-conda: clean-conda ## install conda
 	./bin/install-conda.sh
 	$(CONDA_EXE) update --yes conda
 
-PYTHON_VERSION ?= 3.5
+PYTHON_VERSION ?= 3.6
 init-env-conda: ## init the conda environment
 	$(CONDA_EXE) create --yes -n pearl python=$(PYTHON_VERSION)
 	$(CONDA_EXE) install --yes -n pearl -c conda-forge conda-wrappers

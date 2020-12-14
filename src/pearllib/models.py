@@ -60,7 +60,7 @@ class Package:
 
     @property
     def full_name(self) -> str:
-        return '{}/{}'.format(self.repo_name, self.name)
+        return f'{self.repo_name}/{self.name}'
 
     @property
     def url(self) -> str:
@@ -96,11 +96,11 @@ class Package:
 
     @property
     def dir(self) -> Path:
-        return self._pearl_home / 'packages/{}'.format(self.full_name)
+        return self._pearl_home / f'packages/{self.full_name}'
 
     @property
     def vardir(self) -> Path:
-        return self._pearl_home / 'var/{}'.format(self.full_name)
+        return self._pearl_home / f'var/{self.full_name}'
 
     def add_depend(self, package: 'Package'):
         self._depends = self._depends + (package,)
@@ -128,7 +128,7 @@ class Package:
         # This information is always computed given that it can change over the time
         # (i.e. when replacing URL repo from local to git and vice versa)
         package_dir_url = run_bash(
-            "git -C {} config remote.origin.url".format(self.dir),
+            f"git -C {self.dir} config remote.origin.url",
             check=False, capture_stdout=True
         ).stdout.strip()
         return package_dir_url
@@ -146,7 +146,7 @@ class Package:
         # This information is always computed given that it can change over the time
         # (i.e. when replacing URL repo from local to git and vice versa)
         return run_bash(
-            "git -C {} rev-parse --is-inside-work-tree".format(self.dir),
+            f"git -C {self.dir} rev-parse --is-inside-work-tree",
             capture_stdout=True, capture_stderr=True, check=False
         ).stdout.strip() == "true"
 
@@ -154,7 +154,7 @@ class Package:
         return self.url.startswith('/')
 
     def __repr__(self):
-        return "Package({})".format(self.full_name)
+        return f"Package({self.full_name})"
 
     def __str__(self):
         return self.full_name

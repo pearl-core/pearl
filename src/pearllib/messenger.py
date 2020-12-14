@@ -36,19 +36,19 @@ class Messenger:
         self.logger.info(message)
 
     def debug(self, message):
-        self.logger.debug('{}{}{}'.format(Color.GREEN, message, Color.NORMAL))
+        self.logger.debug(f'{Color.GREEN}{message}{Color.NORMAL}')
 
     def info(self, message):
-        self.logger.info('{}{}{}'.format(Color.CYAN, message, Color.NORMAL))
+        self.logger.info(f'{Color.CYAN}{message}{Color.NORMAL}')
 
     def warn(self, message):
-        self.logger.warning('{}{}{}'.format(Color.YELLOW, message, Color.NORMAL))
+        self.logger.warning(f'{Color.YELLOW}{message}{Color.NORMAL}')
 
     def error(self, message):
-        self.logger.error('{}{}{}'.format(Color.RED, message, Color.NORMAL))
+        self.logger.error(f'{Color.RED}{message}{Color.NORMAL}')
 
     def exception(self, message):
-        self.logger.exception('{}{}{}'.format(Color.RED, message, Color.NORMAL))
+        self.logger.exception(f'{Color.RED}{message}{Color.NORMAL}')
 
 
 messenger = Messenger()

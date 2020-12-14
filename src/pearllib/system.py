@@ -16,11 +16,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     Initializes the Pearl environment by setting up the PEARL_HOME files and directories and the `pearl.conf` file.
     """
     messenger.print(
-        '{cyan}* {normal}Setting up $PEARL_HOME directory as {home}'.format(
-            cyan=Color.CYAN,
-            normal=Color.NORMAL,
-            home=pearl_env.home,
-        )
+        f'{Color.CYAN}* {Color.NORMAL}Setting up $PEARL_HOME directory as {pearl_env.home}'
     )
 
     (pearl_env.home / 'bin').mkdir(parents=True, exist_ok=True)
@@ -36,77 +32,50 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
 
     if not pearl_env.config_filename.exists():
         messenger.print(
-            '{cyan}* {normal}Creating the Pearl configuration file {configfile} from template $PEARL_HOME'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-                configfile=pearl_env.config_filename,
-            )
+            f'{Color.CYAN}* {Color.NORMAL}Creating the Pearl configuration file {pearl_env.config_filename} from template $PEARL_HOME'
         )
         pearl_env.config_filename.parent.mkdir(parents=True, exist_ok=True)
         pearl_conf_template = static / 'templates/pearl.conf.template'
         shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
 
     apply(
-        "source {home}/boot/sh/pearl.sh".format(
-            home=pearl_env.home,
-        ),
-        "{}/.bashrc".format(os.environ['HOME'])
+        f"source {pearl_env.home}/boot/sh/pearl.sh",
+        f"{os.environ['HOME']}/.bashrc"
     )
     messenger.print(
-        '{cyan}* {normal}Activated Pearl for Bash'.format(
-            cyan=Color.CYAN,
-            normal=Color.NORMAL,
-        )
+        f'{Color.CYAN}* {Color.NORMAL}Activated Pearl for Bash'
     )
 
     apply(
-        "source {home}/boot/sh/pearl.sh".format(
-            home=pearl_env.home,
-        ),
-        "{}/.zshrc".format(os.environ['HOME'])
+        f"source {pearl_env.home}/boot/sh/pearl.sh",
+        f"{os.environ['HOME']}/.zshrc"
     )
     messenger.print(
-        '{cyan}* {normal}Activated Pearl for Zsh'.format(
-            cyan=Color.CYAN,
-            normal=Color.NORMAL,
-        )
+        f'{Color.CYAN}* {Color.NORMAL}Activated Pearl for Zsh'
     )
 
     apply(
-        "source {home}/boot/fish/pearl.fish".format(
-            home=pearl_env.home,
-        ),
-        '{}/.config/fish/config.fish'.format(os.environ['HOME'])
+        f"source {pearl_env.home}/boot/fish/pearl.fish",
+        f"{os.environ['HOME']}/.config/fish/config.fish"
     )
     messenger.print(
-        '{cyan}* {normal}Activated Pearl for Fish shell'.format(
-            cyan=Color.CYAN,
-            normal=Color.NORMAL,
-        )
+        f'{Color.CYAN}* {Color.NORMAL}Activated Pearl for Fish shell'
     )
 
     apply(
-        "source {home}/boot/vim/pearl.vim".format(
-            home=pearl_env.home,
-        ),
-        "{}/.vimrc".format(os.environ['HOME'])
+        f"source {pearl_env.home}/boot/vim/pearl.vim",
+        f"{os.environ['HOME']}/.vimrc"
     )
     messenger.print(
-        '{cyan}* {normal}Activated Pearl for Vim editor'.format(
-            cyan=Color.CYAN,
-            normal=Color.NORMAL,
-        )
+        f'{Color.CYAN}* {Color.NORMAL}Activated Pearl for Vim editor'
     )
 
     apply(
-        "(load-file \"{home}/boot/emacs/pearl.el\")".format(home=pearl_env.home),
-        "{}/.emacs".format(os.environ['HOME'])
+        f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")",
+        f"{os.environ['HOME']}/.emacs"
     )
     messenger.print(
-        '{cyan}* {normal}Activated Pearl for Emacs editor'.format(
-            cyan=Color.CYAN,
-            normal=Color.NORMAL,
-        )
+        f'{Color.CYAN}* {Color.NORMAL}Activated Pearl for Emacs editor'
     )
 
     messenger.info('')
@@ -122,7 +91,7 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
     """
     for repo_name, repo_packages in pearl_env.packages.items():
         if ask(
-            "Are you sure to REMOVE all the installed packages in {} repository?".format(repo_name),
+            f"Are you sure to REMOVE all the installed packages in {repo_name} repository?",
             yes_as_default_answer=False, no_confirm=args.no_confirm
         ):
             package_list = []
@@ -137,64 +106,44 @@ def remove_pearl(pearl_env: PearlEnvironment, args: Namespace):
         yes_as_default_answer=False, no_confirm=args.no_confirm
     ):
         unapply(
-            "source {home}/boot/sh/pearl.sh".format(
-                home=pearl_env.home,
-            ),
-            "{}/.bashrc".format(os.environ['HOME'])
+            f"source {pearl_env.home}/boot/sh/pearl.sh",
+            f"{os.environ['HOME']}/.bashrc"
         )
         messenger.print(
-            '{cyan}* {normal}Deactivated Pearl for Bash'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-            )
+            f'{Color.CYAN}* {Color.NORMAL}Deactivated Pearl for Bash'
         )
 
         unapply(
-            "source {home}/boot/sh/pearl.sh".format(
-                home=pearl_env.home,
-            ),
-            "{}/.zshrc".format(os.environ['HOME'])
+            f"source {pearl_env.home}/boot/sh/pearl.sh",
+            f"{os.environ['HOME']}/.zshrc"
         )
         messenger.print(
-            '{cyan}* {normal}Deactivated Pearl for Zsh'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-            )
+            f'{Color.CYAN}* {Color.NORMAL}Deactivated Pearl for Zsh'
         )
 
         unapply(
-            "source {home}/boot/fish/pearl.fish".format(
-                home=pearl_env.home,
-            ),
-            '{}/.config/fish/config.fish'.format(os.environ['HOME'])
+            f"source {pearl_env.home}/boot/fish/pearl.fish",
+            f"{os.environ['HOME']}/.config/fish/config.fish"
         )
         messenger.print(
-            '{cyan}* {normal}Deactivated Pearl for Fish shell'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-            )
+            f'{Color.CYAN}* {Color.NORMAL}Deactivated Pearl for Fish shell'
         )
 
         unapply(
-            "source {home}/boot/vim/pearl.vim".format(home=pearl_env.home),
-            "{}/.vimrc".format(os.environ['HOME'])
+            f"source {pearl_env.home}/boot/vim/pearl.vim",
+            f"{os.environ['HOME']}/.vimrc"
         )
         messenger.print(
-            '{cyan}* {normal}Deactivated Pearl for Vim editor'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-            )
+            f'{Color.CYAN}* {Color.NORMAL}Deactivated Pearl for Vim editor'
         )
 
         unapply(
-            "(load-file \"{home}/boot/emacs/pearl.el\")".format(home=pearl_env.home),
-            "{}/.emacs".format(os.environ['HOME'])
+            f"(load-file \"{pearl_env.home}/boot/emacs/pearl.el\")",
+            f"{os.environ['HOME']}/.emacs"
         )
         messenger.print(
-            '{cyan}* {normal}Deactivated Pearl for Emacs editor'.format(
-                cyan=Color.CYAN,
-                normal=Color.NORMAL,
-            )
+            f'{Color.CYAN}* {Color.NORMAL}Deactivated Pearl for Emacs editor'
+
         )
 
     if ask(

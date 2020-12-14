@@ -56,7 +56,7 @@ def _create_main_parser():
              "-vv shows bash xtrace during the hook function execution."
     )
     version = pkg_resources.require("pearl")[0].version
-    parser.add_argument('--version', '-V', action='version', version='%(prog)s {}'.format(version))
+    parser.add_argument('--version', '-V', action='version', version=f'%(prog)s {version}')
     return parser
 
 
@@ -106,7 +106,7 @@ def _create_info_parser(command_parsers):
         help='Provide information about packages'
     )
     parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='*'
+        'packages', metavar='[repo/]package', type=str, nargs='+'
     )
 
 
@@ -131,6 +131,16 @@ def _create_search_parser(command_parsers):
         action='store_true',
         help="List the package names only"
     )
+    parser.add_argument(
+        '-t', '--dependency-tree',
+        action='store_true',
+        help="Sort packages by dependency tree order"
+    )
+    parser.add_argument(
+        '-i', '--installed-only',
+        action='store_true',
+        help="Show only installed packages"
+    )
 
 
 def _create_list_parser(command_parsers):
@@ -142,6 +152,16 @@ def _create_list_parser(command_parsers):
         '-p', '--package-only',
         action='store_true',
         help="List the package names only"
+    )
+    parser.add_argument(
+        '-t', '--dependency-tree',
+        action='store_true',
+        help="Sort packages by dependency tree order"
+    )
+    parser.add_argument(
+        '-i', '--installed-only',
+        action='store_true',
+        help="Show only installed packages"
     )
 
 
