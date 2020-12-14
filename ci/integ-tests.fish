@@ -13,6 +13,16 @@ set -x PEARL_ROOT $argv[1]
 set -x PEARL_HOME "$HOME/.local/share/pearl"
 set -x PATH $PEARL_ROOT/bin $PATH
 
+# Disabling vim since it hangs on OSX
+# https://stackoverflow.com/questions/46432027/bash-kill-vim-when-vim-warning-output-not-to-a-terminal
+mkdir -p $HOME/bin
+set -x PATH $HOME/bin $PATH
+echo > $HOME/bin/vim "\
+#!/bin/sh
+echo vim_mock \$@
+exit"
+chmod +x $HOME/bin/vim
+
 function pearl_remove_home --on-process-exit %self
     rm -fr $PEARL_HOME
 end
@@ -52,7 +62,7 @@ pearl list
 
 info Install ALL pearl packages
 for package in (pearl list --package-only)
-    pearl info
+    pearl info $package
     pearl -vv --no-confirm emerge $package; or die "Error on pearl install $package"
     [ -d "$PEARL_HOME/packages/$package" ]; or die "$PEARL_HOME/packages/$package does not exist"
 end

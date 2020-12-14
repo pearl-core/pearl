@@ -106,7 +106,7 @@ def _create_info_parser(command_parsers):
         help='Provide information about packages'
     )
     parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='*'
+        'packages', metavar='[repo/]package', type=str, nargs='+'
     )
 
 

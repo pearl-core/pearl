@@ -15,6 +15,17 @@ export PEARL_ROOT="$1"
 export PEARL_HOME="${HOME}/.local/share/pearl"
 export PATH=$PEARL_ROOT/bin:$PATH
 
+# Disabling vim since it hangs on OSX
+# https://stackoverflow.com/questions/46432027/bash-kill-vim-when-vim-warning-output-not-to-a-terminal
+mkdir -p $HOME/bin
+export PATH=$HOME/bin:$PATH
+cat <<EOF >> $HOME/bin/vim
+#!/bin/sh
+echo vim_mock \$@
+exit
+EOF
+chmod +x $HOME/bin/vim
+
 # In later versions of Travis the signals are not recognized in zsh: QUIT TERM KILL ABRT
 # https://travis-ci.org/pearl-core/pearl/jobs/540316660
 trap "rm -rf ${PEARL_HOME}/" EXIT
@@ -42,7 +53,6 @@ pearl init
 info "Creating local pearl package"
 pearl create test $HOME/test
 pearl search test
-pearl info test
 
 info "Listing all pearl packages"
 pearl list
@@ -50,7 +60,7 @@ pearl list
 info Install ALL pearl packages
 for package in $(pearl list --package-only)
 do
-    pearl info
+    pearl info ${package}
     pearl -vv --no-confirm emerge ${package}
     [[ -d "$PEARL_HOME/packages/$package" ]] || { echo "$PEARL_HOME/packages/$package does not exist"; exit 6; }
 done
