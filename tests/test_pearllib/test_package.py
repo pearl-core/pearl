@@ -106,7 +106,11 @@ def test_install_package_git(tmp_path):
     with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock:
         install_package(pearl_env, package, PackageArgs())
 
-        # TODO improve test
+        expected_calls = [
+            mock.call(f'\ninstall_git_repo https://github.com/pkg {tmp_path}/home/packages/repo-test/pkg-test "" true\n', pearl_env, input=None),
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None)
+        ]
+        run_mock.assert_has_calls(expected_calls)
         assert run_mock.call_count == 2
         assert (home_dir / 'var/repo-test/pkg-test').is_dir()
 
@@ -267,10 +271,17 @@ def test_update_package_git_url_not_changed(tmp_path):
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash"), \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
         update_package(pearl_env, package, PackageArgs())
+
+        expected_calls = [
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None),
+            mock.call(f'\nupdate_git_repo {tmp_path}/home/packages/repo-test/pkg-test "" true\n', pearl_env, input=None),
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None)
+        ]
+        run_mock.assert_has_calls(expected_calls)
 
         assert remove_mock.call_count == 0
         assert install_mock.call_count == 0
@@ -290,11 +301,17 @@ def test_update_package_git_url_changed(tmp_path):
     package = packages['repo-test']['pkg-test']
     pearl_env = create_pearl_env(home_dir, packages)
 
-    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash"), \
+    with mock.patch(_MODULE_UNDER_TEST + ".run_pearl_bash") as run_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".remove_package") as remove_mock, \
             mock.patch(_MODULE_UNDER_TEST + ".install_package") as install_mock:
         update_package(pearl_env, package, PackageArgs())
 
+        expected_calls = [
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None),
+            mock.call(f'\nupdate_git_repo {tmp_path}/home/packages/repo-test/pkg-test "" true\n', pearl_env, input=None),
+            mock.call(mock.ANY, pearl_env, enable_errexit=True, enable_xtrace=False, input=None)
+        ]
+        run_mock.assert_has_calls(expected_calls)
         assert remove_mock.call_count == 1
         assert install_mock.call_count == 1
 
