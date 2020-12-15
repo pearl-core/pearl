@@ -2,12 +2,18 @@
 # Usage: source pearl.fish
 # vim: set ft=fish ts=4 sw=4 noet:
 
+####################### FUNCTIONS ############################
+function add_to_path
+    set -l pathname (realpath -m -s $argv[1])
+    if not contains $pathname $PATH
+        set -x PATH $PATH $pathname
+    end
+end
+
 ####################### VARIABLES & IMPORTS ############################
 set -x PEARL_HOME $HOME/.local/share/pearl
 
-if not contains $PEARL_HOME/bin $PATH
-    set PATH $PATH $PEARL_HOME/bin
-end
+add_to_path $PEARL_HOME/bin
 
 ################################# MAIN ##############################
 if command -v pearl > /dev/null

@@ -220,25 +220,16 @@ Any other AUR helpers can be found [here](https://wiki.archlinux.org/index.php/A
 ### Other Linux distributions
 
 Assuming all Pearl [dependencies](#dependencies) are properly installed
-in the system, to install Pearl you can use the `pip` command.
-Unless there is a specific use case, it is not a good option to use virtual environments such as
-`virtualenv` or `conda` because otherwise Pearl will be only visible within that environment.
-It is recommended to use the system-wide `pip` which is generally located in `/usr/bin/pip`.
-The following commands will install the package in your `$HOME` directory (`~/.local/`):
-```
-$> /usr/bin/pip install --user pearl
-```
+in the system, to install Pearl you can use the `pip` command:
 
-`pearl` command path location **must** be under `PATH` variable. For instance, to add it to bash shell:
 ```
-$> echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
-$> source $HOME/.bashrc
-```
-
-To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
-```
+$> sudo /usr/bin/pip install pearl
 $> pearl init
 ```
+
+`pearl` executable will be located to `/usr/bin`.
+The idempotent `init` command will create the `$PEARL_HOME` directory and
+the new pearl configuration files from template.
 
 OSX
 ---
@@ -250,21 +241,15 @@ $> brew update
 $> brew install bash git coreutils grep gnu-sed python
 ```
 
-The following will install the package under `/usr/local`:
-```
+To install Pearl you can use the `pip` command:
+```sh
 $> pip3 install pearl
-```
-
-`pearl` command **must** be under PATH variable. For instance, to add it to bash shell:
-```
-$> echo 'export PATH="/usr/local/bin:$PATH"' >> $HOME/.bashrc
-$> source $HOME/.bashrc
-```
-
-To create the `$PEARL_HOME` directory and the new pearl configuration file from template, run: 
-```
 $> pearl init
 ```
+
+`pearl` executable will be located to `/usr/local/bin`.
+The idempotent `init` command will create the `$PEARL_HOME` directory and
+the new pearl configuration files from template.
 
 **IMPORTANT NOTE**: Pearl gets loaded through `~/.bashrc`. The problem is that in OSX,
 the terminal opens a login shell and only `~/.bash_profile` will get executed.

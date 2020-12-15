@@ -1,5 +1,10 @@
 # Change Log #
 
+## [2.3.6][v236] - 2020-12-16 ##
+
+* Add `add_to_path` function to sh and fish boot scripts
+* Improve README installation section
+
 ## [2.3.5][v235] - 2020-12-14 ##
 
 * Source `config.*` files according to dependency tree order
@@ -299,3 +304,4 @@
 [v233]: https://github.com/pearl-core/pearl/releases/tag/2.3.3
 [v234]: https://github.com/pearl-core/pearl/releases/tag/2.3.4
 [v235]: https://github.com/pearl-core/pearl/releases/tag/2.3.5
+[v236]: https://github.com/pearl-core/pearl/releases/tag/2.3.6
