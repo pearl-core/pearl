@@ -1,13 +1,21 @@
 # Usage: source pearl OR in Bash: bash --rcfile pearl
 # vim: set ft=sh ts=4 sw=4 noet:
 
+####################### FUNCTIONS ############################
+function add_to_path() {
+    local pathname="$(realpath -m -s "$1")"
+    if [[ $PATH != *"${pathname}"* ]]
+    then
+        export PATH=$PATH:${pathname}
+    fi
+
+    return 0
+}
+
 ####################### VARIABLES & IMPORTS ############################
 export PEARL_HOME=${XDG_DATA_HOME:="$HOME/.local/share"}/pearl
 
-if [[ $PATH != *"${PEARL_HOME}/bin"* ]]
-then
-    PATH=$PATH:${PEARL_HOME}/bin
-fi
+add_to_path "${PEARL_HOME}/bin"
 
 ################################# MAIN ##############################
 if command -v pearl > /dev/null; then
@@ -25,19 +33,19 @@ if command -v pearl > /dev/null; then
             if [[ -n ${PEARL_DEBUG} ]]; then
                 echo "Running ${PEARL_PKGDIR}/pearl-config/config.sh..."
             fi
-            source ${PEARL_PKGDIR}/pearl-config/config.sh
+            source "${PEARL_PKGDIR}/pearl-config/config.sh"
         fi
         if [[ -n "$BASH" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.bash ]]; then
             if [[ -n ${PEARL_DEBUG} ]]; then
                 echo "Running ${PEARL_PKGDIR}/pearl-config/config.bash..."
             fi
-            source ${PEARL_PKGDIR}/pearl-config/config.bash
+            source "${PEARL_PKGDIR}/pearl-config/config.bash"
         fi
         if [[ -n "$ZSH_NAME" ]] && [[ -e ${PEARL_PKGDIR}/pearl-config/config.zsh ]]; then
             if [[ -n ${PEARL_DEBUG} ]]; then
                 echo "Running ${PEARL_PKGDIR}/pearl-config/config.zsh..."
             fi
-            source ${PEARL_PKGDIR}/pearl-config/config.zsh
+            source "${PEARL_PKGDIR}/pearl-config/config.zsh"
         fi
         unset PEARL_PKGDIR PEARL_PKGVARDIR PEARL_PKGNAME PEARL_PKGREPONAME
         unset reponame pkgname
