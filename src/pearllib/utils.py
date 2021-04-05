@@ -58,7 +58,9 @@ def run_bash(
         check: bool = True, input: str = None
 ):
     return subprocess.run(
-        ['/usr/bin/env', 'bash', '-c', script],
+        # Important: --norc is required here given that bash, in some system, calls the rc file.
+        # This causes a circular dependency (bash will run the rc pearl file which spawn a new pearl process).
+        ['/usr/bin/env', 'bash', '--norc', '-c', script],
         check=check,
         stdout=subprocess.PIPE if capture_stdout else None,
         stderr=subprocess.PIPE if capture_stderr else None,
