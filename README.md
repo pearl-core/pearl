@@ -10,7 +10,7 @@ Pearl
 
 |Project Status|Donation|Communication|
 |:-----------:|:--------:|:-----------:|
-|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) [![PyPi downloads](https://img.shields.io/pypi/dm/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 **Table of Contents**
 - [Description](#description)
@@ -195,9 +195,10 @@ All the Linux distributions have these dependencies already installed.
 - [grep](https://www.gnu.org/software/grep/) 
 - [sed](https://www.gnu.org/software/sed/) 
 
-### Additional shells supported
-Pearl supports also the following shells:
+### Shells supported
+Pearl supports the following shells:
 
+- [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
 
@@ -223,11 +224,12 @@ Assuming all Pearl [dependencies](#dependencies) are properly installed
 in the system, to install Pearl you can use the `pip` command:
 
 ```
-$> sudo /usr/bin/pip install pearl
+$> sudo python3 -m pip install pearl
 $> pearl init
 ```
 
-`pearl` executable will be located to `/usr/bin`.
+Make sure to update `PATH` environment variable if needed
+(`pearl` is typically located to `/usr/bin`).
 The idempotent `init` command will create the `$PEARL_HOME` directory and
 the new pearl configuration files from template.
 
@@ -247,7 +249,8 @@ $> pip3 install pearl
 $> pearl init
 ```
 
-`pearl` executable will be located to `/usr/local/bin`.
+Make sure to update `PATH` environment variable if needed
+(`pearl` is typically located to `/usr/bin`).
 The idempotent `init` command will create the `$PEARL_HOME` directory and
 the new pearl configuration files from template.
 
