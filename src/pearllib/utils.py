@@ -138,7 +138,8 @@ def ask(prompt: str, yes_as_default_answer: bool = False, no_confirm: bool = Fal
 
     answer = None
     while answer not in ['Y', 'N']:
-        answer = input(messenger.info(f'{prompt} ({default_answer}/{other_answer})')).upper()
+        messenger.info(f'{prompt} ({default_answer}/{other_answer})')
+        answer = input("> ").upper()
         if not answer:
             answer = default_answer
 
