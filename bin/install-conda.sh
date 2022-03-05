@@ -21,5 +21,5 @@ CONDA_DIR="${HOME}/miniconda3"
 
 wget --quiet https://repo.continuum.io/miniconda/${MINICONDA_FILE}
 echo "${MINICONDA_HASH} *${MINICONDA_FILE}" | sha256sum -c -
-/usr/bin/env bash ${MINICONDA_FILE} -f -b -p ${CONDA_DIR}
+/usr/bin/env bash ${MINICONDA_FILE} -f -b -p "${CONDA_DIR}"
 rm ${MINICONDA_FILE}

@@ -71,6 +71,9 @@ test: ## run tests quickly with the default Python
 test-all: ## run tests on every Python version with tox
 	$(TOX)
 
+shellcheck:
+	shellcheck bin/*.sh src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh
+
 coverage: ## check code coverage quickly with the default Python
 	$(COVERAGE) run --source pearllib -m pytest
 	$(COVERAGE) report -m

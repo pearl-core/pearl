@@ -45,11 +45,13 @@ script:
   - zsh --version
   - fish --version
   - make lint
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make shellcheck; fi;
   - make test
   - pearl --help
   - bash ./ci/integ-tests.sh $PWD
   - zsh ./ci/integ-tests.sh $PWD
   - fish ./ci/integ-tests.fish $PWD
+
 
 after_success:
   - ./ci/deploy.sh
