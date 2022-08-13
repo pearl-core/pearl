@@ -120,8 +120,8 @@ create-conda-wrappers: ## create wrapper executables to be accessible outside th
 	$(CONDA_ENV_DIR)/bin/create-wrappers -t conda -b $(CONDA_ENV_DIR)/bin -d $(CONDA_ENV_DIR)/bin/wrappers/ --conda-env-dir $(CONDA_ENV_DIR)
 
 upgrade: ## upgrades all dependencies
-	$(PIP) install --upgrade -r requirements-dev.in
+	$(PIP) install --upgrade --ignore-installed certifi -r requirements-dev.in
 	$(PIP) freeze | grep -v pearl > requirements-dev.txt
 
 install: clean ## install the package to the active Python's site-packages
-	$(PIP) install -e .[dev]
+	$(PIP) install --ignore-installed certifi -e .[dev]
