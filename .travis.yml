@@ -49,8 +49,8 @@ script:
   - make test
   - pearl --help
   - bash ./ci/integ-tests.sh $PWD
-  - zsh ./ci/integ-tests.sh $PWD
-  - fish ./ci/integ-tests.fish $PWD
+  #- zsh ./ci/integ-tests.sh $PWD
+  #- fish ./ci/integ-tests.fish $PWD
 
 
 after_success:
