@@ -1,3 +1,5 @@
+import sys
+
 from enum import Enum
 from pathlib import Path
 from typing import List
@@ -105,3 +107,11 @@ def pearl(sys_args: list, pearl_home_dir: Path = None):
         else:
             messenger.error(message)
         exit(ex.exit_status)
+
+
+def main():
+    pearl(sys.argv[1:])
+
+
+if __name__ == '__main__':
+    main()
