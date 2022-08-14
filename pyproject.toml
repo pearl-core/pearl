@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "pearl"
+version = "2.3.7"
+description="Pearl is a lightweight package manager for automating reproducible environments between different systems (Linux and OSX). It can be used for dotfiles, plugins, programs and any form of code accessible via git."
+authors = ["Filippo Squillace <feel.sqoox@amazon.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+homepage = "http://github.com/pearl-core/pearl"
+repository = "homepage"
+keywords=['pearl', 'shell', 'dotfiles', 'package manager']
+# https://pypi.org/classifiers/
+classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    'Natural Language :: English',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    'Topic :: Software Development :: Build Tools',
+    "Topic :: System :: Software Distribution",
+    "Topic :: System :: Shells",
+    "Topic :: Utilities",
+]
+packages = [
+    { include = "pearllib", from = "src" },
+]
+
+
+[tool.poetry.scripts]
+pearl = "pearllib.pearl:main"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+coverage = "^6.4.3"
+flake8 = "^5.0.4"
+tox = "^3.25.1"
+twine = "^4.0.1"
+watchdog = "^2.1.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
