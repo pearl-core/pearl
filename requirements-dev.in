@@ -1,8 +1,0 @@
-coverage
-flake8
-pip
-pytest
-Sphinx
-tox
-twine
-watchdog

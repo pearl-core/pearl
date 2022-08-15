@@ -1,4 +1,3 @@
-
 class PearlError(RuntimeError):
     def __init__(self, message, exit_status):
         super().__init__(message)

@@ -1,16 +1,16 @@
-
-import pkg_resources
-import subprocess
 import shutil
-
+import subprocess
 from collections import OrderedDict
 from pathlib import Path
-from typing import Sequence, Any
 from textwrap import dedent
+from typing import Any, Sequence
+
+import pkg_resources
 
 from pearllib.messenger import messenger
 
-_BASH_SCRIPT_HEADER_TEMPLATE = dedent("""
+_BASH_SCRIPT_HEADER_TEMPLATE = dedent(
+    """
 set -o pipefail
 
 PEARL_HOME="{pearlhome}"
@@ -24,43 +24,56 @@ source "{static}"/builtins/utils.sh
 # For OSX: Update PATH with GNU coreutils, sed and grep executables
 osx_update_path
 
-""")
+"""
+)
 
 
 def run_pearl_bash(
-        script: str, pearl_env,
-        capture_stdout: bool = False, capture_stderr: bool = False,
-        check: bool = True,
-        input: str = None,
-        enable_xtrace: bool = False,
-        enable_errexit: bool = True,
+    script: str,
+    pearl_env,
+    capture_stdout: bool = False,
+    capture_stderr: bool = False,
+    check: bool = True,
+    input: str = None,
+    enable_xtrace: bool = False,
+    enable_errexit: bool = True,
 ):
     """Runs a bash script within the Pearl ecosystem."""
 
     bash_header = _BASH_SCRIPT_HEADER_TEMPLATE.format(
         pearlhome=pearl_env.home,
-        static=pkg_resources.resource_filename('pearllib', 'static/'),
+        static=pkg_resources.resource_filename("pearllib", "static/"),
     )
-    script_template = '{bashheader}\nset -x\n{script}' if enable_xtrace else '{bashheader}\n{script}'
+    script_template = (
+        "{bashheader}\nset -x\n{script}" if enable_xtrace else "{bashheader}\n{script}"
+    )
     if enable_errexit:
-        script_template = f'set -e\n{script_template}'
+        script_template = f"set -e\n{script_template}"
 
     script = script_template.format(
         bashheader=bash_header,
         script=script,
     )
-    return run_bash(script, capture_stdout=capture_stdout, capture_stderr=capture_stderr, check=check, input=input)
+    return run_bash(
+        script,
+        capture_stdout=capture_stdout,
+        capture_stderr=capture_stderr,
+        check=check,
+        input=input,
+    )
 
 
 def run_bash(
-        script: str,
-        capture_stdout: bool = False, capture_stderr: bool = False,
-        check: bool = True, input: str = None
+    script: str,
+    capture_stdout: bool = False,
+    capture_stderr: bool = False,
+    check: bool = True,
+    input: str = None,
 ):
     return subprocess.run(
         # Important: --norc is required here given that bash, in some system, calls the rc file.
         # This causes a circular dependency (bash will run the rc pearl file which spawn a new pearl process).
-        ['/usr/bin/env', 'bash', '--norc', '-c', script],
+        ["/usr/bin/env", "bash", "--norc", "-c", script],
         check=check,
         stdout=subprocess.PIPE if capture_stdout else None,
         stderr=subprocess.PIPE if capture_stderr else None,
@@ -70,12 +83,12 @@ def run_bash(
 
 
 def verify_git_dep():
-    git_version_min = 'git version 1.8.5'
+    git_version_min = "git version 1.8.5"
     obj = run_bash("git version", capture_stdout=True, check=False)
     git_version = obj.stdout.strip() if obj.stdout else None
     git_status = obj.returncode
     if git_status == 127:
-        raise EnvironmentError('The command git has not been found. Exiting...')
+        raise EnvironmentError("The command git has not been found. Exiting...")
 
     if git_version < git_version_min:
         messenger.warn(
@@ -92,11 +105,9 @@ def verify_bash_dep():
     bash_version = obj.stdout.strip() if obj.stdout else None
     bash_status = obj.returncode
     if bash_status == 127:
-        raise EnvironmentError('The command bash has not been found. Exiting...')
+        raise EnvironmentError("The command bash has not been found. Exiting...")
     if bash_version is None:
-        messenger.warn(
-            "Warn: The BASH_VERSION environment variable is not defined"
-        )
+        messenger.warn("Warn: The BASH_VERSION environment variable is not defined")
         return False
     elif bash_version < bash_version_min:
         messenger.warn(
@@ -116,7 +127,7 @@ def check_and_copy(src_dir: Path, dst_dir: Path):
     Checks if src_dir exists and removes the dst_dir content before copying.
     """
     if not src_dir.is_dir():
-        raise NotADirectoryError(f'{src_dir} is not a directory')
+        raise NotADirectoryError(f"{src_dir} is not a directory")
     shutil.rmtree(str(dst_dir))
     shutil.copytree(str(src_dir), str(dst_dir))
 
@@ -137,8 +148,8 @@ def ask(prompt: str, yes_as_default_answer: bool = False, no_confirm: bool = Fal
         other_answer = "y"
 
     answer = None
-    while answer not in ['Y', 'N']:
-        messenger.info(f'{prompt} ({default_answer}/{other_answer})')
+    while answer not in ["Y", "N"]:
+        messenger.info(f"{prompt} ({default_answer}/{other_answer})")
         answer = input("> ").upper()
         if not answer:
             answer = default_answer
@@ -161,7 +172,7 @@ def apply(line: str, filename: str):
         path.touch()
     with path.open("r+") as f:
         content = f.read()
-        if line not in content.split('\n'):
+        if line not in content.split("\n"):
             f.seek(0)
             f.write(f"{line}\n{content}")
 
@@ -178,14 +189,14 @@ def unapply(line: str, filename: str):
     if not path.exists():
         return
     with path.open("r+") as f:
-        writeable_content = f.read().replace(line + '\n', '').replace(line, "")
+        writeable_content = f.read().replace(line + "\n", "").replace(line, "")
     with path.open("w") as f:
         f.write(writeable_content)
 
 
 class OrderedSet:
     def __init__(self, sequence: Sequence = ()):
-        self._set = OrderedDict()
+        self._set: dict = OrderedDict()
         self.update(sequence)
 
     def add(self, obj: Any):

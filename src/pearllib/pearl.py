@@ -1,32 +1,30 @@
 import sys
-
 from enum import Enum
 from pathlib import Path
 from typing import List
 
 import pearllib.package as pack
 import pearllib.system as syst
-from pearllib.exceptions import PearlError, RepoDoesNotExistError, PackageNotInRepoError
+from pearllib.exceptions import PackageNotInRepoError, PearlError, RepoDoesNotExistError
 from pearllib.messenger import messenger
 from pearllib.parser import parse_args
-
-from pearllib.pearlenv import PearlEnvironment, Package
+from pearllib.pearlenv import Package, PearlEnvironment
 from pearllib.utils import verify_runtime_deps
 
 
 class PearlCommand(Enum):
-    INIT = 'init'
-    INSTALL = 'install'
-    UPDATE = 'update'
-    INFO = 'info'
-    CREATE = 'create'
-    EMERGE = 'emerge'
-    LIST = 'list'
-    SEARCH = 'search'
-    REMOVE = 'remove'
+    INIT = "init"
+    INSTALL = "install"
+    UPDATE = "update"
+    INFO = "info"
+    CREATE = "create"
+    EMERGE = "emerge"
+    LIST = "list"
+    SEARCH = "search"
+    REMOVE = "remove"
 
     @staticmethod
-    def from_string(command: str) -> 'PearlCommand':
+    def from_string(command: str) -> "PearlCommand":
         return PearlCommand.__members__[command.upper()]
 
     def __str__(self):
@@ -50,7 +48,7 @@ def _extract_packages(pearl_env: PearlEnvironment, command: PearlCommand, args) 
 
 def _pearl(pearl_env: PearlEnvironment, args):
     command = PearlCommand.from_string(args.command)
-    if hasattr(args, 'packages'):
+    if hasattr(args, "packages"):
         args.packages = _extract_packages(pearl_env, command, args)
 
     if command == PearlCommand.INIT:
@@ -96,14 +94,14 @@ def pearl(sys_args: list, pearl_home_dir: Path = None):
             config_filename=args.config_file,
             update_repos=args.update_repos,
             verbose=args.verbose,
-            env_initialized=False if args.command == 'init' else True
+            env_initialized=False if args.command == "init" else True,
         )
 
         _pearl(pearl_env, args)
     except PearlError as ex:
         message = ex.args[0] if ex.args else None
         if args.verbose:
-            messenger.exception(f'Pearl error: {message}')
+            messenger.exception(f"Pearl error: {message}")
         else:
             messenger.error(message)
         exit(ex.exit_status)
@@ -113,5 +111,5 @@ def main():
     pearl(sys.argv[1:])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

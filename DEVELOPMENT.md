@@ -1,5 +1,14 @@
 
+## Install Requirements
+
+- Follow steps to install Poetry [here](https://python-poetry.org/docs/#installation).
+- Install [shellcheck](https://github.com/koalaman/shellcheck)
+
 # Init environment
+
+```
+make
+```
 
 The following make commands will install conda and create a conda env called `pearl`:
 

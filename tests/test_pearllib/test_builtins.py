@@ -1,5 +1,6 @@
+from test_pearllib.utils import create_pearl_env, create_pearl_home
+
 from pearllib.utils import run_pearl_bash
-from test_pearllib.utils import create_pearl_home, create_pearl_env
 
 
 def test_link_to_path_null_executable_path(tmp_path):
@@ -15,7 +16,7 @@ def test_link_to_path_null_executable_path(tmp_path):
 
 def test_link_to_path(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    (home_dir / 'bin').mkdir()
+    (home_dir / "bin").mkdir()
     pearl_env = create_pearl_env(home_dir, {})
 
     script = f"""
@@ -31,7 +32,7 @@ def test_link_to_path(tmp_path):
 
 def test_link_to_path_new_executable_name(tmp_path):
     home_dir = create_pearl_home(tmp_path)
-    (home_dir / 'bin').mkdir()
+    (home_dir / "bin").mkdir()
     pearl_env = create_pearl_env(home_dir, {})
 
     script = f"""
@@ -57,15 +58,15 @@ def test_unlink_from_path_null_executable_path(tmp_path):
 
 
 def test_unlink_from_path(tmp_path):
-    (tmp_path / 'binary').write_text("Content")
+    (tmp_path / "binary").write_text("Content")
 
     home_dir = create_pearl_home(tmp_path)
-    (home_dir / 'bin').mkdir()
-    (home_dir / 'bin/binary').symlink_to(tmp_path / 'binary')
+    (home_dir / "bin").mkdir()
+    (home_dir / "bin/binary").symlink_to(tmp_path / "binary")
 
     pearl_env = create_pearl_env(home_dir, {})
 
-    assert (home_dir / 'bin/binary').exists()
+    assert (home_dir / "bin/binary").exists()
 
     script = f"""
     unlink_from_path "{tmp_path}/binary"
@@ -74,19 +75,19 @@ def test_unlink_from_path(tmp_path):
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, check=False)
 
     assert result.returncode == 0
-    assert not (home_dir / 'bin/binary').exists()
+    assert not (home_dir / "bin/binary").exists()
 
 
 def test_unlink_from_path_new_executable_name(tmp_path):
-    (tmp_path / 'binary').write_text("Content")
+    (tmp_path / "binary").write_text("Content")
 
     home_dir = create_pearl_home(tmp_path)
-    (home_dir / 'bin').mkdir()
-    (home_dir / 'bin/new_binary').symlink_to(tmp_path / 'binary')
+    (home_dir / "bin").mkdir()
+    (home_dir / "bin/new_binary").symlink_to(tmp_path / "binary")
 
     pearl_env = create_pearl_env(home_dir, {})
 
-    assert (home_dir / 'bin/new_binary').exists()
+    assert (home_dir / "bin/new_binary").exists()
 
     script = f"""
     unlink_from_path "{tmp_path}/binary" "new_binary"
@@ -95,4 +96,4 @@ def test_unlink_from_path_new_executable_name(tmp_path):
     result = run_pearl_bash(script, pearl_env, capture_stdout=True, check=False)
 
     assert result.returncode == 0
-    assert not (home_dir / 'bin/new_binary').exists()
+    assert not (home_dir / "bin/new_binary").exists()

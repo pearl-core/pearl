@@ -8,9 +8,9 @@ def parse_args(sys_args: list):
     parser = _create_main_parser()
 
     command_parsers = parser.add_subparsers(
-        help='For command help: %(prog)s COMMAND --help',
-        title='commands',
-        dest='command',
+        help="For command help: %(prog)s COMMAND --help",
+        title="commands",
+        dest="command",
     )
     command_parsers.required = True
 
@@ -31,150 +31,118 @@ def parse_args(sys_args: list):
 def _create_main_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-u', '--update-repos',
-        action='store_true',
-        help="update the repositories before doing any action"
+        "-u",
+        "--update-repos",
+        action="store_true",
+        help="update the repositories before doing any action",
     )
     parser.add_argument(
-        '-n', '--no-confirm',
-        action='store_true',
-        help="Bypass all “Are you sure?” messages"
+        "-n", "--no-confirm", action="store_true", help="Bypass all “Are you sure?” messages"
     )
     parser.add_argument(
-        '-f', '--force',
-        action='store_true',
-        help="Continue performing the action even if hooks functions fail"
+        "-f",
+        "--force",
+        action="store_true",
+        help="Continue performing the action even if hooks functions fail",
     )
     parser.add_argument(
-        '-c', '--config-file', metavar='FILE', type=Path,
+        "-c",
+        "--config-file",
+        metavar="FILE",
+        type=Path,
         default=None,
-        help="location of the pearl config path. Defaults to $HOME/.config/pearl/pearl.conf"
+        help="location of the pearl config path. Defaults to $HOME/.config/pearl/pearl.conf",
     )
     parser.add_argument(
-        '--verbose', '-v', action='count', default=0,
+        "--verbose",
+        "-v",
+        action="count",
+        default=0,
         help="-v increases output verbosity. "
-             "-vv shows bash xtrace during the hook function execution."
+        "-vv shows bash xtrace during the hook function execution.",
     )
     version = pkg_resources.require("pearl")[0].version
-    parser.add_argument('--version', '-V', action='version', version=f'%(prog)s {version}')
+    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {version}")
     return parser
 
 
 def _create_install_parser(command_parsers):
-    parser = command_parsers.add_parser(
-        'install',
-        help='Install the packages'
-    )
-    parser.add_argument(
-        'packages', metavar='[REPO/]PACKAGE', type=str, nargs='+'
-    )
+    parser = command_parsers.add_parser("install", help="Install the packages")
+    parser.add_argument("packages", metavar="[REPO/]PACKAGE", type=str, nargs="+")
 
 
 def _create_update_parser(command_parsers):
-    parser = command_parsers.add_parser(
-        'update',
-        help='Update Pearl or the packages if specified'
-    )
-    parser.add_argument(
-        'packages', metavar='[REPO/]PACKAGE', type=str, nargs='*'
-    )
+    parser = command_parsers.add_parser("update", help="Update Pearl or the packages if specified")
+    parser.add_argument("packages", metavar="[REPO/]PACKAGE", type=str, nargs="*")
 
 
 def _create_remove_parser(command_parsers):
-    parser = command_parsers.add_parser(
-        'remove',
-        help='Remove Pearl or the packages if specified'
-    )
-    parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='*'
-    )
+    parser = command_parsers.add_parser("remove", help="Remove Pearl or the packages if specified")
+    parser.add_argument("packages", metavar="[repo/]package", type=str, nargs="*")
 
 
 def _create_emerge_parser(command_parsers):
     parser = command_parsers.add_parser(
-        'emerge',
-        help='Update Pearl or install/update the packages if specified'
+        "emerge", help="Update Pearl or install/update the packages if specified"
     )
-    parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='*'
-    )
+    parser.add_argument("packages", metavar="[repo/]package", type=str, nargs="*")
 
 
 def _create_info_parser(command_parsers):
-    parser = command_parsers.add_parser(
-        'info',
-        help='Provide information about packages'
-    )
-    parser.add_argument(
-        'packages', metavar='[repo/]package', type=str, nargs='+'
-    )
+    parser = command_parsers.add_parser("info", help="Provide information about packages")
+    parser.add_argument("packages", metavar="[repo/]package", type=str, nargs="+")
 
 
 def _create_init_parser(command_parsers):
     command_parsers.add_parser(
-        'init',
-        help='Init Pearl directories and files: $HOME/.local/share/pearl and $HOME/.config/pearl/pearl.conf'
+        "init",
+        help="Init Pearl directories and files: $HOME/.local/share/pearl and $HOME/.config/pearl/pearl.conf",
     )
 
 
 def _create_search_parser(command_parsers):
     parser = command_parsers.add_parser(
-        'search',
-        help='Search the available Pearl packages that match pattern'
+        "search", help="Search the available Pearl packages that match pattern"
+    )
+    parser.add_argument("pattern", metavar="PATTERN", type=str, default=".*")
+    parser.add_argument(
+        "-p", "--package-only", action="store_true", help="List the package names only"
     )
     parser.add_argument(
-        'pattern', metavar='PATTERN', type=str,
-        default=".*"
+        "-t",
+        "--dependency-tree",
+        action="store_true",
+        help="Sort packages by dependency tree order",
     )
     parser.add_argument(
-        '-p', '--package-only',
-        action='store_true',
-        help="List the package names only"
-    )
-    parser.add_argument(
-        '-t', '--dependency-tree',
-        action='store_true',
-        help="Sort packages by dependency tree order"
-    )
-    parser.add_argument(
-        '-i', '--installed-only',
-        action='store_true',
-        help="Show only installed packages"
+        "-i", "--installed-only", action="store_true", help="Show only installed packages"
     )
 
 
 def _create_list_parser(command_parsers):
-    parser = command_parsers.add_parser(
-        'list',
-        help='List all the available Pearl packages'
+    parser = command_parsers.add_parser("list", help="List all the available Pearl packages")
+    parser.add_argument(
+        "-p", "--package-only", action="store_true", help="List the package names only"
     )
     parser.add_argument(
-        '-p', '--package-only',
-        action='store_true',
-        help="List the package names only"
+        "-t",
+        "--dependency-tree",
+        action="store_true",
+        help="Sort packages by dependency tree order",
     )
     parser.add_argument(
-        '-t', '--dependency-tree',
-        action='store_true',
-        help="Sort packages by dependency tree order"
-    )
-    parser.add_argument(
-        '-i', '--installed-only',
-        action='store_true',
-        help="Show only installed packages"
+        "-i", "--installed-only", action="store_true", help="Show only installed packages"
     )
 
 
 def _create_create_parser(command_parsers):
     parser = command_parsers.add_parser(
-        'create',
-        help='Create a new local Pearl package to a new or already existing directory'
+        "create", help="Create a new local Pearl package to a new or already existing directory"
     )
+    parser.add_argument("name", metavar="NAME", type=str, help="Name of the local package")
     parser.add_argument(
-        'name', metavar='NAME', type=str,
-        help="Name of the local package"
-    )
-    parser.add_argument(
-        'dest_dir', metavar='DEST_DIR', type=Path,
-        help="Directory path where the 'pearl-config' directory template will be placed"
+        "dest_dir",
+        metavar="DEST_DIR",
+        type=Path,
+        help="Directory path where the 'pearl-config' directory template will be placed",
     )

@@ -2,16 +2,22 @@ import subprocess
 from argparse import Namespace
 from unittest import mock
 
-from pearllib.pearlenv import PearlEnvironment, Package
+from pearllib.pearlenv import Package, PearlEnvironment
 
 
 class PackageArgs(Namespace):
     def __init__(
-            self, no_confirm=False, verbose=0, force=False,
-            pattern=".*", package_only=False, installed_only=False,
-            dependency_tree=False,
-            name="", dest_dir=None,
-            packages=()
+        self,
+        no_confirm=False,
+        verbose=0,
+        force=False,
+        pattern=".*",
+        package_only=False,
+        installed_only=False,
+        dependency_tree=False,
+        name="",
+        dest_dir=None,
+        packages=(),
     ):
         super().__init__()
         self.no_confirm = no_confirm
@@ -27,9 +33,9 @@ class PackageArgs(Namespace):
 
 
 def create_pearl_home(tmp_path):
-    home_dir = tmp_path / 'home'
+    home_dir = tmp_path / "home"
     home_dir.mkdir(parents=True)
-    pearl_conf = home_dir / 'pearl.conf'
+    pearl_conf = home_dir / "pearl.conf"
     pearl_conf.touch()
     return home_dir
 
@@ -47,17 +53,18 @@ class PackageTestBuilder:
         self.home_dir = home_dir
 
     def add_local_package(
-            self,
-            tmp_path, hooks_sh_script,
-            repo_name='repo-test',
-            package_name='pkg-test',
-            is_installed=False,
-            depends=(),
+        self,
+        tmp_path,
+        hooks_sh_script,
+        repo_name="repo-test",
+        package_name="pkg-test",
+        is_installed=False,
+        depends=(),
     ):
         """Install a package somewhere locally"""
-        pkg_dir = tmp_path / f'{repo_name}/{package_name}'
-        (pkg_dir / 'pearl-config').mkdir(parents=True)
-        hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
+        pkg_dir = tmp_path / f"{repo_name}/{package_name}"
+        (pkg_dir / "pearl-config").mkdir(parents=True)
+        hooks_sh = pkg_dir / "pearl-config/hooks.sh"
         hooks_sh.touch()
         hooks_sh.write_text(hooks_sh_script)
 
@@ -68,36 +75,27 @@ class PackageTestBuilder:
                 package_name=package_name,
             )
 
-        package = Package(
-            self.home_dir, repo_name, package_name, str(pkg_dir), '',
-            depends=depends
-        )
+        package = Package(self.home_dir, repo_name, package_name, str(pkg_dir), "", depends=depends)
         self._update_packages(package)
 
     def add_git_package(
-            self,
-            hooks_sh_script,
-            repo_name='repo-test',
-            package_name='pkg-test',
-            url='https://github.com/pkg',
-            git_url=None,
-            is_installed=False,
-            depends=(),
+        self,
+        hooks_sh_script,
+        repo_name="repo-test",
+        package_name="pkg-test",
+        url="https://github.com/pkg",
+        git_url=None,
+        is_installed=False,
+        depends=(),
     ):
 
         if is_installed:
             if git_url is None:
                 git_url = url
             self._install_package(
-                hooks_sh_script,
-                repo_name='repo-test',
-                package_name='pkg-test',
-                git_url=git_url
+                hooks_sh_script, repo_name="repo-test", package_name="pkg-test", git_url=git_url
             )
-        package = Package(
-            self.home_dir, repo_name, package_name, url, '',
-            depends=depends
-        )
+        package = Package(self.home_dir, repo_name, package_name, url, "", depends=depends)
         self._update_packages(package)
 
     def build(self):
@@ -109,22 +107,18 @@ class PackageTestBuilder:
         self.packages[package.repo_name][package.name] = package
 
     def _install_package(
-            self,
-            hooks_sh_script,
-            repo_name='repo-test',
-            package_name='pkg-test',
-            git_url=None
+        self, hooks_sh_script, repo_name="repo-test", package_name="pkg-test", git_url=None
     ):
-        pkg_dir = self.home_dir / f'packages/{repo_name}/{package_name}'
-        (pkg_dir / 'pearl-config').mkdir(parents=True)
+        pkg_dir = self.home_dir / f"packages/{repo_name}/{package_name}"
+        (pkg_dir / "pearl-config").mkdir(parents=True)
 
-        hooks_sh = pkg_dir / 'pearl-config/hooks.sh'
+        hooks_sh = pkg_dir / "pearl-config/hooks.sh"
         hooks_sh.write_text(hooks_sh_script)
 
         if git_url is not None:
             subprocess.run(
-                ['git', '-C', str(pkg_dir), 'init'],
+                ["git", "-C", str(pkg_dir), "init"],
             )
             subprocess.run(
-                ['git', '-C', str(pkg_dir), 'remote', 'add', 'origin', git_url],
+                ["git", "-C", str(pkg_dir), "remote", "add", "origin", git_url],
             )
