@@ -30,10 +30,6 @@ chmod +x $HOME/bin/vim
 # https://travis-ci.org/pearl-core/pearl/jobs/540316660
 trap "rm -rf ${PEARL_HOME}/" EXIT
 
-function get_all_packages(){
-    ls ${PEARL_HOME}/packages/pearl
-}
-
 function info(){
     # $@: msg (mandatory) - str: Message to print
     echo -e "\033[1;37m$@\033[0m"
@@ -58,7 +54,7 @@ info "Listing all pearl packages"
 pearl list
 
 info Install ALL pearl packages
-for package in $(pearl list --package-only)
+for package in sesaila txum dot-bash
 do
     pearl info ${package}
     pearl -vv --no-confirm emerge ${package}

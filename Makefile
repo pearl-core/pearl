@@ -35,7 +35,6 @@ lint: ## check style with flake8
 bandit:
 	poetry run bandit -lll -r tests src
 
-# TODO test: shellcheck ## run tests quickly with the default Python
 test: ## run tests quickly with the default Python
 	poetry run pytest src tests
 
@@ -43,7 +42,9 @@ test-all: ## run tests on every Python version with tox
 	poetry run tox --parallel auto
 
 test-integration:
-	poetry run pytest test-integration
+	bash ./ci/integ-tests.sh $(PWD)
+	#zsh ./ci/integ-tests.sh $(PWD)
+	#fish ./ci/integ-tests.fish $(PWD)
 
 shellcheck:
 	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh
@@ -70,7 +71,7 @@ coverage: ## check code coverage quickly with the default Python
 
 .DEFAULT_GOAL := default
 
-default: install format bandit test build
-default-ci: install format lint bandit test test-integration build
+default: install format bandit test shellcheck build
+default-ci: install format lint bandit test shellcheck test-integration build
 
 .PHONY: clean clean-test clean-pyc clean-build docs install format lint bandit test test-integration build
