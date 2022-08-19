@@ -43,11 +43,9 @@ test-all: ## run tests on every Python version with tox
 
 test-integration:
 	bash ./ci/integ-tests.sh $(PWD)
-	#zsh ./ci/integ-tests.sh $(PWD)
-	#fish ./ci/integ-tests.fish $(PWD)
 
 shellcheck:
-	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh
+	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh ci/integ-tests.sh ci/deploy.sh
 
 build:
 	poetry build

@@ -10,7 +10,7 @@ Pearl
 
 |Project Status|Donation|Communication|
 |:-----------:|:--------:|:-----------:|
-|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+|[![Build status](https://api.travis-ci.com/pearl-core/pearl.png?branch=master)](https://travis-ci.com/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 **Table of Contents**
 - [Description](#description)
@@ -187,6 +187,9 @@ The Pearl dependencies are the following:
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8.5)](https://git-scm.com/)
 
+**PLEASE NOTE**: Tests may be performed on different versions from the ones listed above.
+To know which versions are truly tested have a look at latest Travis executions [here](https://travis-ci.com/pearl-core/pearl).
+
 ### Optional
 The following are not mandatory dependencies but can be handy to have for the hook functions in Pearl package.
 All the Linux distributions have these dependencies already installed.
@@ -202,6 +205,8 @@ Pearl supports the following shells:
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
 
+**PLEASE NOTE**: Tests may be performed on different versions from the ones listed above.
+To know which versions are truly tested have a look at latest Travis executions [here](https://travis-ci.com/pearl-core/pearl).
 
 Linux
 -----
