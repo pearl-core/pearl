@@ -57,4 +57,4 @@ script:
 
 
 after_success:
-  - ./ci/deploy.sh
+  - make publish
