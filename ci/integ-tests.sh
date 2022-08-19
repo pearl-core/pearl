@@ -54,7 +54,7 @@ info "Listing all pearl packages"
 pearl list
 
 info Install ALL pearl packages
-for package in sesaila txum dot-bash
+for package in local/test pearl/sesaila pearl/txum pearl/dot-bash
 do
     pearl info ${package}
     pearl -vv --no-confirm emerge ${package}
