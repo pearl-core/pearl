@@ -28,7 +28,7 @@ lint: ## check style with flake8
 	# Check that source is properly formatted
 	poetry run black --check src tests
 	# Check for linting issues
-	poetry run flake8 src/**/*.py tests/*.py
+	poetry run flake8 src/**/*.py tests/**/*.py
 	# Make sure imports are properly sorted
 	poetry run isort --check -v src tests
 
