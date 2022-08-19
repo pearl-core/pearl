@@ -7,9 +7,13 @@ python:
 
 addons:
   apt:
-    packages: zsh
+    packages:
+    - zsh
+    - fish
   homebrew:
-    packages: zsh
+    packages:
+    - zsh
+    - fish
 
 #sudo: required
 
