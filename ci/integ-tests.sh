@@ -46,15 +46,22 @@ pearl init
 [[ -d "$PEARL_ROOT" ]] || { echo "$PEARL_ROOT does not exist"; exit 3; }
 [[ -d "$PEARL_HOME" ]] || { echo "$PEARL_HOME does not exist"; exit 4; }
 
-info "Creating local pearl package"
-pearl create test $HOME/test
-pearl search test
+info "Creating a local pearl package"
+pearl create mydotfiles $HOME/dotfiles
+pearl search mydotfiles
+
+echo -e "[alias]\n    cfg = config" > $HOME/dotfiles/gitconfig
+cp ci/hooks.sh $HOME/dotfiles/pearl-config
+
+pearl install mydotfiles
+cat ~/.gitconfig
+git cfg -l
 
 info "Listing all pearl packages"
 pearl list
 
 info Install ALL pearl packages
-for package in local/test pearl/sesaila pearl/txum pearl/dot-bash
+for package in local/mydotfiles pearl/sesaila pearl/txum pearl/dot-bash
 do
     pearl info ${package}
     pearl -vv --no-confirm emerge ${package}
@@ -79,5 +86,5 @@ fi
 # Remove everything now
 yes | pearl remove
 # Remove the created package
-rm -rf $HOME/test
+rm -rf $HOME/mydotfiles
 [[ ! -e ${PEARL_HOME} ]] || echo "$PEARL_HOME exists after remove it"
