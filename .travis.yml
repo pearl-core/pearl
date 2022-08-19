@@ -1,19 +1,22 @@
 # vim: ft=yaml
 
-language: bash
+language: python
 
-sudo: required
+python:
+  - "3.7"
 
-jobs:
-  include:
-    - os: linux
-      env:
-        - PYTHON_VERSION="3.7"
-        - TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
-        # TWINE_PASSWORD
-        - secure: "QhVCwaBpCebV4ZEgvqrymqTboawuGF6+VrbA6hytxP6j6cN6gGKYZt0CLcemUylGQFD4wnKtVHnB0CH9XEQdCORroRXsl1ovpGYvOkM0jGRXZ/veS//kKfuF+BE6o0Mk7O0XseQjDeAAwjC336luxpjEjSf/oIMa3p9NBvjQe+Tsqzal2jYrWsAOG8DkO2hVzXU2VeuxnANt7oxfn8kHsRJsxLREZV+0SEsQXoHv14s6Id2ZkyK2NKCzhLKfzkU/oD0hZvuaKLDMdVCa7V6/xNhcCvtKC/V63M8OxJ/q5JZj7+XUjSBui0/Nsmy5a5IW4KJByNbItD2PmukeFu3hq6vRK9xjulTaQiz68Iq1arnQXG5eWdYkriE+ixkBx+kFTtMoag3Qz9JRNlmxoFWG4HP38aSPlXEdz30ZmBhyjfJ7FsIPGaCFp66e2meKuMP4oPQkIrnlX5dca6kvM5xdVO4jU14q5sQxZgaa8r8Z1gXhJbka6F1gVlOKMn3w9ISTNWYUTuVnBtV5mXefQFm5etjYu57ovNh3jVPRv0QqP2Vba0cZxn2IkOQc0HBSNB5tRbIMFJNSugKi4lBA2hwNTge4DNAMHppEhi6s2Gin/p4Es5BK3JiwtzggPgs+2J0Xc1GLXKlr3QHrczeC3Ubvfx9O6iEpWCdzzjqVAzywJ5w="
-        # TWINE_TEST_PASSWORD
-        - secure: "KMI55OvH9xizoaFIJs0LIYr2z+NXNJ3CfuydBt7C1Voq0KtiTjI+jUucUGTi52LWK1om0rnvP9Ye5yFCp60DPNc01CXsiEs9dyHTOiOcIXdRZ5wNn1X+G31AN3EszT/6OUwAjSog7P+RACXAZobvlceJxoYxOVVRNWKPvGI0msmoZAVRGFegYHjUIALnWDmL6omBs8+qvqhdR4KulLNC23DOFpxNodrLqXAl7/YHoZk3BlZh1/PJ/JG8zMgbj7hzk2UD5UghAJELIHcdOxwnZ/PtTSi0hlEVOMN7BfLBrNS8p1KAHL38ByH2wnw7cJPnsR+AC4Qay501zWJqy978oTPhLo70KGdDhPu0Siit12QEiab8O4ajR0qa1kE4PzCoiJdRubSH8enu0VCXcvnDEwY3e0pyN/YYm7AIzsW+Ukyrs6+t9GqYqzTMIaa9UeoOe6fHHKIJO+JB3lhPyOJLWH2Y+atnWwnQLD9exusojK6+nolPVVtQH7Uc0qT4SRHJ0sYK9c5+X2fpN9yD0ThWP/fa9eqjRJMYwwSnNrUes0No+yRXFgpyhDRCGPlMQACayl5sr+9tAKBWFSPZpbwxvvkwHwfdctIvx6H8gvl2VyEiqwLqbfpnrxRUnVQI9AM1WUoXqUuWAwFql7OIFR7/f2nH4lZmewNTGmjVYlzpByw="
+#sudo: required
+
+#jobs:
+  #include:
+    #- os: linux
+      #env:
+        #- PYTHON_VERSION="3.7"
+        #- TRAVIS_BASH_VERSION="4.1" TRAVIS_ZSH_VERSION="5.0.0" TRAVIS_FISH_VERSION="2.2.0" TRAVIS_GIT_VERSION="1.8.5"
+        ## TWINE_PASSWORD
+        #- secure: "QhVCwaBpCebV4ZEgvqrymqTboawuGF6+VrbA6hytxP6j6cN6gGKYZt0CLcemUylGQFD4wnKtVHnB0CH9XEQdCORroRXsl1ovpGYvOkM0jGRXZ/veS//kKfuF+BE6o0Mk7O0XseQjDeAAwjC336luxpjEjSf/oIMa3p9NBvjQe+Tsqzal2jYrWsAOG8DkO2hVzXU2VeuxnANt7oxfn8kHsRJsxLREZV+0SEsQXoHv14s6Id2ZkyK2NKCzhLKfzkU/oD0hZvuaKLDMdVCa7V6/xNhcCvtKC/V63M8OxJ/q5JZj7+XUjSBui0/Nsmy5a5IW4KJByNbItD2PmukeFu3hq6vRK9xjulTaQiz68Iq1arnQXG5eWdYkriE+ixkBx+kFTtMoag3Qz9JRNlmxoFWG4HP38aSPlXEdz30ZmBhyjfJ7FsIPGaCFp66e2meKuMP4oPQkIrnlX5dca6kvM5xdVO4jU14q5sQxZgaa8r8Z1gXhJbka6F1gVlOKMn3w9ISTNWYUTuVnBtV5mXefQFm5etjYu57ovNh3jVPRv0QqP2Vba0cZxn2IkOQc0HBSNB5tRbIMFJNSugKi4lBA2hwNTge4DNAMHppEhi6s2Gin/p4Es5BK3JiwtzggPgs+2J0Xc1GLXKlr3QHrczeC3Ubvfx9O6iEpWCdzzjqVAzywJ5w="
+        ## TWINE_TEST_PASSWORD
+        #- secure: "KMI55OvH9xizoaFIJs0LIYr2z+NXNJ3CfuydBt7C1Voq0KtiTjI+jUucUGTi52LWK1om0rnvP9Ye5yFCp60DPNc01CXsiEs9dyHTOiOcIXdRZ5wNn1X+G31AN3EszT/6OUwAjSog7P+RACXAZobvlceJxoYxOVVRNWKPvGI0msmoZAVRGFegYHjUIALnWDmL6omBs8+qvqhdR4KulLNC23DOFpxNodrLqXAl7/YHoZk3BlZh1/PJ/JG8zMgbj7hzk2UD5UghAJELIHcdOxwnZ/PtTSi0hlEVOMN7BfLBrNS8p1KAHL38ByH2wnw7cJPnsR+AC4Qay501zWJqy978oTPhLo70KGdDhPu0Siit12QEiab8O4ajR0qa1kE4PzCoiJdRubSH8enu0VCXcvnDEwY3e0pyN/YYm7AIzsW+Ukyrs6+t9GqYqzTMIaa9UeoOe6fHHKIJO+JB3lhPyOJLWH2Y+atnWwnQLD9exusojK6+nolPVVtQH7Uc0qT4SRHJ0sYK9c5+X2fpN9yD0ThWP/fa9eqjRJMYwwSnNrUes0No+yRXFgpyhDRCGPlMQACayl5sr+9tAKBWFSPZpbwxvvkwHwfdctIvx6H8gvl2VyEiqwLqbfpnrxRUnVQI9AM1WUoXqUuWAwFql7OIFR7/f2nH4lZmewNTGmjVYlzpByw="
 
     #- os: osx
       #osx_image: xcode12
@@ -25,8 +28,8 @@ jobs:
         #- secure: "KMI55OvH9xizoaFIJs0LIYr2z+NXNJ3CfuydBt7C1Voq0KtiTjI+jUucUGTi52LWK1om0rnvP9Ye5yFCp60DPNc01CXsiEs9dyHTOiOcIXdRZ5wNn1X+G31AN3EszT/6OUwAjSog7P+RACXAZobvlceJxoYxOVVRNWKPvGI0msmoZAVRGFegYHjUIALnWDmL6omBs8+qvqhdR4KulLNC23DOFpxNodrLqXAl7/YHoZk3BlZh1/PJ/JG8zMgbj7hzk2UD5UghAJELIHcdOxwnZ/PtTSi0hlEVOMN7BfLBrNS8p1KAHL38ByH2wnw7cJPnsR+AC4Qay501zWJqy978oTPhLo70KGdDhPu0Siit12QEiab8O4ajR0qa1kE4PzCoiJdRubSH8enu0VCXcvnDEwY3e0pyN/YYm7AIzsW+Ukyrs6+t9GqYqzTMIaa9UeoOe6fHHKIJO+JB3lhPyOJLWH2Y+atnWwnQLD9exusojK6+nolPVVtQH7Uc0qT4SRHJ0sYK9c5+X2fpN9yD0ThWP/fa9eqjRJMYwwSnNrUes0No+yRXFgpyhDRCGPlMQACayl5sr+9tAKBWFSPZpbwxvvkwHwfdctIvx6H8gvl2VyEiqwLqbfpnrxRUnVQI9AM1WUoXqUuWAwFql7OIFR7/f2nH4lZmewNTGmjVYlzpByw="
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./ci/test-utils/installs/install-linux-deps.sh; fi;
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./ci/test-utils/installs/install-osx-deps-fast.sh; fi;
+  #- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./ci/test-utils/installs/install-linux-deps.sh; fi;
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./ci/test-utils/installs/install-osx-deps-fast.sh; fi;
   - python --version
   - /usr/bin/env python --version
   - /usr/bin/env python3 --version
@@ -36,7 +39,7 @@ before_install:
   - zsh --version
   - fish --version
   # https://python-poetry.org/docs/#installation
-  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | /usr/bin/env python3 -
+  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | /usr/bin/env python -
   - export PATH="$HOME/.poetry/bin:$PATH"
 
 #install:
