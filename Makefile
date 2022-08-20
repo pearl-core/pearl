@@ -40,6 +40,7 @@ bandit:
 
 test: ## run tests quickly with the default Python
 	poetry run pytest src tests
+	poetry run flake8 src/**/*.py tests/**/*.py
 
 test-integration:
 	bash ./integ-tests/integ-tests.sh $(PWD)
@@ -75,6 +76,5 @@ coverage: ## check code coverage quickly with the default Python
 .DEFAULT_GOAL := default
 
 default: install format bandit test shellcheck build
-default-ci: install format lint bandit test shellcheck test-integration build
 
 .PHONY: clean clean-test clean-pyc clean-build docs install format lint bandit test test-integration build
