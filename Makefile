@@ -1,3 +1,7 @@
+PYPI_USER ?= "__token__"
+PYPI_REPOSITORY ?= "https://upload.pypi.org/legacy/"
+
+
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
@@ -14,7 +18,6 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test: ## remove test and coverage artifacts
-	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
@@ -38,14 +41,11 @@ bandit:
 test: ## run tests quickly with the default Python
 	poetry run pytest src tests
 
-test-all: ## run tests on every Python version with tox
-	poetry run tox --parallel auto
-
 test-integration:
-	bash ./ci/integ-tests.sh $(PWD)
+	bash ./integ-tests/integ-tests.sh $(PWD)
 
 shellcheck:
-	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh ci/integ-tests.sh ci/deploy.sh
+	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh ci/integ-tests.sh
 
 build:
 	poetry build
@@ -59,7 +59,7 @@ update:
 
 publish: build ## package and upload a release
     # @ will not show the command to avoid exposing the password
-	@poetry publish --username $(TWINE_USER) --password $(TWINE_PASSWORD)
+	@poetry publish --username $(PYPI_USER) --password $(PYPI_PASSWORD) --repository $(PYPI_REPOSITORY) --no-interaction $(ARGS)
 
 coverage: ## check code coverage quickly with the default Python
 	$(COVERAGE) run --source pearllib -m pytest
