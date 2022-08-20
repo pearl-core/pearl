@@ -57,9 +57,7 @@ python = "^3.7"
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.4"
 coverage = "^6.4.3"
-# TODO remove flake8 pin:
 flake8 = "4.0.1" # Recently released flake8 5.0 version does not work yet with pytest-flake8 https://github.com/tholo/pytest-flake8/issues/87
-tox = "^3.25.1"
 twine = "^4.0.1"
 watchdog = "^2.1.9"
 black = "^22.6.0"
@@ -124,7 +122,6 @@ parallel = true
 [tool.coverage.paths]
 source =  [
     "src/",
-    ".tox/*/lib/*/site-packages/",
     "build/lib/*/site-packages/"
 ]
 
