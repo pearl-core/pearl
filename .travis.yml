@@ -19,9 +19,9 @@ jobs:
   include:
     - name: "Run integ tests on Linux"
       os: linux
-    #- name: "Run integ tests on MacOS"
-      #os: osx
-      #osx_image: xcode12
+    - name: "Run integ tests on MacOS"
+      os: osx
+      osx_image: xcode12
 
 before_install:
   - python --version
