@@ -51,9 +51,12 @@ pearl create mydotfiles "$HOME"/dotfiles
 pearl search mydotfiles
 
 echo -e "[alias]\n    cfg = config" > "$HOME"/dotfiles/gitconfig
+echo -e "#!/bin/bash\necho Hello World!" > "$HOME"/dotfiles/mycmd
+chmod +x "$HOME"/dotfiles/mycmd
 cat > "$HOME"/dotfiles/pearl-config/hooks.sh <<EOF
 post_install() {
     link git "\${PEARL_PKGDIR}/gitconfig"
+    link_to_path "\${PEARL_PKGDIR}/mycmd"
     return 0
 }
 
@@ -63,6 +66,7 @@ post_update() {
 
 pre_remove() {
     unlink git "\${PEARL_PKGDIR}/gitconfig"
+    unlink_from_path "\${PEARL_PKGDIR}/mycmd"
     return 0
 }
 EOF
@@ -74,7 +78,7 @@ info "Listing all pearl packages"
 pearl list
 
 info Install ALL pearl packages
-for package in local/mydotfiles pearl/sesaila pearl/txum pearl/dot-bash pearl/cmd
+for package in local/mydotfiles pearl/sesaila pearl/txum pearl/dot-bash
 do
     pearl info ${package}
     pearl -vv --no-confirm emerge ${package}
@@ -86,10 +90,10 @@ pearl -vv --no-confirm update
 
 info Test the Bash, Zsh and Fish boot files
 export PEARL_DEBUG=1
-bash -c 'source $HOME/.bashrc; set -e; pearl-source; pearl --help; [[ -n $PEARL_HOME ]]; which cmd'
-zsh -c 'source $HOME/.zshrc; set -e; pearl-source; pearl --help; [[ -n $PEARL_HOME ]]; which cmd'
+bash -c 'source $HOME/.bashrc; set -e; pearl-source; pearl --help; [[ -n $PEARL_HOME ]]; mycmd'
+zsh -c 'source $HOME/.zshrc; set -e; pearl-source; pearl --help; [[ -n $PEARL_HOME ]]; mycmd'
 # shellcheck disable=SC2016
-fish -c 'source $HOME/.config/fish/config.fish; pearl-source; pearl --help; [ $PEARL_HOME ]; which cmd'
+fish -c 'source $HOME/.config/fish/config.fish; pearl-source; pearl --help; [ $PEARL_HOME ]; mycmd'
 
 pearl list
 
