@@ -41,6 +41,12 @@ script:
 
 
 after_success:
-  - env
-  - if [[ "$TRAVIS_BRANCH" != "master" ]]; then ARGS="--dry-run" PYPI_PASSWORD="${PYPI_TEST_PASSWORD}" PYPI_REPOSITORY="https://test.pypi.org/legacy/" make publish; fi;
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then PYPI_PASSWORD="${PYPI_PROD_PASSWORD}" make publish; fi;
+  - |
+    if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
+      if [[ "$TRAVIS_BRANCH" != "master" ]]; then
+        PYPI_PASSWORD="${PYPI_TEST_PASSWORD}" make publish-test
+      fi;
+      if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+        PYPI_PASSWORD="${PYPI_PROD_PASSWORD}" make publish;
+      fi;
+    fi;

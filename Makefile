@@ -57,9 +57,14 @@ install:
 update:
 	poetry update
 
+publish-test: build ## package and upload a release
+	poetry config repositories.test-pypi https://test.pypi.org/legacy/ ;
+	@poetry config pypi-token.test-pypi "$(PYPI_PASSWORD)"
+	poetry publish -r test-pypi --no-interaction $(ARGS)
+
 publish: build ## package and upload a release
     # @ will not show the command to avoid exposing the password
-	@poetry publish --username $(PYPI_USER) --password $(PYPI_PASSWORD) --repository $(PYPI_REPOSITORY) --no-interaction $(ARGS)
+	@poetry publish --password $(PYPI_PASSWORD) --no-interaction $(ARGS)
 
 coverage: ## check code coverage quickly with the default Python
 	$(COVERAGE) run --source pearllib -m pytest
