@@ -1,50 +1,52 @@
 
 ## Install Requirements
 
-- Follow steps to install Poetry [here](https://python-poetry.org/docs/#installation).
+- Follow the steps to install Poetry [here](https://python-poetry.org/docs/#installation).
 - Install [shellcheck](https://github.com/koalaman/shellcheck)
 
-# Init environment
+## Init environment
+
+Running `make` without any target will create
+the poetry virtual env, run several checks
+including the unit tests:
 
 ```
 make
 ```
 
-The following make commands will install conda and create a conda env called `pearl`:
-
-```bash
-make install-conda
-make init-env-conda
-```
-
-# Install Pearl package and its dev dependencies
+## Install Pearl package and its dev dependencies
 
 ```bash
 make install
 ```
 
-# Update dependencies
-The following step will update the dependencies in `requirements-dev.in` and
-include them into the file `requirements-dev.txt`:
+## Update dependencies
+The following step will update the dependencies in `poetry.lock`:
 
 ```bash
-make upgrade
+make update
 ```
 
 
-# Build the wheel and source distribution
+## Build the wheel and source distribution
 
 Creates the tar file and wheel under `dist` directory.
 
 ```bash
-make dist
+make build
 ```
 
 ## Publishing
 
-Uses `twine` which separates the build from the actual upload:
+To publish to test PYPI:
 
 ```bash
-make release
+PYPI_PASSWORD="<token here>" make publish-test
+```
+
+To publish to production PYPI:
+
+```bash
+PYPI_PASSWORD="<token here>" make publish
 ```
 
