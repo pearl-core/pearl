@@ -45,7 +45,7 @@ test-integration:
 	bash ./integ-tests/integ-tests.sh $(PWD)
 
 shellcheck:
-	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh ci/integ-tests.sh
+	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh integ-tests/integ-tests.sh
 
 build:
 	poetry build
