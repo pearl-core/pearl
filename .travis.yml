@@ -18,14 +18,15 @@ jobs:
     - name: "Run integ tests with Python 3.7 on Linux"
       os: linux
       python: "3.7"
-    - name: "Run integ tests with Python 3.10 on Linux"
+    - name: "Run integ tests with Python 3.9 on Linux"
       os: linux
-      python: "3.10"
-    - name: "Run integ tests on MacOS"
-      os: osx
-      osx_image: xcode12
-      # https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
-      language: shell       # 'language: python' is an error on Travis CI macOS
+      python: "3.9"
+    # TODO enable this:
+    #- name: "Run integ tests on MacOS"
+      #os: osx
+      #osx_image: xcode12
+      ## https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
+      #language: shell       # 'language: python' is an error on Travis CI macOS
 
 
 before_install:
@@ -50,8 +51,12 @@ after_success:
     if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" && "$TRAVIS_OS_NAME" == "linux" ]]; then
       if [[ "$TRAVIS_BRANCH" != "master" ]]; then
         PYPI_PASSWORD="${PYPI_TEST_PASSWORD}" make publish-test
+        pip3 install --index-url https://test.pypi.org/simple/ pearl==$(poetry version -s)
+        pearl --help
       fi;
       if [[ "$TRAVIS_BRANCH" == "master" ]]; then
         PYPI_PASSWORD="${PYPI_PROD_PASSWORD}" make publish;
+        pip3 install pearl==$(poetry version -s)
+        pearl --help
       fi;
     fi;
