@@ -15,10 +15,10 @@ addons:
 
 jobs:
   include:
-    - name: "Run integ tests with Python 3.7 on Linux"
-      os: linux
-      python: "3.7"
     # TODO enable this:
+    #- name: "Run integ tests with Python 3.7 on Linux"
+      #os: linux
+      #python: "3.7"
     #- name: "Run integ tests with Python 3.9 on Linux"
       #os: linux
       #python: "3.9"
