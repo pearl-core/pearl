@@ -62,7 +62,6 @@ watchdog = "^2.1.9"
 black = "^22.6.0"
 isort = "^5.10.1"
 mypy = "^0.971"
-pytest-black = "^0.3.12"
 pytest-cov = "^3.0.0"
 pytest = "^7.1.2"
 pytest-isort = "^3.0.0"
@@ -106,7 +105,7 @@ ignore_missing_imports = true
 xfail_strict = true
 # --duration: show the slowest 5 tests at the end
 # --cov-fail-under: Enforce a minimum code coverage threshold.
-addopts = "--mypy --isort --black -vv --durations=5 --color=yes --cov=pearllib --cov-fail-under 90 --verbose --cov-report term-missing --cov-report html:build/documentation/coverage --cov-report xml:build/documentation/coverage/coverage.xml"
+addopts = "--mypy --isort -vv --durations=5 --color=yes --cov=pearllib --cov-fail-under 90 --verbose --cov-report term-missing --cov-report html:build/documentation/coverage --cov-report xml:build/documentation/coverage/coverage.xml"
 testpaths = [
     "tests",
 ]

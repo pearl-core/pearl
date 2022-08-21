@@ -26,7 +26,7 @@ format:
 	poetry run black src tests
 	poetry run isort -v src tests
 
-lint: ## check style with flake8
+lint:
 	poetry run mypy
 	# Check that source is properly formatted
 	poetry run black --check src tests
@@ -41,6 +41,7 @@ bandit:
 test: ## run tests quickly with the default Python
 	poetry run pytest src tests
 	poetry run flake8 src/**/*.py tests/**/*.py
+	poetry run black --check src tests
 
 test-integration:
 	bash ./integ-tests/integ-tests.sh $(PWD)
