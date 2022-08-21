@@ -9,6 +9,7 @@ addons:
     - fish
   homebrew:
     packages:
+    - bash
     - zsh
     - fish
     - shellcheck

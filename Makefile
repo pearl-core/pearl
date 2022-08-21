@@ -31,7 +31,6 @@ lint:
 	# Check that source is properly formatted
 	poetry run black --check src tests
 	# Check for linting issues
-	poetry run flake8 src/**/*.py tests/**/*.py
 	# Make sure imports are properly sorted
 	poetry run isort --check -v src tests
 
@@ -40,7 +39,6 @@ bandit:
 
 test: ## run tests quickly with the default Python
 	poetry run pytest src tests
-	poetry run flake8 src/**/*.py tests/**/*.py
 	poetry run black --check src tests
 
 test-integration:
