@@ -2,40 +2,15 @@
 
 set -e
 
-unset PEARL_HOME
 
-if [[ -z "$1" ]]
-then
-    echo "ERROR: To run the integ tests you must specify the Pearl location."
-    echo "For instance: $0 ~/.local/share/pearl"
-    exit 33
-fi
-
-export PEARL_ROOT="$1"
-PEARL_HOME="${HOME}/.local/share/pearl"
-export PATH="$PEARL_ROOT/bin:$PATH"
-
-# Disabling vim since it hangs on OSX
-# https://stackoverflow.com/questions/46432027/bash-kill-vim-when-vim-warning-output-not-to-a-terminal
-mkdir -p "$HOME"/bin
-export PATH=$HOME/bin:$PATH
-cat <<EOF >> "$HOME/bin/vim"
-#!/bin/sh
-echo vim_mock \$@
-exit
-EOF
-chmod +x "$HOME"/bin/vim
-
-# In later versions of Travis the signals are not recognized in zsh: QUIT TERM KILL ABRT
-# https://travis-ci.org/pearl-core/pearl/jobs/540316660
-# shellcheck disable=SC2064
-trap "rm -rf ${PEARL_HOME}/" EXIT
+python3 -m pip install "$1"
 
 function info(){
     # $@: msg (mandatory) - str: Message to print
     echo -e "\033[1;37m$*\033[0m"
 }
 
+PEARL_HOME="${HOME}/.local/share/pearl"
 [[ ! -d ${PEARL_HOME} ]]
 pearl init
 [[ -d ${PEARL_HOME}/packages ]] || { echo "$PEARL_HOME/packages does not exist after install"; exit 1; }
@@ -44,7 +19,6 @@ pearl init
 # shellcheck disable=SC1091
 source "${HOME}/.bashrc"
 
-[[ -d "$PEARL_ROOT" ]] || { echo "$PEARL_ROOT does not exist"; exit 3; }
 [[ -d "$PEARL_HOME" ]] || { echo "$PEARL_HOME does not exist"; exit 4; }
 
 info "Creating a local pearl package"

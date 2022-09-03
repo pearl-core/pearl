@@ -42,7 +42,7 @@ test: ## run tests quickly with the default Python
 	poetry run black --check src tests
 
 test-integration:
-	bash ./integ-tests/integ-tests.sh $(PWD)
+	bash ./integ-tests/integ-tests.sh dist/pearl*.whl
 
 shellcheck:
 	shellcheck src/pearllib/static/boot/sh/pearl.sh src/pearllib/static/builtins/utils.sh integ-tests/integ-tests.sh
@@ -76,4 +76,4 @@ coverage: ## check code coverage quickly with the default Python
 
 default: install format bandit test shellcheck build
 
-.PHONY: clean clean-test clean-pyc clean-build docs install format lint bandit test test-integration build
+.PHONY: clean clean-test clean-pyc clean-build docs install format lint bandit test build test-integration
