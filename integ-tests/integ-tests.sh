@@ -13,6 +13,7 @@ fi
 
 export PEARL_ROOT="$1"
 PEARL_HOME="${HOME}/.local/share/pearl"
+export PATH="$PEARL_ROOT/bin:$PATH"
 
 # Disabling vim since it hangs on OSX
 # https://stackoverflow.com/questions/46432027/bash-kill-vim-when-vim-warning-output-not-to-a-terminal

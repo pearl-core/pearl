@@ -13,6 +13,8 @@ addons:
     - zsh
     - fish
     - shellcheck
+    - gnu-sed
+    - grep
 
 jobs:
   include:
