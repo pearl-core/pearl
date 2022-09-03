@@ -20,9 +20,9 @@ jobs:
     #- name: "Run integ tests with Python 3.7 on Linux"
       #os: linux
       #python: "3.7"
-    #- name: "Run integ tests with Python 3.9 on Linux"
-      #os: linux
-      #python: "3.9"
+    - name: "Run integ tests with Python 3.9 on Linux"
+      os: linux
+      python: "3.9"
     - name: "Run integ tests on MacOS"
       os: osx
       osx_image: xcode12
@@ -40,8 +40,10 @@ before_install:
   - zsh --version
   - fish --version
   # https://python-poetry.org/docs/#installation
-  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | /usr/bin/env python3 -
-  - export PATH="$HOME/.poetry/bin:$PATH"
+  - curl -sSL https://install.python-poetry.org | /usr/bin/env python3 -
+  - export PATH="$HOME/.local/bin:$PATH"
+  - export PATH="$HOME/Library/Python/3.10/bin:$PATH"
+  - poetry --version
 
 install:
   - make install

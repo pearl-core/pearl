@@ -47,7 +47,6 @@ exclude = [
 ]
 
 
-
 [tool.poetry.scripts]
 pearl = "pearllib.pearl:main"
 

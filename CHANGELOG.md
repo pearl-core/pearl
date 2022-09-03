@@ -1,5 +1,11 @@
 # Change Log #
 
+## [2.3.8][v238] - 2022-09-03 ##
+
+* Replace MiniConda with Poetry
+* Heavily simplify integ tests in order to be completed in short time (<10min in Linux)
+* Add shellcheck
+
 ## [2.3.7][v237] - 2020-04-05 ##
 
 * Fix circular dependency caused when running `bash -c` on some systems
@@ -310,3 +316,4 @@
 [v235]: https://github.com/pearl-core/pearl/releases/tag/2.3.5
 [v236]: https://github.com/pearl-core/pearl/releases/tag/2.3.6
 [v237]: https://github.com/pearl-core/pearl/releases/tag/2.3.7
+[v238]: https://github.com/pearl-core/pearl/releases/tag/2.3.8
