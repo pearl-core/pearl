@@ -64,7 +64,7 @@ publish-test: build ## package and upload a release
 
 publish: build ## package and upload a release
     # @ will not show the command to avoid exposing the password
-	@poetry publish --password $(PYPI_PASSWORD) --no-interaction $(ARGS)
+	@poetry publish --username $(PYPI_USER) --password $(PYPI_PASSWORD) --no-interaction $(ARGS)
 
 coverage: ## check code coverage quickly with the default Python
 	$(COVERAGE) run --source pearllib -m pytest
