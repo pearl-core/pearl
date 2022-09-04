@@ -52,7 +52,7 @@ script:
 
 after_success:
   - |
-    if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" && "$TRAVIS_OS_NAME" == "linux" ]]; then
+    if [[ "$TRAVIS_PYTHON_VERSION" == "3.9" && "$TRAVIS_OS_NAME" == "linux" ]]; then
       if [[ "$TRAVIS_BRANCH" != "master" ]]; then
         PYPI_PASSWORD="${PYPI_TEST_PASSWORD}" make publish-test
         pip3 install --index-url https://test.pypi.org/simple/ pearl==$(poetry version -s)
