@@ -1,16 +1,16 @@
 from enum import Enum
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Union
 
 from pearllib.utils import run_bash
 
 
 class OS(Enum):
-    LINUX = 'linux'
-    OSX = 'osx'
+    LINUX = "linux"
+    OSX = "osx"
 
     @staticmethod
-    def from_code(code: str) -> 'OS':
+    def from_code(code: str) -> "OS":
         return OS.__members__[code.upper()]
 
     def __str__(self):
@@ -19,15 +19,18 @@ class OS(Enum):
 
 class Package:
     def __init__(
-            self, pearl_home: Path, repo_name: str,
-            name: str, url: str,
-            description: str = None,
-            homepage: str = None,
-            author: str = None,
-            license: str = None,
-            os: tuple = None,
-            keywords: tuple = None,
-            depends: tuple = None,
+        self,
+        pearl_home: Path,
+        repo_name: str,
+        name: str,
+        url: str,
+        description: str = None,
+        homepage: str = None,
+        author: str = None,
+        license: str = None,
+        os: tuple = None,
+        keywords: tuple = None,
+        depends: tuple = None,
     ):
         self._pearl_home = pearl_home
 
@@ -60,7 +63,7 @@ class Package:
 
     @property
     def full_name(self) -> str:
-        return f'{self.repo_name}/{self.name}'
+        return f"{self.repo_name}/{self.name}"
 
     @property
     def url(self) -> str:
@@ -83,26 +86,26 @@ class Package:
         return self._license
 
     @property
-    def os(self) -> Tuple[OS]:
+    def os(self) -> Union[Tuple, Tuple[OS]]:
         return self._os
 
     @property
-    def keywords(self) -> Tuple[str]:
+    def keywords(self) -> Union[Tuple[str], Tuple]:
         return self._keywords
 
     @property
-    def depends(self) -> Tuple['Package']:
+    def depends(self) -> Union[Tuple["Package"], Tuple]:
         return self._depends
 
     @property
     def dir(self) -> Path:
-        return self._pearl_home / f'packages/{self.full_name}'
+        return self._pearl_home / f"packages/{self.full_name}"
 
     @property
     def vardir(self) -> Path:
-        return self._pearl_home / f'var/{self.full_name}'
+        return self._pearl_home / f"var/{self.full_name}"
 
-    def add_depend(self, package: 'Package'):
+    def add_depend(self, package: "Package"):
         self._depends = self._depends + (package,)
 
     def is_installed(self) -> bool:
@@ -128,8 +131,7 @@ class Package:
         # This information is always computed given that it can change over the time
         # (i.e. when replacing URL repo from local to git and vice versa)
         package_dir_url = run_bash(
-            f"git -C {self.dir} config remote.origin.url",
-            check=False, capture_stdout=True
+            f"git -C {self.dir} config remote.origin.url", check=False, capture_stdout=True
         ).stdout.strip()
         return package_dir_url
 
@@ -145,13 +147,18 @@ class Package:
     def _is_dir_git_repo(self) -> bool:
         # This information is always computed given that it can change over the time
         # (i.e. when replacing URL repo from local to git and vice versa)
-        return run_bash(
-            f"git -C {self.dir} rev-parse --is-inside-work-tree",
-            capture_stdout=True, capture_stderr=True, check=False
-        ).stdout.strip() == "true"
+        return (
+            run_bash(
+                f"git -C {self.dir} rev-parse --is-inside-work-tree",
+                capture_stdout=True,
+                capture_stderr=True,
+                check=False,
+            ).stdout.strip()
+            == "true"
+        )
 
     def is_local(self) -> bool:
-        return self.url.startswith('/')
+        return self.url.startswith("/")
 
     def __repr__(self):
         return f"Package({self.full_name})"
@@ -162,5 +169,7 @@ class Package:
     def __hash__(self):
         return hash(self.full_name)
 
-    def __eq__(self, other: 'Package'):
+    def __eq__(self, other: object):
+        if not isinstance(other, Package):
+            return False
         return self.full_name == other.full_name

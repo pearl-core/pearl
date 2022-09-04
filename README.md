@@ -10,7 +10,7 @@ Pearl
 
 |Project Status|Donation|Communication|
 |:-----------:|:--------:|:-----------:|
-|[![Build status](https://api.travis-ci.org/pearl-core/pearl.png?branch=master)](https://travis-ci.org/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
+|[![Build status](https://api.travis-ci.com/pearl-core/pearl.png?branch=master)](https://travis-ci.com/github/pearl-core/pearl) [![PyPi version](https://img.shields.io/pypi/v/pearl)](https://pypi.org/project/pearl/) [![PyPi status](https://img.shields.io/pypi/status/pearl)](https://pypi.org/project/pearl/) | [![Github Sponsors](https://img.shields.io/badge/GitHub-Sponsors-orange.svg)](https://github.com/sponsors/fsquillace) [![PayPal](https://img.shields.io/badge/PayPal-Donation-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8LEHQKBCYTACY) | [![Join the gitter chat at https://gitter.im/pearl-core/pearl](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/pearl-core/pearl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) |
 
 **Table of Contents**
 - [Description](#description)
@@ -57,13 +57,15 @@ There are two main use cases for Pearl which will be explained here below:
 
 Use case 1: Create custom package
 ---------------------
-The following example creates a Pearl package containing dotfiles. In this example we are going to create a very simple
-dotfile for `git`.
+The following example creates a Pearl package containing
+a `git` dotfile and a simple executable available as soon
+as the package gets installed.
 
 ```sh
 $> pearl create mydotfiles ~/dotfiles
 ```
-This will create a directory `pearl-config` in `~/dotfiles` containing all the templates to help you
+This will create a directory `pearl-config` in `~/dotfiles`
+containing all the templates to help you
 start writing a Pearl package. `~/dotfiles` does not need to be an empty directory.
 
 Additionally, the local repository in `$XDG_CONFIG_HOME/pearl/pearl.conf` (defaults to `~/.config/pearl/pearl.conf`)
@@ -82,14 +84,17 @@ Place the git config inside `~/dotfiles` directory:
 ```sh
 $> cd ~/dotfiles
 $> echo -e "[alias]\n    cfg = config" > gitconfig
+$> echo -e "#!/bin/bash\necho Hello World!" > hello
+$> chmod +x hello
 ```
 
-You need now to give instructions about how to link the `gitconfig` into the system.
+You need now to give instructions about how to link the `gitconfig` file into the system and make the executable available in `PATH`.
 This is possible through the `pearl-config/hooks.sh` file. Just update it with the following:
 
 ```bash
 post_install() {
     link git "${PEARL_PKGDIR}/gitconfig"
+    link_to_path "${PEARL_PKGDIR}/hello"
     return 0
 }
 
@@ -99,19 +104,27 @@ post_update() {
 
 pre_remove() {
     unlink git "${PEARL_PKGDIR}/gitconfig"
+    unlink_from_path "${PEARL_PKGDIR}/hello"
     return 0
 }
 ```
 
 This tells to Pearl to `link` the git config located in `"${PEARL_PKGDIR}/gitconfig"` (`${PEARL_PKGDIR}` is a builtin variable)
-to the `git` program just after the package installation. Conversely, before removal, this tells to `unlink` the same config file.
+to the `git` program just after the package installation.
+Also, `hooks.sh` will link the executable `hello` by creating
+a symlink and make it visible to `PATH` env variable.
+Conversely, before removal, the hooks file tells to
+`unlink` the git config file and remove the symlink.
 
 Now, just install the package and you will see the changes already reflected:
 
 ```sh
 $> pearl install mydotfiles
-$> # The new git config is ready!
 $> git cfg -l
+...
+...
+$> hello
+Hello World!
 ```
 
 Once the package is completed, you can upload it to a git repository and
@@ -183,9 +196,12 @@ Before installing Pearl be sure that all dependencies are properly installed in 
 The Pearl dependencies are the following:
 
 ### Mandatory
-- [python (>=3.6)](https://www.python.org/)
+- [python (>=3.7)](https://www.python.org/)
 - [bash (>=4.1)](https://www.gnu.org/software/bash/)
 - [git (>=1.8.5)](https://git-scm.com/)
+
+**PLEASE NOTE**: Tests may be performed on different versions from the ones listed above.
+To know which versions are truly tested have a look at latest Travis executions [here](https://travis-ci.com/pearl-core/pearl).
 
 ### Optional
 The following are not mandatory dependencies but can be handy to have for the hook functions in Pearl package.
@@ -202,6 +218,8 @@ Pearl supports the following shells:
 - [fish (>=2.2.0)](https://fishshell.com/)
 - [zsh (>=5.2)](http://www.zsh.org/)
 
+**PLEASE NOTE**: Tests may be performed on different versions from the ones listed above.
+To know which versions are truly tested have a look at latest Travis executions [here](https://travis-ci.com/pearl-core/pearl).
 
 Linux
 -----

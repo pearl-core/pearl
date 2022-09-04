@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # This module contains all functionalities needed for
 # handling the pearl packages.
 #
@@ -31,11 +31,14 @@
 #   None
 #######################################
 function link_to_path() {
-    local executable_path=$1
-    check_not_null ${executable_path}
+    local executable_path
+    executable_path=$1
+    check_not_null "${executable_path}"
 
-    local default_executable_name=$(basename "$executable_path")
-    local executable_name=${2:-${default_executable_name}}
+    local default_executable_name
+    default_executable_name=$(basename "$executable_path")
+    local executable_name
+    executable_name=${2:-${default_executable_name}}
     link_to "${executable_path}" "${PEARL_HOME}/bin/${executable_name}"
 }
 
@@ -68,9 +71,10 @@ function link_to_path() {
 #######################################
 function unlink_from_path() {
     local executable_path=$1
-    check_not_null ${executable_path}
+    check_not_null "${executable_path}"
 
-    local default_executable_name=$(basename "$executable_path")
+    local default_executable_name
+    default_executable_name=$(basename "$executable_path")
     local executable_name=${2:-${default_executable_name}}
 
     unlink_from "${executable_path}" "${PEARL_HOME}/bin/${executable_name}"

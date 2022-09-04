@@ -1,19 +1,23 @@
+# shellcheck shell=bash
+# shellcheck disable=SC1091
+# shellcheck disable=SC2034
 # Usage: source pearl OR in Bash: bash --rcfile pearl
 # vim: set ft=sh ts=4 sw=4 noet:
 
 ####################### FUNCTIONS ############################
 function add_to_path() {
-    local pathname="$(realpath -m -s "$1")"
+    local pathname
+    pathname="$(realpath -m -s "$1")"
     if [[ $PATH != *"${pathname}"* ]]
     then
-        export PATH=$PATH:${pathname}
+        export PATH="$PATH:${pathname}"
     fi
 
     return 0
 }
 
 ####################### VARIABLES & IMPORTS ############################
-export PEARL_HOME=${XDG_DATA_HOME:="$HOME/.local/share"}/pearl
+export PEARL_HOME="${XDG_DATA_HOME:="$HOME/.local/share"}"/pearl
 
 add_to_path "${PEARL_HOME}/bin"
 
@@ -52,7 +56,7 @@ if command -v pearl > /dev/null; then
     done
     unset pkgfullname
 else
-    echo "Pearl error: Could not load pearl package config files. `pearl` executable not found. Please update the PATH variable first."
+    echo "Pearl error: Could not load pearl package config files. 'pearl' executable not found. Please update the PATH variable first."
 fi
 
 function pearl-source() {

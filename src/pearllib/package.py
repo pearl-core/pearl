@@ -7,16 +7,21 @@ from typing import Sequence, Set
 
 import pkg_resources
 
-from pearllib.exceptions import PackageAlreadyInstalledError, \
-    PackageNotInstalledError, HookFunctionError, PackageRequiredByOtherError, PackageCreateError
-from pearllib.messenger import messenger, Color
-from pearllib.pearlenv import PearlEnvironment, Package
-from pearllib.utils import check_and_copy, OrderedSet
-from pearllib.utils import run_pearl_bash
+from pearllib.exceptions import (
+    HookFunctionError,
+    PackageAlreadyInstalledError,
+    PackageCreateError,
+    PackageNotInstalledError,
+    PackageRequiredByOtherError,
+)
+from pearllib.messenger import Color, messenger
+from pearllib.pearlenv import Package, PearlEnvironment
+from pearllib.utils import OrderedSet, check_and_copy, run_pearl_bash
 
-_DEFAULT_INPUT = 1000000 * '\n'
+_DEFAULT_INPUT = 1000000 * "\n"
 
-_HOOK_HEADER_TEMPLATE = dedent("""
+_HOOK_HEADER_TEMPLATE = dedent(
+    """
 PEARL_PKGDIR="{pkgdir}"
 PEARL_PKGVARDIR="{vardir}"
 PEARL_PKGNAME="{pkgname}"
@@ -29,13 +34,11 @@ pre_remove() {{ :; }}
 
 HOOKS_SH="$PEARL_PKGDIR"/pearl-config/hooks.sh
 [[ -f $HOOKS_SH ]] && source "$HOOKS_SH"
-""")
+"""
+)
 
 
-def install_packages(
-        pearl_env: PearlEnvironment,
-        args: Namespace
-):
+def install_packages(pearl_env: PearlEnvironment, args: Namespace):
     package_list = closure_dependency_tree(args.packages)
     # Perform emerge command for all dependencies for the specified packages
     for package in package_list:
@@ -45,10 +48,7 @@ def install_packages(
             emerge_package(pearl_env, package, args)
 
 
-def update_packages(
-        pearl_env: PearlEnvironment,
-        args: Namespace
-):
+def update_packages(pearl_env: PearlEnvironment, args: Namespace):
     package_list = closure_dependency_tree(args.packages)
     # Perform emerge command for all dependencies for the specified packages
     for package in package_list:
@@ -58,19 +58,13 @@ def update_packages(
             emerge_package(pearl_env, package, args)
 
 
-def emerge_packages(
-        pearl_env: PearlEnvironment,
-        args: Namespace
-):
+def emerge_packages(pearl_env: PearlEnvironment, args: Namespace):
     package_list = closure_dependency_tree(args.packages)
     for package in package_list:
         emerge_package(pearl_env, package, args)
 
 
-def remove_packages(
-        pearl_env: PearlEnvironment,
-        args: Namespace
-):
+def remove_packages(pearl_env: PearlEnvironment, args: Namespace):
     package_list = list(closure_dependency_tree(args.packages))
     package_list.reverse()
     for package in package_list:
@@ -80,27 +74,24 @@ def remove_packages(
         remaining_requires = set(requires).difference(args.packages)
         if remaining_requires:
             raise PackageRequiredByOtherError(
-                f'Package {package} cannot be removed because is required by other packages: {[str(r) for r in remaining_requires]}'
+                f"Package {package} cannot be removed because is required by other packages: {[str(r) for r in remaining_requires]}"
             )
         remove_package(pearl_env, package, args)
 
 
-def info_packages(
-        pearl_env: PearlEnvironment,
-        args: Namespace
-):
+def info_packages(pearl_env: PearlEnvironment, args: Namespace):
     for package in args.packages:
-        info_package(pearl_env, package, args)
+        info_package(pearl_env, package)
 
 
 def _run(
-        script: str,
-        pearl_env: PearlEnvironment,
-        package: Package,
-        input: str = None,
-        cd_home: bool = False,
-        enable_xtrace: bool = False,
-        enable_errexit: bool = True,
+    script: str,
+    pearl_env: PearlEnvironment,
+    package: Package,
+    input: str = None,
+    cd_home: bool = False,
+    enable_xtrace: bool = False,
+    enable_errexit: bool = True,
 ):
     hookheader = _HOOK_HEADER_TEMPLATE.format(
         pkgdir=package.dir,
@@ -109,35 +100,38 @@ def _run(
         reponame=package.repo_name,
     )
     cd = 'cd "$PEARL_HOME"' if cd_home else 'cd "$PEARL_PKGDIR"'
-    script = f'{hookheader}\n{cd}\n{script}'
-    run_pearl_bash(script, pearl_env, input=input, enable_xtrace=enable_xtrace, enable_errexit=enable_errexit)
+    script = f"{hookheader}\n{cd}\n{script}"
+    run_pearl_bash(
+        script, pearl_env, input=input, enable_xtrace=enable_xtrace, enable_errexit=enable_errexit
+    )
 
 
 def closure_dependency_tree(
-        packages: Sequence[Package],
+    packages: Sequence[Package],
 ) -> Sequence:
-    visited = set()
+    visited: set = set()
     return list(_closure_dependency_tree(OrderedSet(packages), visited))
 
 
 def _closure_dependency_tree(
-        packages: OrderedSet,
-        visited: Set,
+    packages: OrderedSet,
+    visited: Set,
 ) -> OrderedSet:
     accumulator = OrderedSet()
     for package in packages:
         visited.add(package)
         accumulator.update(
-            _closure_dependency_tree(
-                OrderedSet([d for d in package.depends if d not in visited]),
-                visited
+            list(
+                _closure_dependency_tree(
+                    OrderedSet([d for d in package.depends if d not in visited]), visited
+                )
             )
         )
         accumulator.add(package)
     return accumulator
 
 
-def info_package(pearl_env: PearlEnvironment, package: Package, args: Namespace):
+def info_package(pearl_env: PearlEnvironment, package: Package):
     """
     Provide info about a package.
     """
@@ -180,11 +174,9 @@ def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespa
     Installs the Pearl package.
     """
     if package.is_installed():
-        raise PackageAlreadyInstalledError(f'{package} package is already installed.')
+        raise PackageAlreadyInstalledError(f"{package} package is already installed.")
 
-    messenger.print(
-        f'{Color.CYAN}* {Color.NORMAL}Installing {package} package'
-    )
+    messenger.print(f"{Color.CYAN}* {Color.NORMAL}Installing {package} package")
     package.dir.mkdir(parents=True, exist_ok=True)
     if package.is_local():
         check_and_copy(Path(package.url), package.dir)
@@ -199,10 +191,12 @@ def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespa
 
     package.vardir.mkdir(parents=True, exist_ok=True)
 
-    hook = 'post_install'
+    hook = "post_install"
     try:
         _run(
-            hook, pearl_env, package,
+            hook,
+            pearl_env,
+            package,
             input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
@@ -218,7 +212,8 @@ def install_package(pearl_env: PearlEnvironment, package: Package, args: Namespa
         else:
             args.force = True
             remove_package(
-                pearl_env, package,
+                pearl_env,
+                package,
                 args=args,
             )
             raise HookFunctionError(msg) from exc
@@ -229,11 +224,9 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
     Updates the Pearl package.
     """
     if not package.is_installed():
-        raise PackageNotInstalledError(f'{package} package has not been installed.')
+        raise PackageNotInstalledError(f"{package} package has not been installed.")
 
-    messenger.print(
-        f'{Color.CYAN}* {Color.NORMAL}Updating {package} package'
-    )
+    messenger.print(f"{Color.CYAN}* {Color.NORMAL}Updating {package} package")
 
     if package.has_url_changed():
         messenger.info(f"The package URL for {package.full_name} has changed to {package.url}")
@@ -241,10 +234,12 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
         remove_package(pearl_env, package, args)
         install_package(pearl_env, package, args)
 
-    hook = 'pre_update'
+    hook = "pre_update"
     try:
         _run(
-            hook, pearl_env, package,
+            hook,
+            pearl_env,
+            package,
             input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
@@ -270,10 +265,12 @@ def update_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
         )
         run_pearl_bash(script, pearl_env, input=_DEFAULT_INPUT if args.no_confirm else None)
 
-    hook = 'post_update'
+    hook = "post_update"
     try:
         _run(
-            hook, pearl_env, package,
+            hook,
+            pearl_env,
+            package,
             input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
@@ -294,16 +291,16 @@ def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
     Remove the Pearl package.
     """
     if not package.is_installed():
-        raise PackageNotInstalledError(f'{package} package has not been installed.')
+        raise PackageNotInstalledError(f"{package} package has not been installed.")
 
-    messenger.print(
-        f'{Color.CYAN}* {Color.NORMAL}Removing {package} package'
-    )
+    messenger.print(f"{Color.CYAN}* {Color.NORMAL}Removing {package} package")
 
-    hook = 'pre_remove'
+    hook = "pre_remove"
     try:
         _run(
-            hook, pearl_env, package,
+            hook,
+            pearl_env,
+            package,
             input=_DEFAULT_INPUT if args.no_confirm else None,
             enable_xtrace=(args.verbose >= 2),
             enable_errexit=(not args.force),
@@ -324,13 +321,15 @@ def remove_package(pearl_env: PearlEnvironment, package: Package, args: Namespac
 def _list_packages(pearl_env: PearlEnvironment, args: Namespace):
     uninstalled_packages = []
     installed_packages = []
-    pattern = args.pattern if hasattr(args, 'pattern') else ".*"
-    regex = re.compile(f'{pattern}', flags=re.IGNORECASE)
+    pattern = args.pattern if hasattr(args, "pattern") else ".*"
+    regex = re.compile(f"{pattern}", flags=re.IGNORECASE)
     for _, repo_packages in pearl_env.packages.items():
         for _, package in repo_packages.items():
-            if not regex.search(package.full_name) \
-                    and not regex.search(package.description) \
-                    and all([regex.search(key) is None for key in package.keywords]):
+            if (
+                not regex.search(package.full_name)
+                and not regex.search(package.description)
+                and all([regex.search(key) is None for key in package.keywords])
+            ):
                 continue
             if package.is_installed():
                 installed_packages.append(package)
@@ -351,9 +350,7 @@ def list_packages(pearl_env: PearlEnvironment, args: Namespace):
 
     for package in total_packages:
         if args.package_only:
-            messenger.print(
-                f"{package.repo_name}/{package.name}"
-            )
+            messenger.print(f"{package.repo_name}/{package.name}")
         else:
             label = "[installed]" if package.is_installed() else ""
             messenger.print(
@@ -367,15 +364,15 @@ def create_package(pearl_env: PearlEnvironment, args: Namespace):
     """
     Creates package from template.
     """
-    static = Path(pkg_resources.resource_filename('pearllib', 'static/'))
-    pearl_config_template = static / 'templates/pearl-config.template'
-    dest_pearl_config = args.dest_dir / 'pearl-config'
+    static = Path(pkg_resources.resource_filename("pearllib", "static/"))
+    pearl_config_template = static / "templates/pearl-config.template"
+    dest_pearl_config = args.dest_dir / "pearl-config"
     if dest_pearl_config.exists():
-        raise PackageCreateError(f'The pearl-config directory already exists in {args.dest_dir}')
+        raise PackageCreateError(f"The pearl-config directory already exists in {args.dest_dir}")
     shutil.copytree(str(pearl_config_template), str(dest_pearl_config))
 
-    messenger.info(f'Updating {pearl_env.config_filename} to add package in local repository...')
-    with pearl_env.config_filename.open('a') as pearl_conf_file:
+    messenger.info(f"Updating {pearl_env.config_filename} to add package in local repository...")
+    with pearl_env.config_filename.open("a") as pearl_conf_file:
         pearl_conf_file.write(f'PEARL_PACKAGES["{args.name}"] = {{"url": "{args.dest_dir}"}}\n')
 
     messenger.info('Run "pearl search local" to see your new local package available')
