@@ -56,11 +56,9 @@ after_success:
       if [[ "$TRAVIS_BRANCH" != "master" ]]; then
         PYPI_PASSWORD="${PYPI_TEST_PASSWORD}" make publish-test
         pip3 install --index-url https://test.pypi.org/simple/ pearl==$(poetry version -s)
-        pearl --help
-      fi;
-      if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+      else;
         PYPI_PASSWORD="${PYPI_PROD_PASSWORD}" make publish;
         pip3 install pearl==$(poetry version -s)
-        pearl --help
       fi;
+      pearl --help
     fi;

@@ -87,3 +87,6 @@ yes | pearl remove
 # Remove the created package
 rm -rf "$HOME"/mydotfiles
 [[ ! -e ${PEARL_HOME} ]] || echo "$PEARL_HOME exists after remove it"
+
+
+python3 -m pip uninstall --yes pearl
