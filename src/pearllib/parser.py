@@ -1,7 +1,6 @@
 import argparse
+from importlib.metadata import version
 from pathlib import Path
-
-import pkg_resources
 
 
 def parse_args(sys_args: list):
@@ -61,8 +60,8 @@ def _create_main_parser():
         help="-v increases output verbosity. "
         "-vv shows bash xtrace during the hook function execution.",
     )
-    version = pkg_resources.require("pearl")[0].version
-    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {version}")
+
+    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {version('pearl')}")
     return parser
 
 

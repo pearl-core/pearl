@@ -1,11 +1,10 @@
+import importlib.resources as pkg_resources
 import shutil
 import subprocess
 from collections import OrderedDict
 from pathlib import Path
 from textwrap import dedent
 from typing import Any, Sequence
-
-import pkg_resources
 
 from pearllib.messenger import messenger
 
@@ -40,27 +39,28 @@ def run_pearl_bash(
 ):
     """Runs a bash script within the Pearl ecosystem."""
 
-    bash_header = _BASH_SCRIPT_HEADER_TEMPLATE.format(
-        pearlhome=pearl_env.home,
-        static=pkg_resources.resource_filename("pearllib", "static/"),
-    )
-    script_template = (
-        "{bashheader}\nset -x\n{script}" if enable_xtrace else "{bashheader}\n{script}"
-    )
-    if enable_errexit:
-        script_template = f"set -e\n{script_template}"
+    with pkg_resources.path("pearllib", "static") as static:
+        bash_header = _BASH_SCRIPT_HEADER_TEMPLATE.format(
+            pearlhome=pearl_env.home,
+            static=str(static),
+        )
+        script_template = (
+            "{bashheader}\nset -x\n{script}" if enable_xtrace else "{bashheader}\n{script}"
+        )
+        if enable_errexit:
+            script_template = f"set -e\n{script_template}"
 
-    script = script_template.format(
-        bashheader=bash_header,
-        script=script,
-    )
-    return run_bash(
-        script,
-        capture_stdout=capture_stdout,
-        capture_stderr=capture_stderr,
-        check=check,
-        input=input,
-    )
+        script = script_template.format(
+            bashheader=bash_header,
+            script=script,
+        )
+        return run_bash(
+            script,
+            capture_stdout=capture_stdout,
+            capture_stderr=capture_stderr,
+            check=check,
+            input=input,
+        )
 
 
 def run_bash(

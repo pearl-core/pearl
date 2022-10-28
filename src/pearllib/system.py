@@ -1,9 +1,8 @@
+import importlib.resources as pkg_resources
 import os
 import shutil
 from argparse import Namespace
 from pathlib import Path
-
-import pkg_resources
 
 from pearllib.messenger import Color, messenger
 from pearllib.package import remove_packages, update_packages
@@ -24,19 +23,19 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     (pearl_env.home / "repos").mkdir(parents=True, exist_ok=True)
     (pearl_env.home / "var").mkdir(parents=True, exist_ok=True)
 
-    static = Path(pkg_resources.resource_filename("pearllib", "static/"))
+    with pkg_resources.path("pearllib", "static") as static:
 
-    if (pearl_env.home / "boot").exists():
-        (pearl_env.home / "boot").unlink()
-    (pearl_env.home / "boot").symlink_to(static / "boot")
+        if (pearl_env.home / "boot").exists():
+            (pearl_env.home / "boot").unlink()
+        (pearl_env.home / "boot").symlink_to(static / "boot")
 
-    if not pearl_env.config_filename.exists():
-        messenger.print(
-            f"{Color.CYAN}* {Color.NORMAL}Creating the Pearl configuration file {pearl_env.config_filename} from template $PEARL_HOME"
-        )
-        pearl_env.config_filename.parent.mkdir(parents=True, exist_ok=True)
-        pearl_conf_template = static / "templates/pearl.conf.template"
-        shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
+        if not pearl_env.config_filename.exists():
+            messenger.print(
+                f"{Color.CYAN}* {Color.NORMAL}Creating the Pearl configuration file {pearl_env.config_filename} from template $PEARL_HOME"
+            )
+            pearl_env.config_filename.parent.mkdir(parents=True, exist_ok=True)
+            pearl_conf_template = static / "templates/pearl.conf.template"
+            shutil.copyfile(str(pearl_conf_template), str(pearl_env.config_filename))
 
     apply(f"source {pearl_env.home}/boot/sh/pearl.sh", f"{os.environ['HOME']}/.bashrc")
     messenger.print(f"{Color.CYAN}* {Color.NORMAL}Activated Pearl for Bash")

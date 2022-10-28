@@ -1,11 +1,10 @@
+import importlib.resources as pkg_resources
 import re
 import shutil
 from argparse import Namespace
 from pathlib import Path
 from textwrap import dedent
 from typing import Sequence, Set
-
-import pkg_resources
 
 from pearllib.exceptions import (
     HookFunctionError,
@@ -364,12 +363,14 @@ def create_package(pearl_env: PearlEnvironment, args: Namespace):
     """
     Creates package from template.
     """
-    static = Path(pkg_resources.resource_filename("pearllib", "static/"))
-    pearl_config_template = static / "templates/pearl-config.template"
-    dest_pearl_config = args.dest_dir / "pearl-config"
-    if dest_pearl_config.exists():
-        raise PackageCreateError(f"The pearl-config directory already exists in {args.dest_dir}")
-    shutil.copytree(str(pearl_config_template), str(dest_pearl_config))
+    with pkg_resources.path("pearllib", "static") as static:
+        pearl_config_template = static / "templates/pearl-config.template"
+        dest_pearl_config = args.dest_dir / "pearl-config"
+        if dest_pearl_config.exists():
+            raise PackageCreateError(
+                f"The pearl-config directory already exists in {args.dest_dir}"
+            )
+        shutil.copytree(str(pearl_config_template), str(dest_pearl_config))
 
     messenger.info(f"Updating {pearl_env.config_filename} to add package in local repository...")
     with pearl_env.config_filename.open("a") as pearl_conf_file:
