@@ -28,7 +28,7 @@ osx_update_path
 )
 
 
-def package_version(package: str) -> str:  # type: ignore
+def package_version(package: str) -> str:
     if sys.version_info.major == 3 and sys.version_info.minor <= 7:
         from importlib_metadata import version  # type: ignore
     else:
