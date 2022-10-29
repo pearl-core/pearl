@@ -28,6 +28,14 @@ osx_update_path
 )
 
 
+def package_version(package: str) -> str:  # type: ignore
+    if sys.version_info.major == 3 and sys.version_info.minor <= 7:
+        from importlib_metadata import version  # type: ignore
+    else:
+        from importlib.metadata import version  # type: ignore
+    return version(package)
+
+
 def resources_path(package: str, resource: str):
     # https://bugs.python.org/issue44162
     if sys.version_info.major == 3 and sys.version_info.minor == 9:

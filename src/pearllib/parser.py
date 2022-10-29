@@ -1,6 +1,7 @@
 import argparse
-from importlib.metadata import version
 from pathlib import Path
+
+from pearllib.utils import package_version
 
 
 def parse_args(sys_args: list):
@@ -61,7 +62,9 @@ def _create_main_parser():
         "-vv shows bash xtrace during the hook function execution.",
     )
 
-    parser.add_argument("--version", "-V", action="version", version=f"%(prog)s {version('pearl')}")
+    parser.add_argument(
+        "--version", "-V", action="version", version=f"%(prog)s {package_version('pearl')}"
+    )
     return parser
 
 
