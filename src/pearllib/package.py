@@ -1,4 +1,3 @@
-import importlib.resources as pkg_resources
 import re
 import shutil
 from argparse import Namespace
@@ -15,7 +14,7 @@ from pearllib.exceptions import (
 )
 from pearllib.messenger import Color, messenger
 from pearllib.pearlenv import Package, PearlEnvironment
-from pearllib.utils import OrderedSet, check_and_copy, run_pearl_bash
+from pearllib.utils import OrderedSet, check_and_copy, resources_path, run_pearl_bash
 
 _DEFAULT_INPUT = 1000000 * "\n"
 
@@ -363,7 +362,7 @@ def create_package(pearl_env: PearlEnvironment, args: Namespace):
     """
     Creates package from template.
     """
-    with pkg_resources.path("pearllib", "static") as static:
+    with resources_path("pearllib", "static") as static:
         pearl_config_template = static / "templates/pearl-config.template"
         dest_pearl_config = args.dest_dir / "pearl-config"
         if dest_pearl_config.exists():

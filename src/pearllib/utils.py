@@ -1,6 +1,7 @@
 import importlib.resources as pkg_resources
 import shutil
 import subprocess
+import sys
 from collections import OrderedDict
 from pathlib import Path
 from textwrap import dedent
@@ -27,6 +28,14 @@ osx_update_path
 )
 
 
+def resources_path(package: str, resource: str):
+    # https://bugs.python.org/issue44162
+    if sys.version_info.major == 3 and sys.version_info.minor == 9:
+        return pkg_resources.files(package) / resource  # type: ignore
+    else:
+        return pkg_resources.path(package, resource)  # type: ignore
+
+
 def run_pearl_bash(
     script: str,
     pearl_env,
@@ -39,7 +48,7 @@ def run_pearl_bash(
 ):
     """Runs a bash script within the Pearl ecosystem."""
 
-    with pkg_resources.path("pearllib", "static") as static:
+    with resources_path("pearllib", "static") as static:
         bash_header = _BASH_SCRIPT_HEADER_TEMPLATE.format(
             pearlhome=pearl_env.home,
             static=str(static),

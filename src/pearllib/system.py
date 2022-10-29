@@ -1,13 +1,11 @@
-import importlib.resources as pkg_resources
 import os
 import shutil
 from argparse import Namespace
-from pathlib import Path
 
 from pearllib.messenger import Color, messenger
 from pearllib.package import remove_packages, update_packages
 from pearllib.pearlenv import PearlEnvironment
-from pearllib.utils import apply, ask, unapply
+from pearllib.utils import apply, ask, resources_path, unapply
 
 
 def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
@@ -23,7 +21,7 @@ def init_pearl(pearl_env: PearlEnvironment, _: Namespace):
     (pearl_env.home / "repos").mkdir(parents=True, exist_ok=True)
     (pearl_env.home / "var").mkdir(parents=True, exist_ok=True)
 
-    with pkg_resources.path("pearllib", "static") as static:
+    with resources_path("pearllib", "static") as static:
 
         if (pearl_env.home / "boot").exists():
             (pearl_env.home / "boot").unlink()
