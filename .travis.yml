@@ -12,9 +12,9 @@ addons:
     - bash
     - zsh
     - fish
-    - shellcheck
     - gnu-sed
     - grep
+    update: true
 
 jobs:
   include:
@@ -53,7 +53,9 @@ install:
   - make install
 
 script:
-  - make lint bandit test shellcheck build test-integration
+  - make lint bandit test build test-integration
+  # Travis does gets stuck when installing a shellcheck dependency
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make shellcheck; fi;
 
 
 after_success:
