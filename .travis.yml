@@ -12,21 +12,22 @@ addons:
     - bash
     - zsh
     - fish
-    - shellcheck
+    #- shellcheck
     - gnu-sed
     - grep
+    update: true
 
 jobs:
   include:
-    - name: "Run integ tests with Python 3.9 on Linux"
-      os: linux
-      python: "3.9"
-    - name: "Run integ tests with Python 3.8 on Linux"
-      os: linux
-      python: "3.8"
-    - name: "Run integ tests with Python 3.7 on Linux"
-      os: linux
-      python: "3.7"
+    #- name: "Run integ tests with Python 3.9 on Linux"
+      #os: linux
+      #python: "3.9"
+    #- name: "Run integ tests with Python 3.8 on Linux"
+      #os: linux
+      #python: "3.8"
+    #- name: "Run integ tests with Python 3.7 on Linux"
+      #os: linux
+      #python: "3.7"
     - name: "Run integ tests on MacOS"
       os: osx
       osx_image: xcode12
@@ -53,7 +54,8 @@ install:
   - make install
 
 script:
-  - make lint bandit test shellcheck build test-integration
+  - make lint bandit test build test-integration
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make shellcheck; fi;
 
 
 after_success:
