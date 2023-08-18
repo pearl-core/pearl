@@ -63,9 +63,11 @@ after_success:
     if [[ "$TRAVIS_PYTHON_VERSION" == "3.9" && "$TRAVIS_OS_NAME" == "linux" ]]; then
       if [[ "$TRAVIS_BRANCH" != "master" ]]; then
         PYPI_PASSWORD="${PYPI_TEST_PASSWORD}" make publish-test
+        sleep 300
         pip3 install --index-url https://test.pypi.org/simple/ pearl==$(poetry version -s)
       else
         PYPI_PASSWORD="${PYPI_PROD_PASSWORD}" make publish
+        sleep 300
         pip3 install pearl==$(poetry version -s)
       fi;
       pearl --help
