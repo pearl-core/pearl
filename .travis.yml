@@ -29,7 +29,7 @@ jobs:
       python: "3.7"
     - name: "Run integ tests on MacOS"
       os: osx
-      osx_image: xcode12
+      osx_image: xcode12.5
       # https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
       language: shell       # 'language: python' is an error on Travis CI macOS
 
