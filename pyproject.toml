@@ -7,7 +7,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pearl"
-version = "2.3.11"
+version = "2.3.12"
 description="Pearl is a lightweight package manager for automating reproducible environments between different systems (Linux and OSX). It can be used for dotfiles, plugins, programs and any form of code accessible via git."
 authors = ["Filippo Squillace <feel.sqoox@amazon.com>"]
 license = "GPL-3.0-only"
