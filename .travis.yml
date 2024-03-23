@@ -47,6 +47,8 @@ before_install:
   - curl -sSL https://install.python-poetry.org | /usr/bin/env python3 - || cat /home/travis/build/pearl-core/pearl/poetry-installer-error*.log
   - export PATH="$HOME/.local/bin:$PATH"
   - export PATH="$HOME/Library/Python/3.10/bin:$PATH"
+  # https://stackoverflow.com/a/77710122
+  - poetry self add urllib3==1.26.6
   - poetry --version
 
 install:
